@@ -1,0 +1,35 @@
+.course-details-section {
+  padding: 1rem; /* Padding around the section */
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 4px; /* Rounded corners */
+  background-color: #f9f9f9; /* Light background color */
+}
+
+.input-group {
+  margin-bottom: 1.5rem; /* Space between input groups */
+}
+
+.label {
+  display: block; /* Make label take up a full line */
+  font-weight: bold; /* Bold text for labels */
+  margin-bottom: 0.5rem; /* Space between label and input */
+}
+
+.course-detail-input {
+  width: 100%; /* Full width input */
+  padding: 0.5rem; /* Padding inside input */
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 4px; /* Slightly rounded corners */
+  font-size: 1rem; /* Font size */
+}
+
+.course-detail-input:focus {
+  border-color: #007bff; /* Change border color on focus */
+  outline: none; /* Remove default outline */
+}
+
+.error-message {
+  color: red; /* Red color for error messages */
+  font-size: 0.875rem; /* Slightly smaller font for errors */
+  margin-top: 0.25rem; /* Space above error message */
+}

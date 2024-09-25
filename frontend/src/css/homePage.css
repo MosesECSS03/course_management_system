@@ -1,0 +1,304 @@
+  /* Ensure the dashboard and content take up the full viewport height */
+  .dashboard {
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Header, content, and footer */
+    height: 100vh; /* Full viewport height */
+  }
+
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #fab9b9;
+    font-size: 1.2em; /* Adjust font size for readability */
+    z-index: 4;
+    position: sticky;
+    top:0;
+  }
+
+  .language-toggle {
+    margin-left: auto; /* Pushes the button to the extreme right */
+  }
+
+  .language-toggle button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .sidebar-toggle {
+    display: none; /* Hide toggle button by default */
+    font-size: 1.5em; /* Size of the toggle button */
+    cursor: pointer;
+  }
+
+  /* Sidebar styling */
+  .sidebar {
+    width: 60px; /* Collapsed width */
+    background-color: #e1acac;
+    padding: 10px;
+    height: 100%; /* Full height of the content area */
+    box-sizing: border-box; /* Ensure padding is included in the height */
+    position: fixed; /* Fix the sidebar in place */
+    overflow-y: auto; /* Allow vertical scrolling if needed */
+    transition: width 0.3s ease; /* Smooth transition for width change */
+    display: flex;
+    flex-direction: column;
+    z-index: 3;
+  }
+
+  .sidebar-visible .sidebar {
+    transform: translateX(0); /* Slide in the sidebar */
+  }
+
+  .sidebar:hover {
+    width: 270px; /* Expanded width */
+  }
+
+  .sidebar-item {
+    margin: 15px 0; /* Margin for items */
+    padding: 10px; /* Padding for items */
+    cursor: pointer; /* Pointer cursor on hover */
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflowed text */
+    position: relative; /* Position relative for submenu positioning */
+  }
+
+  .sidebar-item i {
+    margin-right: 20px; /* Space between icon and text */
+  }
+
+  .submenu {
+    display: none; /* Hidden by default */
+    position: absolute; /* Position submenu relative to the parent item */
+    left: 100%; /* Align submenu to the right edge of the parent item */
+    top: 0; /* Position submenu directly to the right of the parent item */
+    width: 200px; /* Adjust width as needed */
+    background-color: #e1acac; /* Match sidebar background color */
+    padding: 0; /* Reset padding if needed */
+    z-index: 100; /* Ensure it appears above other elements */
+  }
+
+  .sidebar-item:hover .submenu,
+  .submenu.visible {
+    display: block; /* Show submenu */
+  }
+
+  .submenu-item {
+    padding: 10px; /* Add padding to submenu items */
+    cursor: pointer; /* Pointer cursor on hover */
+  }
+
+  /* Main content layout */
+  .main-content {
+    display: grid;
+    grid-template-rows: auto 1fr; /* Top and bottom sections */
+    width: 100%; /* Full width when sidebar is hidden */
+    height: 100%;
+    overflow-x: hidden; /* Ensure scrollbars appear if content overflows */
+    box-sizing: border-box; /* Include padding in the width/height calculation */
+    padding: 20px; /* Add some padding for better readability */
+    transition: margin-left 0.3s ease; /* Smooth transition for margin change */
+    margin-left: 8.5rem;
+  }
+
+  /* Show main content with sidebar collapsed or expanded */
+  .content.sidebar-visible .main-content {
+    margin-left: 60px; /* Adjust this value if needed */
+  }
+
+  .search-section {
+    grid-row: 1; /* Top section */
+    margin-bottom: 2rem; /* Space between search and courses section (converted from 20px) */
+    z-index: 2;
+  }
+
+  .view-toggle-section {
+      position: absolute; /* Change back to absolute */
+      top: 12rem; /* Adjust as needed for placement below the header */
+      z-index: 1; /* Ensure it's above the courses section */
+  }
+
+  .courses-section {
+    grid-row: 2; /* Botom section */
+    z-index: 0;
+    margin-left: -8.5rem;
+    margin-top: 5rem;
+  }
+
+
+  .footer {
+    background-color: #fab9b9; /* Match header background color */
+    text-align: left;
+    box-sizing: border-box;
+    font-size: 0.7em; /* Adjust as needed */
+    height: 45px; /* Set the same height as header */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center content vertically */
+    padding: 0 10px; /* Add horizontal padding */
+    z-index: 3;
+  }
+
+  /* Responsive Styles */
+  @media (max-width: 1024px) {
+    .sidebar-toggle {
+      display: block; /* Show toggle button for screens 1024px and below */
+      background-color: transparent;
+      border: none;
+    }
+
+
+    /* Sidebar styling */
+  .sidebar {
+    background-color: #e1acac;
+    padding: 10px;
+    height: 100%; /* Full height of the content area */
+    box-sizing: border-box; /* Ensure padding is included in the height */
+    position: fixed; /* Fix the sidebar in place */
+    overflow-y: auto; /* Allow vertical scrolling if needed */
+    transition: width 0.3s ease; /* Smooth transition for width change */
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    transform: translateX(-100%); /* Hide the sidebar off-screen */
+    width: auto;
+  }
+
+  .main-content {
+    margin-left: 1.5rem
+  }
+  }
+
+
+  @media (max-width: 768px) 
+  {
+    .dashboard {
+      grid-template-rows: auto 1fr auto; /* Stack header, content, and footer vertically */
+      grid-template-columns: 1fr; /* Full width for content area */
+      position: relative; /* Ensure the header's absolute positioning works */
+    }
+
+    .header {
+      font-size: 1em; /* Adjust font size as needed */
+      position: relative; /* Ensure positioning works */
+      padding: 10px; /* Adjust padding as needed */
+      display: flex; /* Use Flexbox for layout */
+      justify-content: space-between; /* Space out the sidebar and language toggles */
+      align-items: center; /* Center items vertically */
+      width: 100%; /* Ensure header takes full width */
+      box-sizing: border-box; /* Include padding in width calculation */
+      height: 60px; /* Set a fixed height if needed to ensure alignment */
+    }
+
+    .sidebar-toggle {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      position: absolute;
+      left: 10px;
+    }
+    
+    .language-toggle
+    {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      position: absolute;
+      /* Optionally, add margin or padding if needed */
+      right: 10px;
+    }
+
+    .sidebar {
+      position: absolute; /* Remove fixed positioning */
+      overflow: visible; /* Show content overflow */
+      transform: none; /* Reset transform */
+      display: none; /* Initially hidden */
+    }
+
+    .sidebar-visible .sidebar {
+      display: block; /* Show sidebar when visible */
+      transform: translateX(0); /* Slide in the sidebar if needed */
+      width: 100%; /* Full width on smaller screens */
+      height: auto; /* Adjust height to fit content */
+    }
+
+    
+    .footer {
+      font-size: 0.6em; /* Adjust font size for smaller screens */
+      height: auto; /* Adjust height to fit content */
+      padding: 5px 10px; /* Adjust padding */
+      bottom: 0;
+      z-index: 3;
+    }
+  }
+
+
+  /*@media (max-width: 480px) {
+    .dashboard {
+      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 1fr;
+      position: relative;
+    }
+
+    .header {
+      font-size: 1em;
+      position: relative;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+      height: 60px;
+    }
+
+    .sidebar-toggle {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      position: absolute;
+      left: 10px;
+    }
+
+    .language-toggle {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      position: absolute;
+      right: 10px;
+    }
+
+    .sidebar {
+      position: absolute;
+      overflow: visible;
+      transform: none;
+      display: none;
+    }
+
+    .sidebar-visible .sidebar {
+      display: block;
+      transform: translateX(0);
+      width: 100%;
+      height: auto;
+    }
+
+    .footer {
+      font-size: 0.6em;
+      height: auto;
+      padding: 5px 10px;
+      bottom: 0;
+    }
+  }*/
+
+
+
+
+
+
+
+

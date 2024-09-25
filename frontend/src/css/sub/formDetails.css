@@ -1,0 +1,26 @@
+.form-details-section {
+    margin: 20px; /* Overall margin for the section */
+  }
+  
+  .introduction {
+    margin-bottom: 20px; /* Space between the text and the image */
+    padding: 20px; /* Add some padding inside the box */
+    background-color: #fff; /* Background color for visibility */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Box shadow for the text container */
+  }
+  
+  .image-container {
+    text-align: center; /* Center the image */
+    margin-top: 30px; /* Add space above the image */
+    padding: 20px; /* Add some padding inside the box */
+    background-color: #fff; /* Background color for visibility */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Box shadow for the image container */
+  }
+  
+  .registration-image {
+    max-width: 100%; /* Make it responsive */
+    height: auto; /* Maintain aspect ratio */
+  }
+  
