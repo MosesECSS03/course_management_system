@@ -124,7 +124,7 @@
       z-index: 1; /* Ensure it's above the courses section */
   }
 
-  .courses-section {
+  .courses-section, .registration-payment-section {
     grid-row: 2; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;

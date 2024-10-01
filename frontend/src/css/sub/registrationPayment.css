@@ -1,0 +1,43 @@
+/* Container styling for table */
+.registration-payment-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem; /* Padding using rem units */
+    z-index: 0;
+  }
+  
+/* Center the heading container */
+.registration-payment-heading {
+  text-align: center;
+  width: 100%;
+  height: auto;
+}
+
+.input-container {
+  position: relative; /* Ensure the input container is positioned */
+}
+
+.input-container input[type=text]
+{
+  border: 0;
+  font: inherit;
+}
+
+.suggestions-list {
+  list-style-type: none; /* Remove bullets */
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff; /* Background color for dropdown */
+  position: absolute; /* Position dropdown absolutely */
+  top: 100%; /* Position it directly below the input */
+  left: 0; /* Align with the left of the input */
+  right: 0; /* Align with the right of the input */
+  z-index: 10; /* Ensure it's above other content */
+  border: none;
+}
+
+.suggestions-list li {
+  padding: 8px; /* Add padding */
+  cursor: pointer; /* Pointer cursor on hover */
+}

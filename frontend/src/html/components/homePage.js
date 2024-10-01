@@ -1,6 +1,7 @@
   import React, { Component } from 'react';
   import '../../css/homePage.css'; // Ensure your CSS paths are correct
   import CoursesSection from './sub/courseSection';
+  import RegistrationPaymentSection from './sub/registrationPaymentSection';
   import Popup from './popup/popupMessage';
   import Search from './sub/searchSection';
   import ViewToggle from './sub/viewToggleSection';
@@ -19,49 +20,109 @@
         sidebarVisible: false,
         locations: [],
         languages: [],
-        selectedLanguage: '',
-        selectedLocation: '',
-        searchQuery: '',
+        types: [],
+        selectedCourseLanguage: '',
+        selectedCourseLocation: '',
+        selectedCourseType: '',
+        courseSearchQuery: '',
+        selectedRegPaymentLanguage: '',
+        selectedRegPaymentLocation: '',
+        regPaymentSearchQuery: '',
         resetSearch: false,
         currentPage: 1,
         entriesPerPage: 10,
         totalPages: 1,
         nofCourses: 0,
-        viewMode: 'full' // Initialize viewMode
+        noofDetails: 0,
+        viewMode: 'full',
+        isRegistrationPaymentVisible: false,
+        section: ''
       };
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
       this.searchResultFromChild = this.searchResultFromChild.bind(this);
       this.handleSelectFromChild = this.handleSelectFromChild.bind(this);
+      this.handleRegPaymentSelectFromChild = this.handleRegPaymentSelectFromChild.bind(this);
+      this.handleRegPaymentSearchFromChild = this.handleRegPaymentSearchFromChild.bind(this);
       this.handlePageChange = this.handlePageChange.bind(this);
-      this.toggleViewMode = this.toggleViewMode.bind(this); // Ensure this is bound
+      this.toggleViewMode = this.toggleViewMode.bind(this); 
+      this.toggleRegistrationPaymentComponent = this.toggleRegistrationPaymentComponent.bind(this);
+      //this.getTotalNumberofDetails = this.getTotalNumberofDetails.bind(this);
     }
 
     // Function to handle data passed from the child
-    handleDataFromChild = async (locations, languages) => {
-      const filterLanguages = new Set(languages);
-      const filterLocations = new Set(locations);
-
-      console.log(filterLanguages, filterLocations);
+    handleDataFromChild = async (filter1, filter2) =>
+    {
+      var {section} = this.state;
+      if(section === "courses")
+      {
+      const filterLanguages = new Set(filter1);
+      const filterLocations = new Set(filter2);
 
       this.setState({
-        locations: Array.from(filterLocations),
-        languages: Array.from(filterLanguages)
+        locations: Array.from(filterLanguages),
+        languages: Array.from(filterLocations)
       });
+     }
+     else if(section === "registration")
+     {
+      const filterLocations = new Set(filter1);
+      const filterType = new Set(filter2);
+      this.setState({
+        locations: Array.from(filterLocations),
+        types: Array.from(filterType)
+      });
+     }
     }
 
-    handleSelectFromChild = async (updateState) => {
-      console.log("Selected Data:", updateState);
-      if (updateState.showLanguageDropdown === true) {
-        this.setState({
-          selectedLanguage: updateState.language
-        });
-      } else {
+    handleSelectFromChild = async (updateState, dropdown) => {
+      console.log("Selected Data:", updateState, dropdown);
+      var {section} = this.state;
+      if(section === "courses")
+      {
+        if (dropdown === "showLanguageDropdown") {
+          this.setState({
+            selectedLanguage: updateState.language
+          });
+        }
+        else if (dropdown === "showLocationDropdown") {
+          this.setState({
+            selectedLocation: updateState.centreLocation
+          });
+        }
+        else if(dropdown === "showTypeDropdown")
+        {
+          this.setState({
+            selectedLocation: updateState.centreLocation
+          });
+        }
+      }
+    }
+
+    // Handle selection for registration payments
+    handleRegPaymentSelectFromChild = async (updateState, dropdown) => {
+      console.log("Selected Data (Registration Payment):", updateState, dropdown);
+      if(updateState.centreLocation)
+      {
         this.setState({
           selectedLocation: updateState.centreLocation
         });
       }
+      else if(updateState.courseType)
+      {
+        this.setState({
+          selectedCourseType: updateState.courseType
+        });
+      }
     }
+
+    // Handle selection for registration payments
+    handleRegPaymentSearchFromChild = async (data) => {
+      this.setState({
+        searchQuery: data
+      });
+    }
+
 
     searchResultFromChild = async (value) => {
       //console.log("Search Result:", value);
@@ -69,6 +130,15 @@
         searchQuery: value
       });
     }
+
+      // Search results for registration payments
+      searchRegPaymentResultFromChild = async (value) => {
+        console.log("Registration Payment Search Result:", value);
+        this.setState({
+          regPaymentSearchQuery: value
+        });
+      }
+
 
     toggleSubMenu = (index) => {
       this.setState((prevState) => ({
@@ -97,7 +167,7 @@
 
     toggleCourseComponent = async (courseType) => {
       try {
-        this.setState({ resetSearch: true }, () => {
+        this.setState({ resetSearch: true, }, () => {
           this.setState({ resetSearch: false });
         });
 
@@ -107,6 +177,8 @@
           popupType: "loading",
           courseType: courseType,
           sidebarVisible: false,
+          isRegistrationPaymentVisible: false ,
+          section: "courses"
         });
       } catch (error) {
         console.log(error);
@@ -114,9 +186,18 @@
     };
 
     toggleViewMode(mode) {
+      var {section} = this.state;
       this.setState({ viewMode: mode });
-      if (mode === 'full') {
+      if (mode === 'full') 
+      {
+        if(section === "courses")
+        {
           this.handleEntriesPerPageChange(this.state.nofCourses); // Reset table data when switching to full view
+        }
+        else if(section === "registration")
+        {
+          this.handleEntriesPerPageChange(this.state.noofDetails);
+        }
       }
     }
 
@@ -129,6 +210,7 @@
     };
 
     handlePageChange(page) {
+      console.log("Total No Of Pages:", this.state.totalPages);
       if (page >= 1 && page <= this.state.totalPages) {
         this.setState({ currentPage: page });
       }
@@ -146,23 +228,60 @@
       this.setState({ nofCourses: total });
     };
 
-    handleEntriesPerPageChange = (value) => 
+    getTotalNumberofDetails = async (total) =>
     {
-      const { nofCourses } = this.state;
-      console.log("Entries Per Page:", value);
-      console.log("Number of Courses:", nofCourses);
-      this.setState(
-        { entriesPerPage: value, currentPage: 1 }, // Reset to the first page
-        () => {
-          const totalPages = Math.ceil(nofCourses / value);
-          console.log("Total Pages:", totalPages);
-          this.setState({ totalPages });
-        }
-      );
+        console.log("Registration:", total);
+        this.setState({ noofDetails: total });
     };
 
+    handleEntriesPerPageChange = (value) => 
+    {
+      const { nofCourses, section, noofDetails } = this.state;
+      console.log("Entries Per Page:", value);
+      console.log("Number of Courses:", nofCourses);
+      if(section === "courses")
+      {
+        this.setState(
+          { entriesPerPage: value, currentPage: 1 }, // Reset to the first page
+          () => {
+            const totalPages = Math.ceil(nofCourses / value);
+            console.log("Total Pages:", totalPages);
+            this.setState({ totalPages });
+          }
+        )
+      }
+      else if(section === "registration")
+      {
+        this.setState(
+          { entriesPerPage: value, currentPage: 1 }, // Reset to the first page
+          () => {
+            const totalPages = Math.ceil(noofDetails / value);
+            console.log("Total Pages:", totalPages);
+            this.setState({ totalPages });
+          }
+        )
+      }
+    };
+
+    toggleRegistrationPaymentComponent() {
+      this.setState({ resetSearch: true, }, () => {
+        this.setState({ resetSearch: false });
+      });
+
+      this.setState((prevState) => ({
+          courseType: "",
+          isRegistrationPaymentVisible: !prevState.isRegistrationPaymentVisible, // Toggle visibility
+          isPopupOpen: true,
+          popupMessage: "Loading In Progress",
+          popupType: "loading",
+          sidebarVisible: false,
+          section: "registration"
+
+      }));
+  }
+
     render() {
-      const { submenuVisible, language, courseType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, selectedLanguage, selectedLocation, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses} = this.state;
+      const { submenuVisible, language, courseType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section} = this.state;
       return (
         <>
           <div className="dashboard">
@@ -195,7 +314,7 @@
                     {language === 'zh' ? 'ILP 课程' : 'ILP Courses'}
                   </div>
                 </div>
-                <div className="sidebar-item">
+                <div className="sidebar-item" onClick={() => this.toggleRegistrationPaymentComponent()}>
                   <i className="fa-brands fa-wpforms"></i> {language === 'zh' ? '注册和付款' : 'Registrations and Payments'}
                 </div>
                 <div className="sidebar-item">
@@ -214,6 +333,7 @@
                         passSelectedValueToParent={this.handleSelectFromChild}
                         passSearchedValueToParent={this.searchResultFromChild}
                         resetSearch={resetSearch}
+                        section={section}
                       />
                     </div>
                     <div className="view-toggle-section">
@@ -238,6 +358,7 @@
                         currentPage={currentPage} // Pass current page
                         entriesPerPage={this.state.entriesPerPage} // Pass entries per page
                         resetSearch={resetSearch} 
+                        section={section}
                       />
                     </div>
                     <div className="pagination-section">
@@ -250,6 +371,50 @@
                     </div>
                   </>
                 )}
+                {isRegistrationPaymentVisible && 
+                  <>
+                  <div className="search-section">
+                      <Search
+                        locations={locations}
+                        types={types}
+                        resetSearch={resetSearch}
+                        section={section}
+                        passSelectedValueToParent={this.handleRegPaymentSelectFromChild}
+                        passSearchedValueToParent={this.handleRegPaymentSearchFromChild}
+                      />
+                    </div>
+                    <div className="view-toggle-section">
+                      <ViewToggle
+                        language={language}
+                        viewMode={viewMode}
+                        onToggleView={this.toggleViewMode}
+                        onEntriesPerPageChange={this.handleEntriesPerPageChange}  
+                        getTotalNumberOfCourse= {noofDetails}
+                      />
+                    </div>
+                    <div className="registration-payment-section">
+                    <RegistrationPaymentSection 
+                        closePopup={this.closePopup}
+                        section={section}
+                        passDataToParent={this.handleDataFromChild}
+                        selectedLocation={selectedLocation}
+                        selectedCourseType={selectedCourseType}
+                        searchQuery={searchQuery}
+                        resetSearch={resetSearch}
+                        getTotalNumberofDetails={this.getTotalNumberofDetails}
+                        currentPage={currentPage} // Pass current page
+                        entriesPerPage={this.state.entriesPerPage} // Pass entries per page
+                    />
+                    </div>
+                    <div className="pagination-section">
+                      <Pagination
+                        viewMode = {viewMode}
+                        currentPage={currentPage} 
+                        totalPages={totalPages} 
+                        onPageChange={this.handlePageChange}
+                      />
+                    </div>
+                  </>} {/* Conditionally render the section */}
               </div>
             </div>
             <div className="footer">

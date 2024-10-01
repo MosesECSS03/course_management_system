@@ -5,17 +5,46 @@ class CourseDetailsSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedPayment: ''
+      selectedPayment: '',
+      paymentTouched: false,
     };
   }
 
-  handlePaymentChange = (event) => {
-    this.setState({ selectedPayment: event.target.value });
+  /*handlePaymentChange = (event) => {
+    this.setState({ 
+      selectedPayment: event.target.value,
+      paymentTouched: true, // Update when user interacts with the payment option
+    });
+  };*/
+
+   // Handle payment selection and call onChange prop
+   handlePaymentChange = (event) => {
+    const selectedPayment = event.target.value;
+    this.setState({ 
+      selectedPayment,
+      paymentTouched: true,
+    });
+
+    // Pass the selected payment option back to the parent
+    this.props.onChange({
+      ...this.props.formData,
+      payment: selectedPayment,
+    });
   };
 
-  render() {
+
+  render() 
+  {
+    const { selectedPayment, paymentTouched } = this.state;
+    
     return (
       <div className="course-details-section">
+        <div className="input-group">
+          <label htmlFor="courseType">Course Type</label>
+          <span className="course-detail-text" id="courseType">
+            {this.props.courseType}
+          </span>
+        </div>
         <div className="input-group">
           <label htmlFor="courseName">Course Name</label>
           <span className="course-detail-text" id="courseName">
@@ -39,11 +68,12 @@ class CourseDetailsSection extends Component {
           </span>
         </div>
         <div className="input-group">
-          <label htmlFor="courseType">Course Type</label>
-          <span className="course-detail-text" id="courseType">
-            {this.props.courseType}
+          <label htmlFor="courseDuration">Course Duration</label>
+          <span className="course-detail-text" id="courseDuration">
+            {this.props.courseDuration}
           </span>
         </div>
+
         
         {/* Payment Options Section */}
         <div className="input-group">
@@ -77,6 +107,9 @@ class CourseDetailsSection extends Component {
               PayNow
             </label>
           </div>
+          {!selectedPayment && paymentTouched && (
+            <span className="error-message">Please select a payment option.</span>
+          )}
         </div>
       </div>
     );

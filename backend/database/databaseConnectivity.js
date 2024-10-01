@@ -1,94 +1,109 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
 // MongoDB connection string
-const uri = "mongodb+srv://moseslee:Mlxy6695@ecss-course.hejib.mongodb.net/?retryWrites=true&w=majority&appName=ECSS-Course";
+const uri = 'mongodb+srv://moseslee:Mlxy6695@ecss-course.hejib.mongodb.net/?retryWrites=true&w=majority&appName=ECSS-Course'; // Use env variable
 
-const client = new MongoClient(uri);
+class DatabaseConnectivity {
+    constructor() {
+        this.client = new MongoClient(uri);
+        this.isConnected = false;
+    }
 
-let isConnected = false; // Track connection state
-
-async function connectToDatabase() {
-    try {
-        console.log("isConnected:", isConnected);
-        if (!isConnected) {
-            await client.connect();
-            isConnected = true; // Mark as connected
-            console.log("Connected to MongoDB Atlas!");
+    // Connect to the database
+    async initialize()
+    {
+        try 
+        {
+            if (!this.isConnected) 
+            {
+                await this.client.connect();
+                this.isConnected = true;
+                return "Connected to MongoDB Atlas!";
+            }   
+        } catch (error) {
+            console.error("Error connecting to MongoDB Atlas:", error);
+            throw error;
         }
-    } catch (error) {
-        console.error("Error connecting to MongoDB Atlas:", error);
     }
-}
 
-async function listCollections(databaseName) {
-    try {
-        const database = client.db(databaseName);
-        const collections = await database.listCollections().toArray();
-        console.log("Collections in the database:");
-        collections.forEach(collection => {
-            console.log(`- ${collection.name}`);
-        });
-    } catch (error) {
-        console.error("Error listing collections:", error);
-    }
-}
-
-async function createCollection(databaseName, collectionName) {
-    try {
-        const database = client.db(databaseName);
-        const collections = await database.listCollections().toArray();
-        const collectionExists = collections.some(collection => collection.name === collectionName);
-        
-        if (!collectionExists) {
-            await database.createCollection(collectionName);
-            console.log(`Collection '${collectionName}' created.`);
-        } else {
-            console.log(`Collection '${collectionName}' already exists.`);
+    async insertToDatabase(dbname, data)
+    {
+        console.log("Database:", dbname);
+        console.log("Data:", data);
+        var db = this.client.db(dbname); // return the db object
+        try
+        {
+            if(db)
+            {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+                var result = await table.insertOne(data);
+                return result.acknowledged;
+            }
         }
-    } catch (error) {
-        console.error("Error creating collection:", error);
+        catch(error)
+        {
+            console.log(error);
+        }
     }
-}
-
-async function fetchDocuments(databaseName, collectionName) {
-    try {
-        const database = client.db(databaseName);
-        const collection = database.collection(collectionName);
-        const documents = await collection.find({}).toArray(); // Fetch all documents
         
-        console.log(`Documents in the collection '${collectionName}':`);
-        documents.forEach(doc => {
-            console.log(doc);
-        });
-    } catch (error) {
-        console.error("Error fetching documents:", error);
+    async retrieveFromDatabase(dbname)
+    {
+        var db = this.client.db(dbname); // return the db object
+        try
+        {
+            if(db)
+            {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+                var result = await table.find().toArray();
+                return result;
+            }
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
+    }
+
+            
+    async updateInDatabase(dbname, id, newStatus) {
+        var db = this.client.db(dbname); // return the db object
+        try {
+            if (db) {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+    
+                // Use updateOne to update a single document
+                const filter = { _id: new ObjectId(id) };
+
+                // Add the new key "confirmation" to the update data
+                const update = {
+                    $set: {
+                        status: newStatus // Add new key "confirmation"
+                    }
+                };
+    
+               // Call updateOne
+                const result = await table.updateOne(filter, update);
+    
+                return result;
+            }
+        } catch (error) {
+            console.log("Error updating database:", error);
+        }
+    }
+    
+
+    // Close the connection to the database
+    async close() {
+        if (this.isConnected) {
+            await this.client.close();
+            this.isConnected = false;
+            console.log("MongoDB connection closed.");
+        }
     }
 }
 
-async function closeConnection() {
-    if (isConnected) {
-        await client.close();
-        console.log("MongoDB connection closed.");
-    }
-}
-
-// Main function to execute the tasks
-async function main() {
-    await connectToDatabase();
-
-    // Specify your database name
-    const databaseName = 'Courses-Management-System'; // Replace with your actual database name
-    await listCollections(databaseName);
-    
-    // Create the collection 'Registration Forms'
-    const collectionName = 'Registration Forms'; 
-    await createCollection(databaseName, collectionName);
-    
-    // Fetch and display documents in the newly created collection
-    //await fetchDocuments(databaseName, collectionName);
-    
-    await closeConnection();
-}
-
-// Call the main function to execute
-main();
+// Export the instance for use in other modules
+module.exports = DatabaseConnectivity;

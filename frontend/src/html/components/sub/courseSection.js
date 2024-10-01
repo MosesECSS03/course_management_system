@@ -12,8 +12,6 @@
         hideAllCells: false,
         dataFetched: false,
         clearTable: false,
-        locations: [], // State to hold all locations
-        languages: [],  
         currentPage: 1, // Add this
         entriesPerPage: 10 // Add this
       };
@@ -91,51 +89,55 @@
 
     filterCourses() 
     {
-      const { courses } = this.state;
-      const { selectedLanguage, selectedLocation, searchQuery } = this.props;
-    
-      // Reset filtered courses to all courses if the search query is empty
-      if (!searchQuery && selectedLanguage === "All Languages" && selectedLocation === "All Locations") {
-        this.setState({ filteredCourses: courses });
-        return;
-      }
-    
-      const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
-      console.log("Search Query:", normalizedSearchQuery);
-    
-      const filteredCourses = courses.filter(course => {
-        const nameDetails = this.courseNameAndDetails(course.name);
-        const courseDetails = this.getSelectedDetails(course.short_description);
-    
-        // Normalize fields
-        const courseName = course.name.toLowerCase().trim();
-        const courseDescription = course.short_description.toLowerCase().trim();
-        const location = nameDetails.location.toLowerCase().trim();
-        const language = courseDetails.language.toLowerCase().trim();
-        const startDate = courseDetails.startDate.toLowerCase().trim();
-        const endDate = courseDetails.endDate.toLowerCase().trim();
-        const startTime = courseDetails.startTime.toLowerCase().trim();
-        const endTime = courseDetails.endTime.toLowerCase().trim();
-    
-        // Match 'All Languages' and 'All Locations'
-        const matchesLanguage = selectedLanguage === "All Languages" || selectedLanguage === "所有语言" || selectedLanguage === "" ? true : language === selectedLanguage.toLowerCase().trim();
-        const matchesLocation = selectedLocation === "All Locations" || selectedLocation === "所有地点" || selectedLocation === "" ? true : location === selectedLocation.toLowerCase().trim();
-    
-        // Match search query against multiple fields
-        const matchesSearchQuery = normalizedSearchQuery
-          ? (courseName.includes(normalizedSearchQuery) ||
-            courseDescription.includes(normalizedSearchQuery) ||
-            language.includes(normalizedSearchQuery) ||
-            startDate.includes(normalizedSearchQuery) ||
-            endDate.includes(normalizedSearchQuery) ||
-            startTime.includes(normalizedSearchQuery) ||
-            endTime.includes(normalizedSearchQuery))
-          : true;
-    
-        return matchesLanguage && matchesLocation && matchesSearchQuery;
-      });
-    
-      this.setState({ filteredCourses });
+      var {section} = this.props;
+      if(section === "courses")
+      {
+        const { courses } = this.state;
+        const { selectedLanguage, selectedLocation, searchQuery } = this.props;
+        console.log("Props:", this.props);
+       
+          // Reset filtered courses to all courses if the search query is empty
+          if (!searchQuery && selectedLanguage === "All Languages" && selectedLocation === "All Locations") {
+            this.setState({ filteredCourses: courses });
+            return;
+          }
+        
+          const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
+
+        
+          const filteredCourses = courses.filter(course => {
+            const nameDetails = this.courseNameAndDetails(course.name);
+            const courseDetails = this.getSelectedDetails(course.short_description);
+        
+            // Normalize fields
+            const courseName = course.name.toLowerCase().trim();
+            const courseDescription = course.short_description.toLowerCase().trim();
+            const location = nameDetails.location.toLowerCase().trim();
+            const language = courseDetails.language.toLowerCase().trim();
+            const startDate = courseDetails.startDate.toLowerCase().trim();
+            const endDate = courseDetails.endDate.toLowerCase().trim();
+            const startTime = courseDetails.startTime.toLowerCase().trim();
+            const endTime = courseDetails.endTime.toLowerCase().trim();
+        
+            // Match 'All Languages' and 'All Locations'
+            const matchesLanguage = selectedLanguage === "All Languages" || selectedLanguage === "所有语言" || selectedLanguage === "" || !selectedLanguage ? true : language === selectedLanguage.toLowerCase().trim();
+            var matchesLocation = selectedLocation === "All Locations" || selectedLocation === "所有地点" || selectedLocation === "" || !selectedLocation ? true : location === selectedLocation.toLowerCase().trim();
+        
+            // Match search query against multiple fields
+          const matchesSearchQuery = normalizedSearchQuery
+              ? (courseName.includes(normalizedSearchQuery) ||
+                courseDescription.includes(normalizedSearchQuery) ||
+                language.includes(normalizedSearchQuery) ||
+                startDate.includes(normalizedSearchQuery) ||
+                endDate.includes(normalizedSearchQuery) ||
+                startTime.includes(normalizedSearchQuery) ||
+                endTime.includes(normalizedSearchQuery))
+              : true;
+            return matchesLanguage && matchesLocation && matchesSearchQuery;
+          });
+        
+          this.setState({ filteredCourses });
+        }
     }
     
     
@@ -267,16 +269,16 @@
       startDateTime.setHours(startHours);
       startDateTime.setMinutes(startMinutes);
       startDateTime.setSeconds(0);
-      console.log("Start Date Time:", startDateTime);
+      //console.log("Start Date Time:", startDateTime);
       
       const endDateTime = new Date(year1, month1, day1);
       const { hours: endHours, minutes: endMinutes } = this.convertTo24HourWithHrs(endTime); // Fix here
       endDateTime.setHours(endHours);
       endDateTime.setMinutes(endMinutes);
       endDateTime.setSeconds(0);
-      console.log("End Date Time:", endDateTime);
+      //console.log("End Date Time:", endDateTime);
       
-      console.log("Today Date:", startDateTime < new Date());
+      //console.log("Today Date:", startDateTime < new Date());
 
       if (startDateTime > new Date()) 
       {
@@ -346,14 +348,6 @@
       var periodChinese = period === 'AM' ? '上午' : '下午';
       
       return `${periodChinese}${formattedTime}`;
-    }
-
-    getPaginatedCourses() {
-      const { filteredCourses } = this.state;
-      const { currentPage, entriesPerPage } = this.props; // Use the props directly if needed
-      const indexOfLastCourse = currentPage * entriesPerPage;
-      const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
-      return filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
     }
 
     formatStatusToChinese(status)

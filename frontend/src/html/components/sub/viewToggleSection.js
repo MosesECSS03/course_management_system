@@ -50,7 +50,7 @@ class ViewToggleSection extends Component {
     };
 
     calculateQuarterSegments(total) {
-        console.log("Total Number Of Course:", total);
+        console.log("Total Number:", total);
         if (total == null) return []; // Return an empty array if total is undefined or null
     
         const segments = [
@@ -65,8 +65,13 @@ class ViewToggleSection extends Component {
             return (segment % 1 >= 0.4) ? Math.ceil(segment) : Math.floor(segment);
         }).map(segment => segment.toString()); // Convert to strings
     
-       return dropdownList;
+        // Convert the dropdown list to a Set to ensure unique values
+        const uniqueDropdownList = new Set(dropdownList);
+    
+        // Return as an array
+        return Array.from(uniqueDropdownList);
     }
+    
     
     render() {
         const { viewMode } = this.props;

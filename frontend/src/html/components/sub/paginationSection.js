@@ -12,6 +12,7 @@ class PaginationSection extends Component {
 
   renderPageNumbers() {
     const { currentPage, totalPages } = this.props;
+    console.log("Render page Number:", this.props)
     const pageNumbers = [];
     const range = 5; // Number of page numbers to show on each side of the current page
 

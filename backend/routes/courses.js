@@ -3,7 +3,11 @@ var router = express.Router();
 var CoursesController = require("../Controller/Courses/CoursesController");
 
 router.post("/", async function(req, res) {
+    console.log("Request Data:", req.body);
     var courseType = req.body.courseType;
+    var type = req.body.type;
+    var status = req.body.status;
+    var page = req.body.page;
     console.log("Course Type:", courseType);
   
     var controller = new CoursesController();
@@ -19,8 +23,15 @@ router.post("/", async function(req, res) {
             }
             else if(courseType === "ILP") 
             {
-                const products = await controller.getILPProducts();
-                return res.json(products); // Send the products as a response
+              const products = await controller.getILPProducts();
+              return res.json(products); // Send the products as a response
+            }
+            else if(type === "update")
+            {
+              const productId = await controller.getProductID(page);
+              console.log("Product ID:", productId);
+              const updateProductStock = await controller.updateProductStock(productId, status);
+              console.log("Update Product Stock:", updateProductStock);
             }
             else
             {

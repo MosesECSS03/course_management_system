@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import '../../css/formPage.css';
-import FormDetails from './sub/formDetailsSection'; // Import the FormDetails component
-import PersonalInfo from './sub/personalInfoSection'; // Import PersonalInfo component
+import FormDetails from './sub/formDetails'; // Import the FormDetails component
+import PersonalInfo from './sub/personalInfo'; // Import PersonalInfo component
 import CourseDetails from './sub/courseDetails'; // Import CourseDetails component
 import AgreementDetailsSection from './sub/agreementDetails';
 import SubmitDetailsSection from './sub/submitDetails';
+import axios from 'axios';
 
 class FormPage extends Component {
   constructor(props) {
@@ -26,21 +27,24 @@ class FormPage extends Component {
         eDUCATION: '',
         wORKING: '',
         courseName: '',
-        courseDate: ''
+        courseDate: '',
+        agreement: ''  // Corrected key from 'argeement' to 'agreement'
       },
       validationErrors: {}
     };
   }
 
   componentDidMount() {
+    window.scrollTo(0, 0);
     const queryParams = new URLSearchParams(window.location.search);
     const englishName = queryParams.get('engName')?.trim() || '';
     const chineseName = queryParams.get('chiName')?.split(":")[1].trim() || '';
     const location = queryParams.get('location')?.trim() || '';
     const price = queryParams.get('price')?.trim() || '';
     const type = queryParams.get('type')?.trim() || '';
+    const duration = queryParams.get('courseDuration')?.trim() || '';
 
-    console.log(englishName, chineseName, "Location:", location, price);
+    console.log(englishName, chineseName, "Location:", location, price, duration);
 
     this.setState((prevState) => ({
       formData: {
@@ -49,32 +53,136 @@ class FormPage extends Component {
         chineseName,
         location, 
         price, 
-        type
+        type,
+        duration
       }
     }));
   }
 
   handleDataChange = (newData) => {
-    this.setState((prevState) => ({
-      formData: {
+    this.setState((prevState) => {
+      const updatedFormData = {
         ...prevState.formData,
         ...newData,
-      },
-      validationErrors: {}, // Clear errors when data changes
-    }));
+      };
+      
+      const key = Object.keys(newData)[0];
+      const updatedValidationErrors = { ...prevState.validationErrors };
+  
+      if (updatedValidationErrors[key]) {
+        delete updatedValidationErrors[key];
+      }
+  
+      return {
+        formData: updatedFormData,
+        validationErrors: updatedValidationErrors,
+      };
+    });
   };
 
   handleNext = () => {
-    const errors = this.validateForm(); // Call the validation method
-    if (Object.keys(errors).length === 0) { // No errors
-      if (this.state.currentSection < 4) { // Adjust based on sections
-        this.setState({ currentSection: this.state.currentSection + 1 }, () => {
-          window.scrollTo(0, 0); // Scroll to top after state update
-        });
-      }
-    } else {
-      this.setState({ validationErrors: errors }); // Store errors in state
+    const errors = this.validateForm();
+    const { currentSection } = this.state;
+  
+    // Payment validation when in CourseDetails section (currentSection === 2)
+    if (currentSection === 2 && !this.courseDetailsRef.state.selectedPayment) {
+      errors.selectedPayment = 'Please select a payment option.';
+      this.courseDetailsRef.setState({ paymentTouched: true });
     }
+
+    if (currentSection === 3 && !this.agreementDetailsRef.state.selectedChoice) {
+      errors.selectedPayment = 'Please agree to move on for submitting this form.';
+      this.agreementDetailsRef.setState({ isSelcted: true });
+    }
+    if (currentSection === 3) {
+      this.handleSubmit(); 
+    }
+    
+    if (Object.keys(errors).length === 0) {
+      if (this.state.currentSection < 4) {
+        this.setState({ currentSection: this.state.currentSection + 1 }, () => {
+          window.scrollTo(0, 0);
+        });
+      } 
+    } else {
+      this.setState({ validationErrors: errors });
+    }
+  };
+
+  handleSubmit = () => {
+    const { formData } = this.state;
+
+    // Participants Details
+    var name = formData.pName;
+    var nric = formData.nRIC;
+    var residentalStatus = formData.rESIDENTIALSTATUS;
+    var race = formData.rACE;
+    var gender = formData.gENDER;
+    var dateOfBirth = formData.dOB.formattedDate;
+    var contactNumber = formData.cNO;
+    var email = formData.eMAIL;
+    var postalCode = formData.postalCode;
+    var educationLevel = formData.eDUCATION;
+    var workStatus = formData.wORKING;
+
+    // Course 
+    var courseType = formData.type;
+    var courseEngName = formData.englishName;
+    var courseChiName = formData.chineseName;
+    var courseLocation = formData.location;
+    var coursePrice = formData.price; 
+    var courseDuration = formData.duration;
+    var payment = formData.payment;
+
+    // Agreement
+    var agreement = formData.agreement; // Use the corrected key
+
+    var participantDetails = {
+      participant: {
+          name: name,
+          nric: nric,
+          residentialStatus: residentalStatus,
+          race: race,
+          gender: gender,
+          dateOfBirth: dateOfBirth,
+          contactNumber: contactNumber,
+          email: email,
+          postalCode: postalCode,
+          educationLevel: educationLevel,
+          workStatus: workStatus
+      },
+      course: {
+          courseType: courseType,
+          courseEngName: courseEngName,
+          courseChiName: courseChiName,
+          courseLocation: courseLocation,
+          coursePrice: coursePrice,
+          courseDuration: courseDuration,
+          payment: payment
+      },
+      agreement: agreement,
+      status: "Pending"
+    };
+
+    console.log('Participants Details', participantDetails);
+    
+    // Example of sending data to the server using Axios
+    axios.post('http://localhost:3001/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
+      .then((response) => {
+        console.log('Form submitted successfully', response.data);
+        if(response.data)
+        {
+          window.close(); 
+          //alert("Success");
+        }
+        else
+        {
+          //alert("Failure");
+        }
+      })
+      .catch((error) => {
+        console.error('Error submitting form:', error);
+      });
   };
 
   validateForm = () => {
@@ -83,8 +191,8 @@ class FormPage extends Component {
 
     // Validate fields for PersonalInfo section
     if (currentSection === 1) {
-      if (!formData.englishName) {
-        errors.englishName = 'English Name is required.';
+      if (!formData.pName) {
+        errors.pName = 'Name is required.';
       }
       if (!formData.location) {
         errors.location = 'Location is required.';
@@ -119,7 +227,6 @@ class FormPage extends Component {
       if (!formData.wORKING) {
         errors.wORKING = 'Work Status is required.';
       }
-
     }
 
     return errors;
@@ -133,12 +240,7 @@ class FormPage extends Component {
 
   render() {
     const { currentSection, formData, validationErrors } = this.state;
-    if (currentSection === 4) {
-      // Set a timeout to close the page after rendering SubmitDetailsSection
-      setTimeout(() => {
-        window.close(); // Close the current tab/window
-      }, 5000);
-    }
+
     return (
       <div className="formwholepage">
         <div className="form-page">
@@ -149,15 +251,19 @@ class FormPage extends Component {
             )}
             {currentSection === 2 && 
               <CourseDetails 
+                ref={(ref) => this.courseDetailsRef = ref} 
                 courseEnglishName={formData.englishName} 
                 courseChineseName={formData.chineseName} 
                 courseLocation={formData.location} 
                 coursePrice={formData.price} 
                 courseType={formData.type}
+                courseDuration={formData.duration}
+                payment={formData.payment}
+                onChange={this.handleDataChange}
               />
             }
-            {currentSection === 3 && <AgreementDetailsSection />}
-            {currentSection === 4 && <SubmitDetailsSection />} {/* Added SubmitDetailsSection */}
+            {currentSection === 3 && <AgreementDetailsSection ref={(ref) => this.agreementDetailsRef = ref} agreement={formData.agreement} onChange={this.handleDataChange} />}
+            {currentSection === 4 && <SubmitDetailsSection />}
           </div>
   
           {/* Conditionally render the button container */}
@@ -173,7 +279,6 @@ class FormPage extends Component {
       </div>
     );
   }
-  
 }
 
 export default FormPage;
