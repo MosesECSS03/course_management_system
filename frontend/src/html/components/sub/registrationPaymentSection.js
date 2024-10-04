@@ -53,7 +53,7 @@
 
     fetchCourseRegistrations(language) {
       return axios
-        .post('http://localhost:3001/courseregistration', { purpose: 'retrieve' })
+        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
         .then(response => {
           const array = this.languageDatabase(response.data.result, language);
           return array;
@@ -329,7 +329,7 @@
     updateDatabaseForRegistrationPayment = async (value, id, page) => {
       console.log(value, id);
       return axios
-        .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
+        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
@@ -346,7 +346,7 @@
     {
       console.log("WooCommerce");
       return axios
-        .post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
+        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courses', { type: 'update', page: page, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
