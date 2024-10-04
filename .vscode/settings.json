@@ -1,8 +1,0 @@
-{
-    "appService.zipIgnorePattern": [
-        "node_modules{,/**}",
-        ".vscode{,/**}"
-    ],
-    "appService.defaultWebAppToDeploy": "/subscriptions/d18cfb44-26a0-42aa-9024-3e1e7a1c356f/resourceGroups/course-management-system/providers/Microsoft.Web/sites/Course-Management-Course",
-    "appService.deploySubpath": "backend\\Controller"
-}
