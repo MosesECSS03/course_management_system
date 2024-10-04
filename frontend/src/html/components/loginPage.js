@@ -75,10 +75,14 @@ class LoginPage extends Component {
     this.setState({ emailError: '', passwordError: '' });
 
     // Replace with your API endpoint and payload
-    var response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/login', {
+    var response = await axios.post('http://localhost:3001/login', {
+      email,
+      password
+    });
+    /*var response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/login', {
         email,
         password
-      });
+      });*/
 
       console.log(response);
 

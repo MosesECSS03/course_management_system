@@ -53,7 +53,7 @@
 
     fetchCourseRegistrations(language) {
       return axios
-        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
+        .post('http://localhost:3001/courseregistration', { purpose: 'retrieve' })
         .then(response => {
           const array = this.languageDatabase(response.data.result, language);
           return array;
@@ -62,6 +62,16 @@
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
         });
+      /*return axios
+        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
+        .then(response => {
+          const array = this.languageDatabase(response.data.result, language);
+          return array;
+        })
+        .catch(error => {
+          console.error('Error fetching course registrations:', error);
+          return []; // Return an empty array in case of error
+        });*/
     }
 
     languageDatabase(array, language) {
@@ -329,7 +339,7 @@
     updateDatabaseForRegistrationPayment = async (value, id, page) => {
       console.log(value, id);
       return axios
-        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
+        .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
@@ -340,13 +350,25 @@
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
         });
+      /*return axios
+        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
+        .then(response => {
+          if(response.data.result ===  true)
+          {
+            this.updateWooCommerceForRegistrationPayment(value, page)
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching course registrations:', error);
+          return []; // Return an empty array in case of error
+        });*/
     };
 
     updateWooCommerceForRegistrationPayment(value, page)
     {
       console.log("WooCommerce");
-      return axios
-        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courses', { type: 'update', page: page, status: value })
+      axios
+        .post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
@@ -357,6 +379,18 @@
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
         });
+      /* axios
+        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courses', { type: 'update', page: page, status: value })
+        .then(response => {
+          if(response.data.result ===  true)
+          {
+           
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching course registrations:', error);
+          return []; // Return an empty array in case of error
+        });*/
     }
     
     handleBlur = (index) => {

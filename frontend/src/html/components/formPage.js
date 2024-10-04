@@ -167,7 +167,7 @@ class FormPage extends Component {
     console.log('Participants Details', participantDetails);
     
     // Example of sending data to the server using Axios
-    axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
+    axios.post('http://localhost:3001/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
       .then((response) => {
         console.log('Form submitted successfully', response.data);
         if(response.data)
@@ -183,6 +183,22 @@ class FormPage extends Component {
       .catch((error) => {
         console.error('Error submitting form:', error);
       });
+    /*axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
+      .then((response) => {
+        console.log('Form submitted successfully', response.data);
+        if(response.data)
+        {
+          window.close(); 
+          //alert("Success");
+        }
+        else
+        {
+          //alert("Failure");
+        }
+      })
+      .catch((error) => {
+        console.error('Error submitting form:', error);
+      });*/
   };
 
   validateForm = () => {
