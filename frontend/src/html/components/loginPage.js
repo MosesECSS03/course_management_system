@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import '../../css/loginPage.css';
 import axios from 'axios';
+import { withRouter } from 'react-router-dom';
+import Popup from './popup/popupMessage';
+
 
 class LoginPage extends Component {
   constructor(props) {
@@ -12,6 +15,10 @@ class LoginPage extends Component {
       emailError: '',
       passwordError: '',
       showPassword: false, // State to toggle password visibility
+      isPopupOpen: false,
+      popupMessage: '',
+      popupType: '', 
+      accountId: null
     };
   }
 
@@ -76,32 +83,80 @@ class LoginPage extends Component {
 
     // Replace with your API endpoint and payload
     var response = await axios.post('http://localhost:3001/login', {
-      email,
-      password
+      "email":email,
+      "password":password
     });
-    /*var response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/login', {
-        email,
-        password
-      });*/
 
-      console.log(response);
-
-      /*if (response.data.success) {
-        // Handle successful login
-        console.log('Login successful:', response.data);
-        this.setState({ emailError: '', passwordError: '' });
-        // Redirect or perform further actions
-      } else {
-        // Handle errors from the server
+      if (response.data.message.message === "Login successful") 
+      {
+        //this.props.history.push('/home');  
         this.setState({
-          emailError: response.data.emailError || '',
-          passwordError: response.data.passwordError || '',
+          isPopupOpen: true,
+          popupMessage: response.data.message.message,
+          popupType: "success-message",
         });
-      }*/
+        setTimeout(() => {
+          this.setState({ isPopupOpen: false});
+          //console.log(response.data.message.details);
+          if(response.data.message.details.first_time_log_in === "Yes")
+          {
+            this.setState({
+              isPopupOpen: true,
+              popupMessage: response.data.message.message,
+              popupType: "change-password",
+              accountId: response.data.message.details._id
+            });
+          }
+          else
+          {
+            this.props.history.push('/home');  
+          }
+      }, 5000);
+      } 
+      else 
+      {
+        this.setState({
+          isPopupOpen: true,
+          popupMessage: "Login Failure",
+          popupType: "error-message",
+        });
+        setTimeout(() => {
+          this.setState({ isPopupOpen: false, name: '', email: '', password: '', role: ''});
+      }, 5000);
+      }
   };
 
+  passPopupMessage = (success, message) =>
+  {
+    //console.log(message);
+    if(success === true)
+    {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: message,
+        popupType: "success-message",
+      });
+      setTimeout(() => {
+          this.setState({ isPopupOpen: false});
+          this.props.history.push('/home');  
+      }, 5000);
+    }
+    else 
+    {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: message,
+        popupType: "error-message",
+      });
+      setTimeout(() => {
+        this.setState({ isPopupOpen: false, name: '', email: '', password: '', role: ''});
+    }, 5000);
+    }
+  }
+
   render() {
-    const { language, emailError, passwordError, showPassword } = this.state;
+    const { language, emailError, passwordError, showPassword, isPopupOpen, popupMessage, popupType, accountId} = this.state;
+
     const title = (
       <>
         En Community Services Society
@@ -146,6 +201,7 @@ class LoginPage extends Component {
                 type="text"
                 id="email"
                 name="email"
+                className='emailInput'
                 value={this.state.email}
                 onChange={this.handleChange}
                 placeholder={
@@ -189,9 +245,10 @@ class LoginPage extends Component {
             </div>
           </div>
         </div>
+        <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} accountId={accountId} passPopupMessage={this.passPopupMessage}/>
       </div>
     );
   }
 }
 
-export default LoginPage;
+export default withRouter(LoginPage);

@@ -6,7 +6,7 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
   display: flex;
-  align-items: center;
+    align-items: center;
   justify-content: center;
   z-index: 1000;
 }
@@ -71,6 +71,142 @@
 .circle:nth-child(4) {
   background-color: #388e3c; /* Dark green */
   animation-delay: 0.75s;
+}
+
+/* Success message container */
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: black; /* Solid black background */
+  padding: 1.5rem; /* Padding around the content */
+  border-radius: 0.625rem; /* Rounded corners */
+  height: 12.5rem; /* Set the width of the popup */
+  text-align: center;
+}
+
+/* Styling for the image */
+.success-message img {
+  width: 4rem; /* Set a fixed width for the image */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 1rem; /* Space below the image */
+}
+
+/* Success message title */
+.success-title {
+  color: #4caf50; /* Green color for success */
+  font-size: 1.5rem; /* Title size */
+  font-weight: bold;
+  margin: 1rem 0; /* Space around the title */
+}
+
+/* Message text styling */
+.success-message p {
+  font-size: 0.78rem; /* 16px for the text */
+  color: #4caf50; /* Dark text */
+  text-align: left;
+  margin: -0.5rem 0;
+}
+
+/*Error message container */
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: black; /* Solid black background */
+  padding: 1.5rem; /* Padding around the content */
+  border-radius: 0.625rem; /* Rounded corners */
+  height: 12.5rem; /* Set the width of the popup */
+  text-align: center;
+  height: auto;
+}
+
+/* Styling for the image */
+.error-message img {
+  width: 3.5rem; /* Set a fixed width for the image */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 1rem; /* Space below the image */
+}
+
+/* Success message title */
+.error-title {
+  color: #FF0000; /* Green color for success */
+  font-size: 1.5rem; /* Title size */
+  font-weight: bold;
+  margin: 1rem 0; /* Space around the title */
+}
+
+/* Message text styling */
+.error-message p {
+  font-size: 0.78rem; /* 16px for the text */
+  color: #FF0000; /* Dark text */
+  text-align: left;
+  margin: -0.5rem 0;
+}
+
+/*Error message container */
+.change-password-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff; /* Solid black background */
+  padding: 1.5rem; /* Padding around the content */
+  border-radius: 0.625rem; /* Rounded corners */
+  height: 12.5rem; /* Set the width of the popup */
+  text-align: center;
+  height: auto;
+}
+
+/* Success message title */
+.change-password-title {
+  color: #000000; /* Green color for success */
+  font-size: 1.5rem; /* Title size */
+  font-weight: bold;
+  margin: 1rem 0; /* Space around the title */
+}
+
+.change-password-message p
+{
+  text-align: left;
+  margin-left: -1rem;
+  font-size: 0.75rem;
+}
+
+.change-password-message label
+{
+  text-align: left;
+  margin-left: -1rem;
+  font-size: 0.75rem;
+}
+
+.change-password-message input
+{
+  margin-left: -1rem;
+  width: 20rem;
+}
+
+.change-password-message button
+{
+  width: 10rem;
+}
+
+.change-password-message .error-message1
+{
+  background-color: #ffffff;
+  font-size: 0.78rem; /* 16px for the text */
+  color: #FF0000; /* Dark text */
+  font-weight: bold;
+}
+
+.change-password-message .password-input-container {
+  position: relative;
+}
+
+.change-password-message .password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 @keyframes bounce {

@@ -22,16 +22,21 @@
             languages: [], // Default to props if available
             statuses: [], // Default to props if available
             types: [], // Default to props if available
+            roles: [],
             filteredLocations: [],
             filteredLanguages: [],
             filteredStatuses: [],
             filteredTypes: [],
+            filteredRoles: [],
             showLocationDropdown: false,
             showLanguageDropdown: false,
-            showTypeDropdown: false
+            showTypeDropdown: false,
+            showAccountTypeDropdown: false,
+            role: ''
           };
           this.locationDropdownRef = React.createRef();
           this.languageDropdownRef = React.createRef();
+          this.accountTypeDropdownRef = React.createRef();
           this.typeDropdownRef = React.createRef();
         }
 
@@ -70,20 +75,20 @@
                 ),
                 courseType: value
               });
-            } else if (name === 'searchQuery') {
+            } 
+            else if (name === 'accountType') {
+              console.log(name, value);
+              this.setState({
+                filteredRoles: this.state.roles.filter(role =>
+                 role.toLowerCase().includes(value.toLowerCase())
+                ),
+               role: value
+              });
+            }else if (name === 'searchQuery') {
               this.props.passSearchedValueToParent(value);
             }
           });
         };
-
-        /*handleDropdownToggle = (dropdown) => {
-          console.log("Toggle:", dropdown);
-          this.setState(prevState => ({ 
-            showLocationDropdown: dropdown === 'showLocationDropdown' ? !prevState.showLocationDropdown : false,
-            showLanguageDropdown: dropdown === 'showLanguageDropdown' ? !prevState.showLanguageDropdown : false,
-            showTypeDropdown: dropdown === 'showTypeDropdown' ? !prevState.showTypeDropdown : false
-          }));
-        };*/
 
         handleDropdownToggle = (dropdown) =>
         {
@@ -93,7 +98,8 @@
             this.setState({
               showLocationDropdown: true,
               showLanguageDropdown: false,
-              showTypeDropdown: false
+              showTypeDropdown: false,
+              showAccountTypeDropdown: false
             });
           }
           else if(dropdown === 'showLanguageDropdown')
@@ -101,7 +107,8 @@
               this.setState({
                 showLocationDropdown: false,
                 showLanguageDropdown: true,
-                showTypeDropdown: false
+                showTypeDropdown: false,
+                showAccountTypeDropdown: false
               });
             }
             else if(dropdown === 'showTypeDropdown')
@@ -109,38 +116,62 @@
                 this.setState({
                   showLocationDropdown: false,
                   showLanguageDropdown: false,
-                  showTypeDropdown: true
+                  showTypeDropdown: true,
+                  showAccountTypeDropdown: false
                 });
             }
+            else if(dropdown === 'showAccountTypeDropdown')
+              {
+                  this.setState({
+                    showLocationDropdown: false,
+                    showLanguageDropdown: false,
+                    showTypeDropdown: false,
+                    showAccountTypeDropdown: true
+                  });
+              }
         }
 
         handleOptionSelect = (value, dropdown) => {
           const isMandarin = this.props.language === "zh"; 
           let updatedState = {};
-        
+
             // Update state based on dropdown type
             if (dropdown === 'showLocationDropdown') {
               updatedState = {
                 centreLocation: value,
                 showLocationDropdown: false, // Close the location dropdown
                 showLanguageDropdown: false,
-                showTypeDropdown: false
+                showTypeDropdown: false,
+                showAccountTypeDropdown: false
               };
             } else if (dropdown === 'showLanguageDropdown') {
               updatedState = {
                 language: value,
                 showLocationDropdown: false,
                 showLanguageDropdown: false, // Close the language dropdown
-                showTypeDropdown: false
+                showTypeDropdown: false,
+                showAccountTypeDropdown: false
               };
             } else if (dropdown === 'showTypeDropdown') {
               updatedState = {
                 courseType: value,
                 showLocationDropdown: false,
                 showLanguageDropdown: false,
-                showTypeDropdown: false // Close the type dropdown
+                showTypeDropdown: false,
+                showAccountTypeDropdown: false // Close the type dropdown
               };
             }
+            else if (dropdown === 'showAccountTypeDropdown') {
+              console.log(value);
+              updatedState = {
+                role: value,
+                showLocationDropdown: false,
+                showLanguageDropdown: false,
+                showTypeDropdown: false,
+                showAccountTypeDropdown: false
+              };
+            }
+        
         
             this.setState(updatedState, () => {
               console.log("Updated States:", updatedState);
@@ -156,23 +187,22 @@
             this.languageDropdownRef.current &&
             !this.languageDropdownRef.current.contains(event.target) &&  
             this.typeDropdownRef.current &&
-            !this.typeDropdownRef.current.contains(event.target)
+            !this.typeDropdownRef.current.contains(event.target) &&
+            this.accountTypeDropdownRef.current &&
+            !this.accountTypeDropdownRef.current.contains(event.target)
           ) {
             this.setState({
               showLocationDropdown: false,
               showLanguageDropdown: false,
               showTypeDropdown: false,
+              showAccountTypeDropdown: false,
             });
           }
         };
 
         componentDidMount() {
           document.addEventListener('mousedown', this.handleClickOutside);
-          // Initialize state with unique values from props
-          const uniqueLocations = [...new Set(this.props.locations)];
-          const uniqueLanguages = [...new Set(this.props.languages)];
-
-          this.updateUniqueLocationsLanguagesTypes(this.props);
+          this.updateUniqueLocationsLanguagesRolesTypes(this.props);
         }
 
           componentDidUpdate(prevProps) {
@@ -182,9 +212,11 @@
                 searchQuery: '',
                 centreLocation: '',
                 language: '',
+                role: '',
                 showLocationDropdown: false,
                 showLanguageDropdown: false,
-                showTypeDropdown: false
+                showTypeDropdown: false,
+                showAccountTypeDropdown: false
               });
             }
 
@@ -193,7 +225,8 @@
               this.setState({
                 searchQuery: '',
                 centreLocation: '',
-                language: ''
+                language: '',
+                role: ''
               });
             }
           
@@ -221,10 +254,20 @@
                 filteredTypes: uniqueTypes
               }); 
             }  
+
+                      
+            if (this.props.roles !== prevProps.roles) {
+              const uniqueRoles = ["All Roles", ...new Set(this.props.roles)];
+              this.setState({
+                roles: uniqueRoles,
+                filteredRoles: uniqueRoles
+              }); 
+            }  
           }
           
         // Method to handle updating locations and languages
-      updateUniqueLocationsLanguagesTypes(props) {
+      updateUniqueLocationsLanguagesRolesTypes(props) {
+        const uniqueRoles = ["All Roles", ...new Set(props.roles)];
         const uniqueLocations = ["All Locations", ...new Set(props.locations)];
         const uniqueLanguages = ["All Languages", ...new Set(props.languages)];
         const uniqueTypes = ["All Types", ...new Set(props.types)];
@@ -236,7 +279,9 @@
           languages: this.translateLanguages(uniqueLanguages), // Translate if necessary
           filteredLanguages: this.translateLanguages(uniqueLanguages), // Translate if necessary
           types: uniqueTypes, // Translate if necessary
-          filteredTypes: uniqueTypes // Translate if necessary
+          filteredTypes: uniqueTypes, // Translate if 
+          roles: uniqueRoles, 
+          filteredRoles: uniqueRoles
         });
       }
 
@@ -246,12 +291,63 @@
 
         
 render() {
-  const { searchQuery, centreLocation, language, filteredLocations, filteredLanguages, filteredTypes, showLocationDropdown, showLanguageDropdown, showTypeDropdown, courseType} = this.state;
+  const { searchQuery, centreLocation, language, filteredLocations, filteredLanguages, filteredTypes, showLocationDropdown, showLanguageDropdown, showTypeDropdown, courseType, showAccountTypeDropdown, role, roles, filteredRoles} = this.state;
   const { section } = this.props; // Destructure section from props
 
   return (
     <div className="filter-section"> {/* Same class name for both sections */}
-      <div className="form-group-row">
+      <div className="form-group-row" >
+        {section === "accounts" && ( // Content for "registration"
+          <>
+           <div className="form-group">
+              <label htmlFor="accountType">{this.props.language === 'zh' ? '' : 'Account Type'}</label>
+              <div
+                className={`dropdown-container ${showAccountTypeDropdown ? 'open' : ''}`}
+                ref={this.accountTypeDropdownRef}
+              >
+                <input
+                  type="text"
+                  id="accountType"
+                  name="accountType"
+                  value={role}
+                  onChange={this.handleChange}
+                  onClick={() => this.handleDropdownToggle('showAccountTypeDropdown')}
+                  placeholder={this.props.language === 'zh' ? '' : 'Filter by account type'}
+                  autoComplete="off"
+                />
+                {showAccountTypeDropdown && (
+                  <ul className="dropdown-list">
+                    {filteredRoles.map((role, index) => (
+                      <li
+                        key={index}
+                        onClick={() => this.handleOptionSelect(role, 'showAccountTypeDropdown')}
+                      >
+                        {role}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <i className="fas fa-angle-down dropdown-icon"></i>
+              </div>
+            </div>
+              <div className="form-group">
+              <label htmlFor="searchQuery">{this.props.language === 'zh' ? '搜寻' : 'Search'}</label>
+              <div className="search-container">
+                <input
+                  type="text"
+                  id="searchQuery"
+                  name="searchQuery"
+                  value={searchQuery}
+                  onChange={this.handleChange}
+                  placeholder={this.props.language === 'zh' ? '搜索' : 'Search'}
+                  autoComplete="off"
+                />
+                <i className="fas fa-search search-icon"></i>
+              </div>
+            </div>
+          </>            
+        )}
+
         {section === "courses" && ( // Content for "courses"
           <>
             <div className="form-group">

@@ -183,22 +183,6 @@ class FormPage extends Component {
       .catch((error) => {
         console.error('Error submitting form:', error);
       });
-    /*axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
-      .then((response) => {
-        console.log('Form submitted successfully', response.data);
-        if(response.data)
-        {
-          window.close(); 
-          //alert("Success");
-        }
-        else
-        {
-          //alert("Failure");
-        }
-      })
-      .catch((error) => {
-        console.error('Error submitting form:', error);
-      });*/
   };
 
   validateForm = () => {

@@ -1,8 +1,9 @@
   /* Ensure the dashboard and content take up the full viewport height */
   .dashboard {
     display: grid;
-    grid-template-rows: auto 1fr auto; /* Header, content, and footer */
+    grid-template-rows: auto 1fr auto auto; /* Header, content, and footer */
     height: 100vh; /* Full viewport height */
+    
   }
 
 
@@ -119,16 +120,28 @@
   }
 
   .view-toggle-section {
-      position: absolute; /* Change back to absolute */
-      top: 12rem; /* Adjust as needed for placement below the header */
-      z-index: 1; /* Ensure it's above the courses section */
+      /*position: absolute; 
+      top: 12rem;*/ 
+      z-index: 1;
+      grid-row: 2;
+      height: fit-content;
   }
 
-  .courses-section, .registration-payment-section {
-    grid-row: 2; /* Botom section */
+  .account-section, .courses-section, .registration-payment-section {
+    grid-row: 3; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;
-    margin-top: 5rem;
+    margin-top: -20rem;
+  }
+
+  .account-section
+  {
+    margin-top: -30rem !important;
+  }
+
+  .pagination-section
+  {
+    grid-row: 4;
   }
 
 

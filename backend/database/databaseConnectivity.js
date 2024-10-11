@@ -26,7 +26,80 @@ class DatabaseConnectivity {
         }
     }
 
-    async insertToDatabase(dbname, data)
+    async login(dbname, collectionName, email, password, date, time)
+    {
+        const db = this.client.db(dbname);
+        try
+        {
+            var table = db.collection(collectionName);
+            // Find a user with matching email and password
+            const user = await table.findOne({ email: email, password: password });
+            if (user) {
+                await table.updateOne(
+                    { _id: user._id }, // Filter to find the user
+                    {
+                        $set: {
+                            date_log_in: date,
+                            time_log_in: time
+                        }
+                    }
+                );
+    
+            // User found, login successful
+            return {
+                success: true,
+                message: 'Login successful',
+                user: user // or you can choose to return specific user details
+            };
+            } else {
+            // No user found, login failed
+            return {
+                success: false,
+                message: 'Invalid email or password'
+            };
+            }
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
+    }
+
+    async changePassword(dbname, collectionName, accountId, newPassword)
+    {
+        const db = this.client.db(dbname);
+        try
+        {
+            var table = db.collection(collectionName);
+            // Find a user with matching email and password
+            const result = await table.updateOne(
+                { _id: accountId }, // Filter
+                { $set: { password: newPassword,
+                            first_time_log_in: "No"
+                 } } // Update
+            );
+
+            if (result) {
+            // User found, login successful
+            return {
+                success: true,
+                message: 'Change Password Successful',
+            };
+            } else {
+            // No user found, login failed
+            return {
+                success: false,
+                message: 'Change Password Failure'
+            };
+            }
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
+    }
+
+    async insertToDatabase(dbname, collectionName, data)
     {
         console.log("Database:", dbname);
         console.log("Data:", data);
@@ -35,10 +108,16 @@ class DatabaseConnectivity {
         {
             if(db)
             {
-                var tableName = "Registration Forms";
-                var table = db.collection(tableName);
+                var table = db.collection(collectionName);
                 var result = await table.insertOne(data);
-                return result.acknowledged;
+                if(collectionName === "Accounts")
+                {
+                    return {acknowledged: result.acknowledged, accountId: result.insertedId };
+                }
+                else
+                {
+                    return {acknowledged: result.acknowledged};
+                }
             }
         }
         catch(error)
@@ -47,15 +126,14 @@ class DatabaseConnectivity {
         }
     }
         
-    async retrieveFromDatabase(dbname)
+    async retrieveFromDatabase(dbname, collectionName)
     {
         var db = this.client.db(dbname); // return the db object
         try
         {
             if(db)
             {
-                var tableName = "Registration Forms";
-                var table = db.collection(tableName);
+                var table = db.collection(collectionName);
                 var result = await table.find().toArray();
                 return result;
             }

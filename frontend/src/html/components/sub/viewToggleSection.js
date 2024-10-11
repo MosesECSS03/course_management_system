@@ -9,7 +9,7 @@ class ViewToggleSection extends Component {
     };
 
     handleViewChange = (mode) => {
-        const total = this.props.getTotalNumberOfCourse;
+        const total = this.props.getTotalNumber;
     
         if (mode === "paginated") {
             const array = this.calculateQuarterSegments(total);
@@ -59,6 +59,7 @@ class ViewToggleSection extends Component {
             (total / 4) * 3, // 3/4 of total
             total           // 4/4 of total
         ];
+        console.log("Segments:", segments);
     
         const dropdownList = segments.map(segment => {
             // Round based on the decimal value
@@ -78,7 +79,7 @@ class ViewToggleSection extends Component {
         const { inputValue, dropdownVisible, options } = this.state;
 
         return (
-            <div className="view-toggle">
+            <div className="view-toggle1">
                 <div className="button-row">
                     <button
                         onClick={() => this.handleViewChange('full')}

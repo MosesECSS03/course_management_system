@@ -1,30 +1,32 @@
-.view-toggle {
-    display: flex;
-    flex-direction: column; /* Stack button container and items per page */
-    align-items: center; /* Center everything */
-    background-color: none; /* Background color to ensure readability */
-    z-index: 10; /* Ensure it stays above other content */
-    padding: 10px; /* Add some padding for spacing */
+.view-toggle1 {
+   /* display: flex;*/
+    flex-direction: column !important; /* Stack button container and items per page */
+    align-items: center !important; /* Center everything */
+    background-color: none !important; /* Background color to ensure readability */
+    z-index: 10 !important; /* Ensure it stays above other content */
+    padding: 10px !important; /* Add some padding for spacing */
+    width: 20rem !important;
 }
 
-.button-container {
-    display: flex; /* Keep buttons in a row */
-    justify-content: center; /* Center buttons */
+.button-row {
+    display: flex !important; /* Keep buttons in a row */
+    justify-content: center !important; /* Center buttons */
+    gap: 1rem;
 }
 
-.view-toggle button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    background-color: #f8f8f8;
-    cursor: pointer;
-    font-size: 14px;
+.view-toggle .button-row button {
+    margin: 0 10px !important;
+    padding: 10px 20px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    background-color: #f8f8f8 !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
 }
 
-.view-toggle button.active {
-    background-color: #007bff;
-    color: #fff;
+.view-toggle .button-row button.active {
+    background-color: #007bff !important;
+    color: #ffffff !important;
 }
 
 .items-per-page {

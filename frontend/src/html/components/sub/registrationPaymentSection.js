@@ -62,16 +62,6 @@
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
         });
-      /*return axios
-        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
-        .then(response => {
-          const array = this.languageDatabase(response.data.result, language);
-          return array;
-        })
-        .catch(error => {
-          console.error('Error fetching course registrations:', error);
-          return []; // Return an empty array in case of error
-        });*/
     }
 
     languageDatabase(array, language) {
@@ -249,8 +239,6 @@
       }
   }
   
-  
-    
     handleFocus = (index, payment) => {
       this.setState({
         dropdownVisible: {
@@ -379,18 +367,6 @@
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
         });
-      /* axios
-        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courses', { type: 'update', page: page, status: value })
-        .then(response => {
-          if(response.data.result ===  true)
-          {
-           
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching course registrations:', error);
-          return []; // Return an empty array in case of error
-        });*/
     }
     
     handleBlur = (index) => {

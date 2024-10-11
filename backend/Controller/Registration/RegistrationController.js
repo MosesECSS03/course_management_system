@@ -17,7 +17,8 @@ class RegistrationController {
             if(result === "Connected to MongoDB Atlas!")
             {
                 var databaseName = "Courses-Management-System";
-                var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, data);   
+                var collectionName = "Registration Forms";
+                var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, data);   
                 console.log("Insert New Participants:", connectedDatabase);
                 if(connectedDatabase === true)
                 {
@@ -52,7 +53,8 @@ class RegistrationController {
             if(result === "Connected to MongoDB Atlas!")
             {
                 var databaseName = "Courses-Management-System";
-                var connectedDatabase = await this.databaseConnectivity.retrieveFromDatabase(databaseName);   
+                var collectionName = "Registration Forms";
+                var connectedDatabase = await this.databaseConnectivity.retrieveFromDatabase(databaseName, collectionName);   
                 return connectedDatabase;
                 //console.log(connectedDatabase);
             }

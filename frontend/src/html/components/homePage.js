@@ -1,5 +1,7 @@
   import React, { Component } from 'react';
+  import { withRouter } from 'react-router-dom';
   import '../../css/homePage.css'; // Ensure your CSS paths are correct
+  import AccountsSection from './sub/accountsSection';
   import CoursesSection from './sub/courseSection';
   import RegistrationPaymentSection from './sub/registrationPaymentSection';
   import Popup from './popup/popupMessage';
@@ -7,7 +9,8 @@
   import ViewToggle from './sub/viewToggleSection';
   import Pagination from './sub/paginationSection';
 
-    class HomePage extends Component {
+
+  class HomePage extends Component {
     constructor(props) {
       super(props);
       this.state = {
@@ -34,9 +37,12 @@
         totalPages: 1,
         nofCourses: 0,
         noofDetails: 0,
+        nofAccounts: 0,
         viewMode: 'full',
         isRegistrationPaymentVisible: false,
-        section: ''
+        section: '',
+        accountType: null,
+        roles: []
       };
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
@@ -54,6 +60,7 @@
     handleDataFromChild = async (filter1, filter2) =>
     {
       var {section} = this.state;
+      console.log("Current Sections:", section);  
       if(section === "courses")
       {
       const filterLanguages = new Set(filter1);
@@ -73,7 +80,14 @@
         types: Array.from(filterType)
       });
      }
-    }
+     else if(section === "accounts")
+     {
+      var filterRoles = new Set(filter1);
+      this.setState({
+        roles: Array.from(filterRoles)
+      });
+     }
+  }
 
     handleSelectFromChild = async (updateState, dropdown) => {
       console.log("Selected Data:", updateState, dropdown);
@@ -96,6 +110,15 @@
             selectedLocation: updateState.centreLocation
           });
         }
+      }
+      else if(section === "accounts")
+      {
+        if(dropdown === "showAccountTypeDropdown")
+        {
+              this.setState({
+                selectedAccountType: updateState.role
+              });
+          }
       }
     }
 
@@ -140,11 +163,12 @@
       }
 
 
-    toggleSubMenu = (index) => {
-      this.setState((prevState) => ({
-        submenuVisible: prevState.submenuVisible === index ? null : index
-      }));
-    };
+      toggleSubMenu = (index) => {
+        this.setState((prevState) => ({
+          submenuVisible: prevState.submenuVisible === index ? null : index
+        }));
+        //this.setState({viewMode: "full"});
+      };
 
     toggleLanguage = () => {
       this.setState((prevState) => {
@@ -178,15 +202,41 @@
           courseType: courseType,
           sidebarVisible: false,
           isRegistrationPaymentVisible: false ,
-          section: "courses"
+          section: "courses",
+          accountType: ""
         });
       } catch (error) {
         console.log(error);
       }
     };
 
+    toggleAccountsComponent = async (accountType) => {
+      try {
+        this.setState({ resetSearch: true, }, () => {
+          this.setState({ resetSearch: false });
+        });
+
+        console.log(accountType);
+
+       this.setState({
+          isPopupOpen: true,
+          popupMessage: "Loading In Progress",
+          popupType: "loading",
+          courseType: "",
+          sidebarVisible: false,
+          isRegistrationPaymentVisible: false ,
+          section: "accounts",
+          accountType: accountType
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+
     toggleViewMode(mode) {
       var {section} = this.state;
+      console.log("Toggle View Mode:", section);
       this.setState({ viewMode: mode });
       if (mode === 'full') 
       {
@@ -197,6 +247,10 @@
         else if(section === "registration")
         {
           this.handleEntriesPerPageChange(this.state.noofDetails);
+        }
+        else if(section === "accounts")
+        {
+          this.handleEntriesPerPageChange(this.state.nofAccounts);
         }
       }
     }
@@ -234,11 +288,19 @@
         this.setState({ noofDetails: total });
     };
 
+    getTotalNumberofAccounts = async (total) =>
+    {
+        console.log("Total Number Of Accounts:", total);
+        this.setState({ nofAccounts: total });
+    };
+  
+
     handleEntriesPerPageChange = (value) => 
     {
-      const { nofCourses, section, noofDetails } = this.state;
+      value = Number(value);
+      const { nofCourses, section, noofDetails, nofAccounts } = this.state;
       console.log("Entries Per Page:", value);
-      console.log("Number of Courses:", nofCourses);
+      console.log("Number of Courses:", nofAccounts);
       if(section === "courses")
       {
         this.setState(
@@ -261,6 +323,18 @@
           }
         )
       }
+      else if(section === "accounts")
+      {
+          console.log("Number of Accounts:", nofAccounts);
+          this.setState(
+            { entriesPerPage: value, currentPage: 1 }, // Reset to the first page
+            () => {
+              const totalPages = Math.ceil(nofAccounts / value);
+              console.log(" Accounts Total Pages:", totalPages);
+              this.setState({ totalPages });
+            }
+          )
+        }
     };
 
     toggleRegistrationPaymentComponent() {
@@ -275,20 +349,21 @@
           popupMessage: "Loading In Progress",
           popupType: "loading",
           sidebarVisible: false,
-          section: "registration"
-
+          section: "registration",
+          accountType: null,
+          //viewMode: "full"
       }));
   }
 
     render() {
-      const { submenuVisible, language, courseType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section} = this.state;
+      const { submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts} = this.state;
       return (
         <>
           <div className="dashboard">
             <div className="header">
               <button className="sidebar-toggle" onClick={this.toggleSidebar}>
                 ☰
-              </button>
+              x</button>
               <div className="language-toggle">
                 <button onClick={this.toggleLanguage}>
                   {language === 'en' ? '中文' : 'English'}
@@ -300,13 +375,21 @@
                 className={`sidebar ${submenuVisible !== null ? 'expanded' : ''}`}
                 onMouseLeave={this.handleMouseLeave}
               >
-                <div className="sidebar-item">
+                <div className="sidebar-item"  onClick={() => this.toggleSubMenu(0)}>
                   <i className="fa-solid fa-user"></i> {language === 'zh' ? '账户' : 'Accounts'}
                 </div>
-                <div className="sidebar-item" onClick={() => this.toggleSubMenu(0)}>
+                <div className={`submenu${submenuVisible === 0 ? 'visible' : ''}`}>
+                  <div className="submenu-item" onClick={() => this.toggleAccountsComponent('Accounts')}>
+                    {language === 'zh' ? 'Accounts Tables' : 'Accounts Tables'}
+                  </div>
+                  <div className="submenu-item" onClick={() => this.toggleAccountsComponent('Access Rights')}>
+                    {language === 'zh' ? 'ILP 课程' : 'Access Rights Table'}
+                  </div>
+                </div>
+                <div className="sidebar-item" onClick={() => this.toggleSubMenu(1)}>
                   <i className="fas fa-tachometer-alt"></i> {language === 'zh' ? '课程' : 'Courses'}
                 </div>
-                <div className={`submenu${submenuVisible === 0 ? 'visible' : ''}`}>
+                <div className={`submenu${submenuVisible === 1 ? 'visible' : ''}`}>
                   <div className="submenu-item" onClick={() => this.toggleCourseComponent('NSA')}>
                     {language === 'zh' ? 'NSA 课程' : 'NSA Courses'}
                   </div>
@@ -322,6 +405,53 @@
                 </div>
               </div>
               <div className="main-content">
+              {accountType && (
+                  <>
+                  <div className="search-section">
+                      <Search
+                        language={language}
+                        closePopup={this.closePopup}
+                        passSelectedValueToParent={this.handleSelectFromChild}
+                        passSearchedValueToParent={this.searchResultFromChild}
+                        resetSearch={resetSearch}
+                        section={section}
+                        roles={roles}
+                      />
+                    </div>
+                    <div className="view-toggle-section">
+                      <ViewToggle
+                        language={language}
+                        viewMode={viewMode}
+                        onToggleView={this.toggleViewMode}
+                        onEntriesPerPageChange={this.handleEntriesPerPageChange}  
+                        getTotalNumber= {nofAccounts}
+                      />
+                    </div>
+                    <div className="account-section">
+                      <AccountsSection
+                        language={language}
+                        accountType={accountType}
+                        closePopup={this.closePopup}
+                        passDataToParent={this.handleDataFromChild}
+                        selectedAccountType ={selectedAccountType}
+                        searchQuery={searchQuery}
+                        getTotalNumberofAccounts={this.getTotalNumberofAccounts}
+                        currentPage={currentPage} // Pass current page
+                        entriesPerPage={this.state.entriesPerPage} // Pass entries per page
+                        resetSearch={resetSearch} 
+                        section={section}
+                      />
+                    </div>
+                    <div className="pagination-section">
+                      <Pagination
+                        viewMode = {viewMode}
+                        currentPage={currentPage} 
+                        totalPages={totalPages} 
+                        onPageChange={this.handlePageChange}
+                      />
+                    </div>
+                  </>
+                )}
                 {courseType && (
                   <>
                     <div className="search-section">
@@ -342,7 +472,7 @@
                         viewMode={viewMode}
                         onToggleView={this.toggleViewMode}
                         onEntriesPerPageChange={this.handleEntriesPerPageChange}  
-                        getTotalNumberOfCourse= {nofCourses}
+                        getTotalNumber= {nofCourses}
                       />
                     </div>
                     <div className="courses-section">
@@ -389,7 +519,7 @@
                         viewMode={viewMode}
                         onToggleView={this.toggleViewMode}
                         onEntriesPerPageChange={this.handleEntriesPerPageChange}  
-                        getTotalNumberOfCourse= {noofDetails}
+                        getTotalNumber= {noofDetails}
                       />
                     </div>
                     <div className="registration-payment-section">
@@ -428,4 +558,4 @@
     }
   }
 
-  export default HomePage;
+  export default withRouter(HomePage);
