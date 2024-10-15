@@ -1,6 +1,29 @@
 var express = require('express');
 var router = express.Router();
-var RegistrationController = require('../Controller/Registration/RegistrationController')
+var RegistrationController = require('../Controller/Registration/RegistrationController');
+var PdfGenerator = require('../Others/Pdf/PdfGenerator')
+
+function getCurrentDateTime() {
+    const now = new Date();
+
+    // Get day, month, year, hours, and minutes
+    const day = String(now.getDate()).padStart(2, '0'); // Ensure two digits
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = now.getFullYear();
+
+    const hours = String(now.getHours()).padStart(2, '0'); // 24-hour format
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Ensure two digits
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // Ensure two digits
+
+    // Format date and time
+    const formattedDate = `${day}/${month}/${year}`;
+    const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+    return {
+        date: formattedDate,
+        time: formattedTime,
+    };
+}
 
 router.post('/', async function(req, res, next) 
 {
@@ -30,9 +53,25 @@ router.post('/', async function(req, res, next)
         var newStatus = req.body.status;
         var controller = new RegistrationController();
         var result = await controller.updateParticipant(id, newStatus);
-       return res.json({"result": result}); 
+        return res.json({"result": result}); 
     }
-
+    else if(req.body.purpose === "updatePayment")
+    {
+        console.log("Official Use");
+        var id = req.body.registration_id;
+        var name = req.body.staff;
+        const currentDateTime = getCurrentDateTime();
+        var date = currentDateTime.date;
+        var time = currentDateTime.time;
+        var controller = new RegistrationController();
+        var result = await controller.updateOfficialUse(id, name, date, time);
+    }
+    else if(req.body.purpose === "receipt")
+    {
+        var pdf = new PdfGenerator();
+        pdf.generateReceipt(res);
+        //return res.json({"blob": result}); ; 
+    }
 });
 
 module.exports = router;

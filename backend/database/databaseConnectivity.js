@@ -188,6 +188,38 @@ class DatabaseConnectivity {
             console.log("Error updating database:", error);
         }
     }
+
+    async updatePaymentOfficialUse(dbname,  id, name, date, time) {
+        var db = this.client.db(dbname); // return the db object
+        try {
+            if (db) {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+    
+                // Use updateOne to update a single document
+                const filter = { _id: new ObjectId(id) };
+
+                // Add the new key "confirmation" to the update data
+                const update = {
+                    $set: {
+                        official:
+                        {
+                            name: name,
+                            date: date,
+                            time: time
+                        }
+                    }
+                };
+    
+               // Call updateOne
+                const result = await table.updateOne(filter, update);
+    
+                return result;
+            }
+        } catch (error) {
+            console.log("Error updating database:", error);
+        }
+    }
     
 
     // Close the connection to the database

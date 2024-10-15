@@ -151,7 +151,8 @@
     grid-row: 3; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;
-    margin-top: - 10rem;
+    margin-top: -30rem;
+    height: fit-content;
   }
 
   .account-section

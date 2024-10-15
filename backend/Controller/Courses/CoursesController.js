@@ -227,7 +227,7 @@ class CoursesController {
         // Update the product stock
         await this.api.post(`products/${productId}`, updateData);
 
-        console.log(`Stock updated for product ID ${productId}: New quantity is ${newStockQuantity}`);
+       return("Stock Updated Successfully");
     } catch (error) {
         console.error("Error updating product stock:", error);
         throw new Error("Error updating product stock");

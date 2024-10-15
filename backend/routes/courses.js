@@ -11,7 +11,8 @@ router.post("/", async function(req, res) {
     console.log("Course Type:", courseType);
   
     var controller = new CoursesController();
-    try {
+    try 
+    {
       const connectionStatus = await controller.initialize();
       
         if (connectionStatus === "Success") 
@@ -31,7 +32,11 @@ router.post("/", async function(req, res) {
               const productId = await controller.getProductID(page);
               console.log("Product ID:", productId);
               const updateProductStock = await controller.updateProductStock(productId, status);
-              console.log("Update Product Stock:", updateProductStock);
+              //console.log("Update Product Stock:", updateProductStock);
+              if(updateProductStock === "Stock Updated Successfully")
+              {
+                return res.json({"result":true});
+              }
             }
             else
             {

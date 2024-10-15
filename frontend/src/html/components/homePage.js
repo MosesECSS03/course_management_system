@@ -208,7 +208,8 @@
           sidebarVisible: false,
           isRegistrationPaymentVisible: false ,
           section: "courses",
-          accountType: ""
+          accountType: "",
+          createAccount: false
         });
       } catch (error) {
         console.log(error);
@@ -381,6 +382,7 @@
             sidebarVisible: false,
             section: "registration",
             accountType: null,
+            createAccount: false
             //viewMode: "full"
         }));
       }
@@ -607,6 +609,7 @@
                         getTotalNumberofDetails={this.getTotalNumberofDetails}
                         currentPage={currentPage} // Pass current page
                         entriesPerPage={this.state.entriesPerPage} // Pass entries per page
+                        userName = {userName}
                     />
                     </div>
                     <div className="pagination-section">

@@ -331,7 +331,8 @@
         .then(response => {
           if(response.data.result ===  true)
           {
-            this.updateWooCommerceForRegistrationPayment(value, page)
+            window.location.reload();
+            this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
         })
         .catch(error => {
@@ -352,15 +353,25 @@
         });*/
     };
 
-    updateWooCommerceForRegistrationPayment(value, page)
+    updateWooCommerceForRegistrationPayment(value, id, page)
     {
       console.log("WooCommerce");
-      axios
-        .post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
+      axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
-           
+            console.log(this.props);
+            axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName }).then(response => {
+              if(response.data.result ===  true)
+              {
+                //this.props.createAccountPopupMessage(true, response.data.message, response.data.message);
+                
+              }
+              }).catch(error => {
+                console.error('Error fetching course registrations:', error);
+                return []; // Return an empty array in case of error
+              });
+            //var updateResult = await 
           }
         })
         .catch(error => {
@@ -408,6 +419,28 @@
           return data.course.courseType;
         }))];
       }
+
+      receiptGenerator = async(event, rowData) =>
+      {
+        event.stopPropagation();
+        console.log(rowData); // This will contain all data of the clicked row
+        if((rowData.course.payment === "Cash" || rowData.course.payment === "PayNow")  && rowData.status === "Paid")
+        {
+          console.log("Generating Receipt:");
+              axios.post('http://localhost:3001/courseregistration', { purpose: 'receipt', rowData: rowData }, { responseType: 'blob' })
+              .then(response => {
+                const blob = new Blob([response.data], { type: 'application/pdf' }); // Create a new Blob
+                const url = window.URL.createObjectURL(blob); // Create a URL for the blob
+                const pdfWindow = window.open();
+                pdfWindow.location.href = url; // Open the PDF in the new tab
+              })
+              .catch(error => {
+                console.error('Error fetching course registrations:', error);
+                // Handle error here (e.g., show a message to the user)
+              });
+
+        }
+      }
     
 
     render() {
@@ -445,7 +478,7 @@
                     <th>{this.props.language === 'zh' ? '时长' : 'Duration'}</th>
                     <th>{this.props.language === 'zh' ? '支付方式' : 'Payment Method'}</th>
                     <th>{this.props.language === 'zh' ? '协议' : 'Agreement'}</th>
-                    <th>{this.props.language === 'zh' ? '支付' : 'Payment'}</th>
+                    <th>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Staff Name'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Date Received'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
@@ -480,7 +513,7 @@
                               value={this.state.inputValues[index]} // Use index-specific value from inputValues
                               onChange={(e) => this.handleInputChange(e, index)} // Pass index for specific input
                               onFocus={() => this.handleFocus(index, item.course.payment)} // Pass index to focus handler
-                              onMouseDown={() => this.handleBlur(index)} // Pass index to blur handler
+                              onBlur={() => this.handleBlur(index)} // Pass index to blur handler
                               placeholder="Type here..."
                             />
                             {this.state.dropdownVisible[index] && this.state.filteredSuggestions.length > 0 && (
@@ -488,7 +521,8 @@
                                 {this.state.filteredSuggestions.map((suggestion, idx) => (
                                   <li
                                     key={idx}
-                                    onClick={() => {
+                                    onMouseDown={(event) => {
+                                      event.stopPropagation();
                                       var coursePage = `${item.course.courseChiName}<br />${item.course.courseEngName}<br />(${item.course.courseLocation})`;
                                       coursePage = coursePage.replace(/–/g, "-");
                                       this.handleSuggestionClick(index, suggestion, item._id, coursePage);
@@ -503,7 +537,7 @@
                         )}
 
                       </td>
-                      <td>{item.official.name}</td>
+                      <td onClick={(event) => this.receiptGenerator(event, item)}>{item.official.name}</td>
                       <td>{item.official.date}</td>                      
                       <td>{item.official.time}</td>
                     </tr>
