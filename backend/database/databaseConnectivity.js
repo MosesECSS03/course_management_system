@@ -144,6 +144,23 @@ class DatabaseConnectivity {
         }
     }
 
+    async retrieveOneFromDatabase(dbname, collectionName, id) {
+        console.log("Selected One");
+        console.log("Id:", id);
+        var db = this.client.db(dbname); // Return the db object
+        try {
+            if (db) {
+                var table = db.collection(collectionName);
+                // Use findOne to get the document by nested field
+                var result = await table.findOne({ "Account Details.Account ID": new ObjectId(id) }); // Convert id to ObjectId
+                console.log(result); // Log the result
+                return result; // Return the single document
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    
             
     async updateInDatabase(dbname, id, newStatus) {
         var db = this.client.db(dbname); // return the db object

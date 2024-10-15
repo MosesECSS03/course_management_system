@@ -17,19 +17,64 @@ class AccountController
             {
                 var databaseName = "Courses-Management-System";
                 var collectionName = "Accounts";
-                var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, accountDetails);   
+                var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, accountDetails);  
+                console.log(connectedDatabase); 
                 if(connectedDatabase.acknowledged === true)
                 {
                     if(accountDetails.role === "Admin" || accountDetails.role === "Sub Admin")
                     {
                         var accountID = connectedDatabase.accountId;
-                        var accessRightDetails = {"Account Details":{"Account ID": accountID, "Name": accountDetails.name, "Role": accountDetails.role}, "Account":{"Account Table": true, "Access Rights Table": true}, "Courses":{"Upload Courses": true, "NSA Courses": true, "ILP Courses": true, "Update Courses": true, "Delete Courses": true}, "Registration And Payment": {"Registration And Payment Table": true, "Receipt Table": true, "Invoice Table": true}, "QR Code": {"Create QR Code": true, "QR Code Table": true, "Update QR Code": true, "Delete QR Code": true}};
+                        var accessRightDetails = {"Account Details":{"Account ID": accountID, "Name": accountDetails.name, "Role": accountDetails.role}, "Account":{"Create Account": true, "Account Table": true, "Access Rights Table": true}, "Courses":{"Upload Courses": true, "NSA Courses": true, "ILP Courses": true, "Update Courses": true, "Delete Courses": true}, "Registration And Payment": {"Registration And Payment Table": true, "Receipt Table": true, "Invoice Table": true}, "QR Code": {"Create QR Code": true, "QR Code Table": true, "Update QR Code": true, "Delete QR Code": true}};
                         var collectionName = "Access Rights";
                         var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, accessRightDetails);   
                         return {
                             success: true,
                             message: "New account with respectively access rights created successfully"
                         }
+                    }
+                    else if(accountDetails.role === "Ops in-charge")
+                    {
+                        var accountID = connectedDatabase.accountId;
+                        var accessRightDetails = {"Account Details":{"Account ID": accountID, "Name": accountDetails.name, "Role": accountDetails.role}, "Account":{"Create Account": false, "Account Table": false, "Access Rights Table": false}, "Courses":{"Upload Courses": false, "NSA Courses": true, "ILP Courses": true, "Update Courses": false, "Delete Courses": false}, "Registration And Payment": {"Registration And Payment Table": true, "Receipt Table": true, "Invoice Table": true}, "QR Code": {"Create QR Code": true, "QR Code Table": true, "Update QR Code": true, "Delete QR Code": true}};
+                        var collectionName = "Access Rights";
+                        var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, accessRightDetails);   
+                        return {
+                            success: true,
+                            message: "New account with respectively access rights created successfully"
+                        }
+                    }
+                    else if(accountDetails.role === "NSA in-charge")
+                    {
+                            var accountID = connectedDatabase.accountId;
+                            var accessRightDetails = {"Account Details":{"Account ID": accountID, "Name": accountDetails.name, "Role": accountDetails.role}, "Account":{"Create Account": false, "Account Table": false, "Access Rights Table": false}, "Courses":{"Upload Courses": false, "NSA Courses": true, "ILP Courses": false, "Update Courses": false, "Delete Courses": false}, "Registration And Payment": {"Registration And Payment Table": true, "Receipt Table": true, "Invoice Table": true}, "QR Code": {"Create QR Code": true, "QR Code Table": true, "Update QR Code": true, "Delete QR Code": true}};
+                            var collectionName = "Access Rights";
+                            var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, accessRightDetails);   
+                            return {
+                                success: true,
+                                message: "New account with respectively access rights created successfully"
+                            }
+                    }
+                    else if(accountDetails.role === "Site in-charge")
+                    {
+                            var accountID = connectedDatabase.accountId;
+                            var accessRightDetails = {"Account Details":{"Account ID": accountID, "Name": accountDetails.name, "Role": accountDetails.role}, "Account":{"Create Account": false,"Account Table": false, "Access Rights Table": false}, "Courses":{"Upload Courses": false, "NSA Courses": true, "ILP Courses": true, "Update Courses": false, "Delete Courses": false}, "Registration And Payment": {"Registration And Payment Table": true, "Receipt Table": true, "Invoice Table": true}, "QR Code": {"Create QR Code": true, "QR Code Table": true, "Update QR Code": true, "Delete QR Code": true}};
+                            var collectionName = "Access Rights";
+                            var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, accessRightDetails);   
+                            return {
+                                success: true,
+                                message: "New account with respectively access rights created successfully"
+                            }
+                    }
+                    else if(accountDetails.role === "Finance")
+                    {
+                        var accountID = connectedDatabase.accountId;
+                        var accessRightDetails = {"Account Details":{"Account ID": accountID, "Name": accountDetails.name, "Role": accountDetails.role}, "Account":{"Create Account": false, "Account Table": false, "Access Rights Table": false}, "Courses":{"Upload Courses": false, "NSA Courses": true, "ILP Courses": true, "Update Courses": false, "Delete Courses": false}, "Registration And Payment": {"Registration And Payment Table": true, "Receipt Table": true, "Invoice Table": true}, "QR Code": {"Create QR Code": false, "QR Code Table": false, "Update QR Code": false, "Delete QR Code": false}};
+                        var collectionName = "Access Rights";
+                        var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, accessRightDetails);   
+                        return {
+                                    success: true,
+                                    message: "New account with respectively access rights created successfully"
+                                }
                     }
                 }
             }

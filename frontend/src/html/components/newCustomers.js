@@ -246,7 +246,7 @@ class NewCustomersPage extends Component {
                 onChange={this.handleChange} 
                 autoComplete='off'
               />
-              {this.state.nameError && <p className="error-message">{this.state.nameError}</p>}
+              {this.state.nameError && <p className="error-message2">{this.state.nameError}</p>}
             </div>
             <div className="form-group">
               <label htmlFor="email">Email:</label>
@@ -259,7 +259,7 @@ class NewCustomersPage extends Component {
                 onChange={this.handleChange} 
                 autoComplete='off' 
               />
-              {this.state.emailError && <p className="error-message">{this.state.emailError}</p>}
+              {this.state.emailError && <p className="error-message2">{this.state.emailError}</p>}
             </div>
             <div className="form-group1">
                 <label htmlFor="password">Password:</label>
@@ -287,7 +287,7 @@ class NewCustomersPage extends Component {
                         Generate Password
                     </button>
                 </div>
-                {this.state.passwordError && <p className="error-message">{this.state.passwordError}</p>}
+                {this.state.passwordError && <p className="error-message2">{this.state.passwordError}</p>}
             </div>
             <div className="form-group">
               <label htmlFor="role">Role:</label>
@@ -315,7 +315,7 @@ class NewCustomersPage extends Component {
                   </ul>
                 )}
               </div>
-              {this.state.roleError && <p className="error-message">{this.state.roleError}</p>}
+              {this.state.roleError && <p className="error-message2">{this.state.roleError}</p>}
             </div>
             <div className="button-container">
                 <button 

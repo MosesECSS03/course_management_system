@@ -93,12 +93,13 @@ class CoursesSection extends Component {
   
   async componentDidMount() {
     var { accountType } = this.props;
+    console.log("ComponentDidMount:", accountType);
     if (accountType && !this.state.dataFetched && accountType === "Accounts") {
       await this.fetchAccounts();
     }
     else if (accountType && !this.state.dataFetched && accountType === "Access Rights") 
     {
-        this.fetchAccessRights();
+      await this.fetchAccessRights();
     }
   }
 
@@ -106,21 +107,19 @@ class CoursesSection extends Component {
   componentDidUpdate(prevProps)
   {
    var { accountType, selectedAccountType, language, searchQuery } = this.props;
-   console.log("Selected Account Type:", selectedAccountType, prevProps.selectedAccountType, selectedAccountType !== prevProps.selectedAccountTyp);
-
+    console.log("Component Did Update:", accountType, prevProps.accountType, accountType !== prevProps.accountType);
    // Check if any of the relevant props have changed
    if (
-     accountType !== prevProps.accountType || 
+     accountType !== prevProps.accountType ||
      language !== prevProps.language
    ) {
-     this.setState({filteredAccounts: [] });
-     if(accountType === "Accounts")
+         if(accountType === "Accounts")
      {
         this.fetchAccounts();
      }
-     else
+     else if(accountType === "Access Rights")
      {
-        this.fetchAccessRights();
+         this.fetchAccessRights();
         //this.props.closePopup();
      }
    }
@@ -132,7 +131,7 @@ class CoursesSection extends Component {
         {
             this.filterAccounts();
         }
-        else
+        else if(accountType === "Access Rights")  
         {
             this.filterAccessRights();
            //this.props.closePopup();
@@ -264,23 +263,18 @@ filterAccessRights()
 
   render() 
   {
-    const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights } = this.state;
+    const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType } = this.state;
     var paginatedDetails = this.getPaginatedDetails();
-    if(accounts.length > 0)
-    {
-        paginatedDetails = this.getPaginatedDetails();
-    }
-    else if(accessRights.length > 0)
-    {
-        paginatedDetails = this.getPaginatedAccessDetails();
-    }
+    var paginatedDetails1 = this.getPaginatedAccessDetails();
 
+      //console.log(filteredAccessRights);
+      //paginatedDetails = this.getPaginatedAccessDetails();
     return (
       <div className="accounts-container">
         <div className="accounts-heading">
           <h1>{this.props.language === 'zh' ? (this.props.courseType === 'NSA' ? 'NSA 课程' : 'ILP 课程') : (this.props.accountType === 'Accounts' ? 'Accounts Table' : 'Access Rights Table')}</h1>
           <div className="table-wrapper" ref={this.tableRef}>
-            {this.props.accountType === 'Accounts'? (
+            { this.props.accountType === 'Accounts'? (
               <table>
                 <thead>
                   <tr>
@@ -347,11 +341,11 @@ filterAccessRights()
                     </tr>
                   </thead>
                   <tbody>
-                  {paginatedDetails.map((accessRight, index) => { 
+                  {paginatedDetails1.map((accessRight, index) => { 
                       return (
                         <tr key={index}>
-                          <td>{accessRight["Account Details"].Name}</td> 
-                          <td>{accessRight["Account Details"].Role}</td>
+                          <td>{accessRight["Account Details"]["Name"]}</td> 
+                          <td>{accessRight["Account Details"]["Role"]}</td>
                           <td><input type="checkbox" checked={accessRight["Account"]["Account Table"]} disabled readOnly/></td> 
                           <td><input type="checkbox" checked={accessRight["Account"]["Account Table"]} disabled readOnly/></td> 
                           <td><input type="checkbox" checked={accessRight["Courses"]["Upload Courses"]} disabled readOnly/></td> 

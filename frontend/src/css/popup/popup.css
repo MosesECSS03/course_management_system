@@ -209,6 +209,45 @@
   transform: translateY(-50%);
 }
 
+
+/*Error message container */
+.logout-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff; /* Solid black background */
+  padding: 1.5rem; /* Padding around the content */
+  border-radius: 0.625rem; /* Rounded corners */
+  height: 12.5rem; /* Set the width of the popup */
+  text-align: center;
+  height: auto;
+}
+
+.logout-title {
+  color: #000000; /* Green color for success */
+  font-size: 1.5rem; /* Title size */
+  font-weight: bold;
+  margin: 1rem 0; /* Space around the title */
+}
+
+.button-container1 {
+  display: flex;
+  justify-content: space-between; /* Spreads the buttons evenly */
+  margin-top: 1rem; /* Adds some spacing above the buttons */
+}
+
+.button-container1 button {
+  padding: 0.5rem 1rem; /* Adjust button padding */
+  flex-grow: 1; /* Makes both buttons equally wide */
+  margin-right: 12rem; /* Adds space between the buttons */
+  font-weight: bold;
+  width: 5rem;
+}
+
+.button-container1 button:last-child {
+  margin-right: 0; /* Removes the right margin for the last button */
+}
+
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0);

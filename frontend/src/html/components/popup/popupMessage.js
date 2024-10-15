@@ -112,6 +112,16 @@ class Popup extends Component {
     }));
   };
 
+  cancel = async() =>
+  {
+    this.props.closePopup();
+  }
+
+  goBackHome = async() =>
+  {
+    this.props.goBackLoginPage();
+  }
+  
 
   render() {
     const { message, isOpen, onClose, type } = this.props;
@@ -200,7 +210,17 @@ class Popup extends Component {
                 <button type="submit" className="submit-btn">Change Password</button>
               </form>
         </div>
-          ) : (
+          ):  type === "logout" ? (
+            // Layout for success type
+            <div className="logout-message">
+              <h2 className="logout-title">Logout</h2>
+              <p>{message}</p>
+              <div className="button-container1">
+                <button onClick={this.cancel}>No</button>
+                <button onClick={this.goBackHome}>Yes</button>
+              </div>
+            </div>
+          ): (
             // Default layout for other types (like "message")
             <>
              

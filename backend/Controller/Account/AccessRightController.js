@@ -68,6 +68,35 @@ class AccessRightController
             await this.databaseConnectivity.close(); // Ensure the connection is closed
         }    
     }  
+
+    async allAccessRights(accountId) 
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System";
+                var collectionName = "Access Rights";
+                var connectedDatabase = await this.databaseConnectivity.retrieveOneFromDatabase(databaseName, collectionName, accountId);   
+                var accessRights = {"Account": connectedDatabase["Account"], "Courses": connectedDatabase["Courses"], "Registration And Payment": connectedDatabase["Registration And Payment"], "QR Code":  connectedDatabase["QR Code"]}
+                return accessRights;
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error retrieving all user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }  
  }
 
 module.exports = AccessRightController;

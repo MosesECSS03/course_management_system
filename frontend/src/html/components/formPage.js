@@ -60,29 +60,38 @@ class FormPage extends Component {
   }
 
   handleDataChange = (newData) => {
-    this.setState((prevState) => {
-      const updatedFormData = {
-        ...prevState.formData,
-        ...newData,
-      };
-      
-      const key = Object.keys(newData)[0];
-      const updatedValidationErrors = { ...prevState.validationErrors };
-  
-      if (updatedValidationErrors[key]) {
-        delete updatedValidationErrors[key];
-      }
-  
-      return {
-        formData: updatedFormData,
-        validationErrors: updatedValidationErrors,
-      };
-    });
+    try
+    {
+      this.setState((prevState) => {
+        const updatedFormData = {
+          ...prevState.formData,
+          ...newData,
+        };
+        
+        const key = Object.keys(newData)[0];
+        const updatedValidationErrors = { ...prevState.validationErrors };
+    
+        if (updatedValidationErrors[key]) {
+          delete updatedValidationErrors[key];
+        }
+
+    
+        return {
+          formData: updatedFormData,
+          validationErrors: updatedValidationErrors,
+        };
+      });
+    }
+    catch(error)
+    {
+      console.log(error);
+    }
   };
 
   handleNext = () => {
     const errors = this.validateForm();
     const { currentSection } = this.state;
+    console.log(currentSection);
   
     // Payment validation when in CourseDetails section (currentSection === 2)
     if (currentSection === 2 && !this.courseDetailsRef.state.selectedPayment) {

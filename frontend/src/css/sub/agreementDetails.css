@@ -22,4 +22,20 @@
     font-size: 1rem; /* Adjust font size as necessary */
     color: #333; /* Dark text color for readability */
   }
+
+  .agreement-options {
+    display: flex; /* Use Flexbox to arrange the labels in a row */
+    align-items: center; /* Center radio buttons vertically */
+    gap: 1rem; /* Space between radio options */
+    margin-top: 0.5rem; /* Space between the label and options */
+  }
+  
+  .agreement-options label {
+    display: flex; /* Keep label as flex for alignment */
+    align-items: center; /* Center radio buttons vertically */
+  }
+  
+  .agreement-options input {
+    width: fit-content; /* Fit input width to content */
+  }
   

@@ -33,3 +33,18 @@
   font-size: 0.875rem; /* Slightly smaller font for errors */
   margin-top: 0.25rem; /* Space above error message */
 }
+
+.payment-options {
+  display: flex; /* Use Flexbox to arrange the labels in a row */
+  gap: 1rem; /* Space between radio options */
+  margin-top: 0.5rem; /* Space between the label and options */
+}
+
+.payment-options label {
+  display: flex; /* Keep label as flex for alignment */
+  align-items: center; /* Center radio buttons vertically */
+}
+
+.payment-options input{
+  width: fit-content;
+}

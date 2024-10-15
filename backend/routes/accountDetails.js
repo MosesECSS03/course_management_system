@@ -28,14 +28,15 @@ function getCurrentDateTime() {
 router.post('/', async function(req, res, next) {
     if (req.body.purpose === "create") 
     {
-        var { name, email, password, role } = req.body.accountDetails;
+        var { name, email, password, role, site } = req.body.accountDetails;
+        console.log(role);
         const currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
 
         // Uncomment and implement the controller if necessary
          var controller = new AccountController();
-         var result = await controller.createAccount({ name, email, password, role, date_created: date, time_created: time, first_time_log_in: "Yes", date_log_in: "", time_log_in: "", date_log_out: "", time_log_out: "" });
+         var result = await controller.createAccount({ name, email, password, role, site, date_created: date, time_created: time, first_time_log_in: "Yes", date_log_in: "", time_log_in: "", date_log_out: "", time_log_out: "" });
 
         // Log the result if needed
         // console.log(result);

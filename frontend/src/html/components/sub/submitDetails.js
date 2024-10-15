@@ -5,7 +5,7 @@ class SubmitDetailsSection extends React.Component {
   render() {
     return (
       <div className="submit-details-section">
-        <div className="input-group">
+        <div className="input-group1">
           <span className="submit-detail-text">
             Thank you for registration! It is currently under review, and we will contact you shortly.
             </span>

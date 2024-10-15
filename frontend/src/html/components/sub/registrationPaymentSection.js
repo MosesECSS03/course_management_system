@@ -425,6 +425,7 @@
                     <th colSpan="5">{this.props.language === 'zh' ? '课程' : 'Courses'}</th>
                     <th>{this.props.language === 'zh' ? '其他' : 'Others'}</th>
                     <th>{this.props.language === 'zh' ? '确认状态' : 'Confirmation Status'}</th>
+                    <th colSpan="3">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
                   </tr>
                   <tr>
                     <th>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
@@ -445,6 +446,9 @@
                     <th>{this.props.language === 'zh' ? '支付方式' : 'Payment Method'}</th>
                     <th>{this.props.language === 'zh' ? '协议' : 'Agreement'}</th>
                     <th>{this.props.language === 'zh' ? '支付' : 'Payment'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Staff Name'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Date Received'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -499,6 +503,9 @@
                         )}
 
                       </td>
+                      <td>{item.official.name}</td>
+                      <td>{item.official.date}</td>                      
+                      <td>{item.official.time}</td>
                     </tr>
                   ))}
                 </tbody>

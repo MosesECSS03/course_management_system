@@ -10,6 +10,12 @@ router.post('/', async function(req, res, next)
         var result = await controller.allAccountsWithAccessRight();
         return res.json({"result": result}); 
     }
+    else if(req.body.purpose === "retrieveAccessRight")
+    {
+        var controller = new AccessRightController();
+        var result = await controller.allAccessRights(req.body.accountId);
+        return res.json({"result": result});
+    }
 });
 
 module.exports = router;

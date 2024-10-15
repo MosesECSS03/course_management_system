@@ -49,6 +49,7 @@
     display: flex;
     flex-direction: column;
     z-index: 3;
+    overflow: hidden;
   }
 
   .sidebar-visible .sidebar {
@@ -127,11 +128,30 @@
       height: fit-content;
   }
 
-  .account-section, .courses-section, .registration-payment-section {
+  .create-account-section
+  {
+    grid-row: 1; /* Botom section */
+    z-index: 0;
+    margin-left: -20rem;
+   -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+
+  .account-section, .courses-section
+  {
     grid-row: 3; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;
     margin-top: -20rem;
+  }
+
+ .registration-payment-section 
+  {
+    grid-row: 3; /* Botom section */
+    z-index: 0;
+    margin-left: -8.5rem;
+    margin-top: - 10rem;
   }
 
   .account-section
@@ -146,15 +166,56 @@
 
 
   .footer {
-    background-color: #fab9b9; /* Match header background color */
-    text-align: left;
-    box-sizing: border-box;
-    font-size: 0.7em; /* Adjust as needed */
-    height: 45px; /* Set the same height as header */
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Center content vertically */
-    padding: 0 10px; /* Add horizontal padding */
-    z-index: 3;
+    background-color: #fab9b9 !important; /* Match header background color */
+    text-align: left !important;
+    box-sizing: border-box !important;
+    font-size: 0.7em !important; /* Adjust as needed */
+    height: 45px !important; /* Set the same height as header */
+    display: flex !important; /* Use flexbox for alignment */
+    align-items: center !important; /* Center content vertically */
+    padding: 0 10px !important; /* Add horizontal padding */
+    z-index: 3 !important;
+  }
+
+  .displayedName
+  {
+    font-size: 1rem;
+    margin-left: -10rem;
+    margin-right: 0.5rem;
+  }
+
+  .user-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 2.5rem;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    min-width: 12rem;
+    z-index: 1;
+    font-size: 1rem;
+  }
+  
+  .dropdown-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .dropdown-menu li {
+    padding: 10px;
+    cursor: pointer;
   }
 
   /* Responsive Styles */
@@ -185,7 +246,7 @@
   .main-content {
     margin-left: 1.5rem
   }
-  }
+}
 
 
   @media (max-width: 768px) 
@@ -226,6 +287,16 @@
       right: 10px;
     }
 
+    .logout-div {
+      width: 50px !important;
+      height: 50px !important;
+    }
+    
+    .logout-button {
+      width: 100% !important;
+      height: auto !important;
+    }
+    
     .sidebar {
       position: absolute; /* Remove fixed positioning */
       overflow: visible; /* Show content overflow */

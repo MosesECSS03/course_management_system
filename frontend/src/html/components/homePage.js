@@ -8,7 +8,8 @@
   import Search from './sub/searchSection';
   import ViewToggle from './sub/viewToggleSection';
   import Pagination from './sub/paginationSection';
-
+  import CreateAccountsSection from './sub/createAccountsSection';
+  import SideBarContent from './sub/sideBarContent';
 
   class HomePage extends Component {
     constructor(props) {
@@ -42,7 +43,10 @@
         isRegistrationPaymentVisible: false,
         section: '',
         accountType: null,
-        roles: []
+        roles: [],
+        createAccount: false,
+        displayedName: "",
+        isDropdownOpen: false
       };
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
@@ -53,6 +57,7 @@
       this.handlePageChange = this.handlePageChange.bind(this);
       this.toggleViewMode = this.toggleViewMode.bind(this); 
       this.toggleRegistrationPaymentComponent = this.toggleRegistrationPaymentComponent.bind(this);
+      this.createAccountPopupMessage = this.createAccountPopupMessage.bind(this);
       //this.getTotalNumberofDetails = this.getTotalNumberofDetails.bind(this);
     }
 
@@ -210,25 +215,47 @@
       }
     };
 
-    toggleAccountsComponent = async (accountType) => {
-      try {
-        this.setState({ resetSearch: true, }, () => {
-          this.setState({ resetSearch: false });
-        });
+    toggleAccountsComponent = async (accountType) => 
+    {
+      try 
+      {
+        if(accountType !== "Create Account")
+        { 
+          this.setState({ resetSearch: true, }, () => {
+            this.setState({ resetSearch: false });
+          });
 
-        console.log(accountType);
+          console.log("Account Type:", accountType);
 
-       this.setState({
-          isPopupOpen: true,
-          popupMessage: "Loading In Progress",
-          popupType: "loading",
-          courseType: "",
-          sidebarVisible: false,
-          isRegistrationPaymentVisible: false ,
-          section: "accounts",
-          accountType: accountType
-        });
-      } catch (error) {
+          this.setState({
+            isPopupOpen: true,
+            popupMessage: "Loading In Progress",
+            popupType: "loading",
+            courseType: "",
+            sidebarVisible: false,
+            isRegistrationPaymentVisible: false ,
+            section: "accounts",
+            accountType: accountType,
+            createAccount: false
+          });
+        }
+        else
+        {
+          this.setState({
+            isPopupOpen: true,
+            popupMessage: "Loading In Progress",
+            popupType: "loading",
+            courseType: "",
+            sidebarVisible: false,
+            isRegistrationPaymentVisible: false ,
+            section: "accounts",
+            accountType: null,
+            createAccount: true
+          });
+        }
+      } 
+      catch (error) 
+      {
         console.log(error);
       }
     };
@@ -337,26 +364,67 @@
         }
     };
 
-    toggleRegistrationPaymentComponent() {
-      this.setState({ resetSearch: true, }, () => {
-        this.setState({ resetSearch: false });
-      });
+    toggleRegistrationPaymentComponent(item)
+    {
+      if(item === "Registration And Payment Table")
+      {
+        this.setState({ resetSearch: true, }, () => {
+          this.setState({ resetSearch: false });
+        });
 
-      this.setState((prevState) => ({
-          courseType: "",
-          isRegistrationPaymentVisible: !prevState.isRegistrationPaymentVisible, // Toggle visibility
-          isPopupOpen: true,
-          popupMessage: "Loading In Progress",
-          popupType: "loading",
-          sidebarVisible: false,
-          section: "registration",
-          accountType: null,
-          //viewMode: "full"
-      }));
+        this.setState((prevState) => ({
+            courseType: "",
+            isRegistrationPaymentVisible: !prevState.isRegistrationPaymentVisible, // Toggle visibility
+            isPopupOpen: true,
+            popupMessage: "Loading In Progress",
+            popupType: "loading",
+            sidebarVisible: false,
+            section: "registration",
+            accountType: null,
+            //viewMode: "full"
+        }));
+      }
   }
 
-    render() {
-      const { submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts} = this.state;
+  logOut = async() =>
+  {
+    //this.props.history.push('/');  
+    this.setState({
+      isPopupOpen: true,
+      popupMessage: "Are you sure that you want to log out?",
+      popupType: "logout",
+      isDropdownOpen: false
+    });
+  }
+
+  goBackHome = async() =>
+  {
+    this.props.history.push("/");
+  }
+
+    createAccountPopupMessage(result, message, popupType)
+    {
+      console.log(result, message, popupType);
+      this.setState({
+        isPopupOpen: result,
+        popupMessage: message,
+        popupType: "success-message"
+      });
+      setTimeout(() => {
+        this.setState({ isPopupOpen: false});
+      }, 5000);
+    }
+
+    toggleDropdown = () => {
+      this.setState((prevState) => ({
+        isDropdownOpen: !prevState.isDropdownOpen,
+      }));
+    };
+
+    render() 
+    {
+      const userName = this.props.location.state?.name || 'User';
+      const { isDropdownOpen, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
       return (
         <>
           <div className="dashboard">
@@ -369,42 +437,47 @@
                   {language === 'en' ? '中文' : 'English'}
                 </button>
               </div>
+              <div className="user-dropdown">
+                <div className="dropdown-toggle" onClick={this.toggleDropdown}>
+                  <span className="displayedName">{userName}</span>
+                  <i className='fas fa-user-alt'></i>
+                </div>
+
+                {isDropdownOpen && (
+                  <div className="dropdown-menu">
+                    <ul>
+                      {/*<li>Profile</li>
+                      <li>Settings</li>*/}
+                      <li onClick={this.logOut}>Logout</li>
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
             <div className={`content ${sidebarVisible ? 'sidebar-visible' : 'sidebar-hidden'}`}>
               <div
                 className={`sidebar ${submenuVisible !== null ? 'expanded' : ''}`}
                 onMouseLeave={this.handleMouseLeave}
               >
-                <div className="sidebar-item"  onClick={() => this.toggleSubMenu(0)}>
-                  <i className="fa-solid fa-user"></i> {language === 'zh' ? '账户' : 'Accounts'}
-                </div>
-                <div className={`submenu${submenuVisible === 0 ? 'visible' : ''}`}>
-                  <div className="submenu-item" onClick={() => this.toggleAccountsComponent('Accounts')}>
-                    {language === 'zh' ? 'Accounts Tables' : 'Accounts Tables'}
-                  </div>
-                  <div className="submenu-item" onClick={() => this.toggleAccountsComponent('Access Rights')}>
-                    {language === 'zh' ? 'ILP 课程' : 'Access Rights Table'}
-                  </div>
-                </div>
-                <div className="sidebar-item" onClick={() => this.toggleSubMenu(1)}>
-                  <i className="fas fa-tachometer-alt"></i> {language === 'zh' ? '课程' : 'Courses'}
-                </div>
-                <div className={`submenu${submenuVisible === 1 ? 'visible' : ''}`}>
-                  <div className="submenu-item" onClick={() => this.toggleCourseComponent('NSA')}>
-                    {language === 'zh' ? 'NSA 课程' : 'NSA Courses'}
-                  </div>
-                  <div className="submenu-item" onClick={() => this.toggleCourseComponent('ILP')}>
-                    {language === 'zh' ? 'ILP 课程' : 'ILP Courses'}
-                  </div>
-                </div>
-                <div className="sidebar-item" onClick={() => this.toggleRegistrationPaymentComponent()}>
-                  <i className="fa-brands fa-wpforms"></i> {language === 'zh' ? '注册和付款' : 'Registrations and Payments'}
-                </div>
-                <div className="sidebar-item">
-                  <i className="fas fa-qrcode"></i> {language === 'zh' ? '二维码' : 'QR Code'}
-                </div>
+                <SideBarContent
+                  accountId = {this.props.location.state?.accountId}
+                  toggleAccountsComponent = {this.toggleAccountsComponent}
+                  toggleCourseComponent = {this.toggleCourseComponent}
+                  toggleRegistrationPaymentComponent = {this.toggleRegistrationPaymentComponent}
+                />
               </div>
               <div className="main-content">
+              {createAccount && (
+                <>
+                   <div className="create-account-section">
+                      <CreateAccountsSection
+                        language={language}
+                        closePopup={this.closePopup}
+                        createAccountPopupMessage={this.createAccountPopupMessage}
+                      />
+                    </div>
+                </>
+              )}
               {accountType && (
                   <>
                   <div className="search-section">
@@ -552,7 +625,7 @@
                 All rights reserved.</p>
             </div>
           </div>
-          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} />
+          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} goBackLoginPage={this.goBackHome}/>
         </>
       );
     }

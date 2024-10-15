@@ -1,46 +1,56 @@
 /* personalInfo.css */
-.input-group {
+.input-group1 {
     margin: 1rem 0; /* Add spacing between sections */
     padding: 1rem; /* Add some padding */
-    border-radius: 0.5rem; /* Rounded corners */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    background-color: #fff; /* Background color for contrast */
   }
   
-.input-group label {
+.input-group1 label {
   display: block; /* Make label a block element */
   margin-bottom: 5px; /* Space between label and input */
   font-weight: bold; /* Optional: make label text bold */
 }
 
-.personal-info-input {
+.personal-info-input1 {
   width: 100%; /* Full width */
   padding: 10px; /* Padding for better spacing */
-  border: 1px solid #ccc; /* Border color */
   border-radius: 5px; /* Rounded corners */
   font-size: 1rem; /* Font size */
 }
 
-.personal-info-input:focus {
+.personal-info-input1:focus {
   border-color: #007bff; /* Change border color on focus */
   outline: none; /* Remove default outline */
 }
 
 
 /* personalInfo.css */
-.input-group {
+.input-group1 {
   margin: 1rem 0; /* Spacing between sections */
   padding: 1rem; /* Padding inside the section */
   border-radius: 0.5rem; /* Rounded corners */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
-  background-color: #f9f9f9; /* Light background color */
+  background-color: #ffffff; /* Light background color */
   border: 1px solid #e0e0e0; /* Border to define the section */
 }
 
-.personal-info-input {
+.personal-info-input1 {
   width: 100%; /* Full width of the section */
   padding: 0.5rem; /* Padding inside the input */
-  border: 1px solid #ccc; /* Border for the input */
-  border-radius: 0.25rem; /* Rounded corners for the input */
   box-sizing: border-box; /* Include padding and border in width */
+}
+
+.radio-group1 {
+  display: flex; /* Aligns radio buttons horizontally */
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  gap: 1rem; /* Adds spacing between each radio option */
+}
+
+.radio-option1 {
+  display: inline-flex; /* Aligns the radio button and label next to each other */
+  align-items: center; /* Centers the label and radio button vertically */
+}
+
+.radio-option1 input {
+  margin-right: 0.5rem;
+  width: fit-content; /* Adds space between the radio button and the label */
 }

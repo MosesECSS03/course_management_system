@@ -30,7 +30,7 @@ class AgreementDetailsSection extends Component {
 
     return (
       <div className="agreement-details-section">
-        <div className="input-group">
+        <div className="input-group1">
           <label>Consent for use of Personal Data</label>
           <span className="agreement-detail-text">
             By submitting this form, I consent to my Personal Data being collected, used and disclosed to C3A and relevant partners for course administration purposes and to be informed of relevant information on programmes, research and publicity relating to active ageing. Do note that photographs and videos may be taken during the course for publicity purposes. 
@@ -40,21 +40,23 @@ class AgreementDetailsSection extends Component {
             我了解我可以随时通过发送电子邮件至<a href="mailto:dataprotection@c3a.org.sg">dataprotection@c3a.org.sg</a>更新我的个人资料或撤销我的同意，活跃乐龄理事会的隐私条款可在 <a href="https://www.c3a.org.sg">www.c3a.org.sg</a>网站上查阅。
           </span>
         </div>
-        <div className="input-group">
+        <div className="input-group1">
           <label>I agree to C3A's privacy policy 我同意活跃乐龄理事会的隐私条款</label>
-          <label>
-            <input
-              type="radio"
-              value="Agree 我同意" // Correct value assignment
-              checked={selectedChoice === 'Agree 我同意'} // Control radio button
-              onChange={this.handleAgreementChange} // Call handler on change
-            />
-            Agree 我同意
-          </label>
+          <div className="agreement-options">
+            <label>
+              <input
+                type="radio"
+                value="Agree 我同意" // Correct value assignment
+                checked={selectedChoice === 'Agree 我同意'} // Control radio button
+                onChange={this.handleAgreementChange} // Call handler on change
+              />
+              Agree 我同意
+            </label>
           {/* Show error message if the user has interacted but not selected the option */}
           {isSelected && !selectedChoice && (
-            <span className="error-message">Please select an option.</span>
+            <span className="error-message1">Please select an option.</span>
           )}
+          </div>
         </div>
       </div>
     );

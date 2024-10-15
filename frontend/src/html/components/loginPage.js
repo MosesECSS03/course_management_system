@@ -104,12 +104,13 @@ class LoginPage extends Component {
               isPopupOpen: true,
               popupMessage: response.data.message.message,
               popupType: "change-password",
-              accountId: response.data.message.details._id
+              accountId: response.data.message.details._id,
+              name: response.data.message.details.name
             });
           }
           else
           {
-            this.props.history.push('/home');  
+            this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}}); 
           }
       }, 5000);
       } 
@@ -138,7 +139,7 @@ class LoginPage extends Component {
       });
       setTimeout(() => {
           this.setState({ isPopupOpen: false});
-          this.props.history.push('/home');  
+            this.props.history.push({ pathname: '/home', state: { accountId:  this.state.accountId, name: this.state.name}});  
       }, 5000);
     }
     else 

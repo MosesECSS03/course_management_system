@@ -83,32 +83,31 @@ class PersonalInfo extends Component {
     return (
       <div>
         {sections.map((section) => (
-          <div key={section.name} className="input-group">
+          <div key={section.name} className="input-group1">
             <label htmlFor={section.name}>{section.placeholder}</label>
             {section.isSelect ? (
               section.isDate ? (
                 <DatePicker
-              selected={data.dOB ? new Date(data.dOB.formattedDate.split('/').reverse().join('-')) : null}
-              onChange={this.handleDateChange}
-              dateFormat="dd/MM/yyyy"
-              showMonthDropdown
-              showYearDropdown
-              dropdownMode="select"
-              customInput={<CustomInput />}
-              placeholderText="DD/MM/YYYY" // Placeholder text to guide users
-            />
-
+                  selected={data.dOB ? new Date(data.dOB.formattedDate.split('/').reverse().join('-')) : null}
+                  onChange={this.handleDateChange}
+                  dateFormat="dd/MM/yyyy"
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                  customInput={<CustomInput />}
+                  placeholderText="DD/MM/YYYY"
+                />
               ) : (
                 section.isRadio && (
-                  <div className="radio-group">
+                  <div className="radio-group1">
                     {optionMappings[section.name].map((option) => (
-                      <label key={option}>
+                      <label key={option} className="radio-option1">
                         <input
                           type="radio"
                           name={section.name}
                           value={option}
                           checked={data[section.name] === option}
-                          onChange={this.handleChange}
+                          onChange={this.handleChange} // Ensure this is set
                         />
                         {option}
                       </label>
@@ -122,12 +121,12 @@ class PersonalInfo extends Component {
                 id={section.name}
                 name={section.name}
                 placeholder={section.placeholder}
-                value={data[section.name] || ''}
+                value={data[section.name] || ''} // Ensure to provide a value
                 onChange={this.handleChange} // Ensure onChange is set
-                className="personal-info-input"
+                className="personal-info-input1"
               />
             )}
-            {errors[section.name] && <span className="error-message">{errors[section.name]}</span>}
+            {errors[section.name] && <span className="error-message1">{errors[section.name]}</span>}
           </div>
         ))}
       </div>

@@ -39,13 +39,13 @@ class CourseDetailsSection extends Component {
     
     return (
       <div className="course-details-section">
-        <div className="input-group">
+        <div className="input-group1">
           <label htmlFor="courseType">Course Type</label>
           <span className="course-detail-text" id="courseType">
             {this.props.courseType}
           </span>
         </div>
-        <div className="input-group">
+        <div className="input-group1">
           <label htmlFor="courseName">Course Name</label>
           <span className="course-detail-text" id="courseName">
             English Name: {this.props.courseEnglishName}
@@ -55,19 +55,19 @@ class CourseDetailsSection extends Component {
             Chinese Name: {this.props.courseChineseName}
           </span>
         </div>
-        <div className="input-group">
+        <div className="input-group1">
           <label htmlFor="courseLocation">Course Location</label>
           <span className="course-detail-text" id="courseLocation">
             {this.props.courseLocation}
           </span>
         </div>
-        <div className="input-group">
+        <div className="input-group1">
           <label htmlFor="coursePrice">Course Price</label>
           <span className="course-detail-text" id="coursePrice">
             {this.props.coursePrice}
           </span>
         </div>
-        <div className="input-group">
+        <div className="input-group1">
           <label htmlFor="courseDuration">Course Duration</label>
           <span className="course-detail-text" id="courseDuration">
             {this.props.courseDuration}
@@ -76,9 +76,9 @@ class CourseDetailsSection extends Component {
 
         
         {/* Payment Options Section */}
-        <div className="input-group">
+        <div className="input-group1">
           <label>Payment Options</label>
-          <div>
+          <div className="payment-options">
             <label>
               <input
                 type="radio"
@@ -108,7 +108,7 @@ class CourseDetailsSection extends Component {
             </label>
           </div>
           {!selectedPayment && paymentTouched && (
-            <span className="error-message">Please select a payment option.</span>
+            <span className="error-message1">Please select a payment option.</span>
           )}
         </div>
       </div>
