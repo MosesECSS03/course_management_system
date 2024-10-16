@@ -331,7 +331,6 @@
         .then(response => {
           if(response.data.result ===  true)
           {
-            window.location.reload();
             this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
         })
@@ -358,6 +357,7 @@
       console.log("WooCommerce");
       axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
+          console.log("Update Woo Commerce", response.data);
           if(response.data.result ===  true)
           {
             console.log(this.props);
@@ -365,7 +365,7 @@
               if(response.data.result ===  true)
               {
                 //this.props.createAccountPopupMessage(true, response.data.message, response.data.message);
-                
+                window.location.reload();
               }
               }).catch(error => {
                 console.error('Error fetching course registrations:', error);
@@ -420,27 +420,68 @@
         }))];
       }
 
-      receiptGenerator = async(event, rowData) =>
-      {
+      receiptGenerator = async (event, rowData) => {
         event.stopPropagation();
-        console.log(rowData); // This will contain all data of the clicked row
-        if((rowData.course.payment === "Cash" || rowData.course.payment === "PayNow")  && rowData.status === "Paid")
-        {
-          console.log("Generating Receipt:");
-              axios.post('http://localhost:3001/courseregistration', { purpose: 'receipt', rowData: rowData }, { responseType: 'blob' })
-              .then(response => {
-                const blob = new Blob([response.data], { type: 'application/pdf' }); // Create a new Blob
-                const url = window.URL.createObjectURL(blob); // Create a URL for the blob
-                const pdfWindow = window.open();
-                pdfWindow.location.href = url; // Open the PDF in the new tab
-              })
-              .catch(error => {
-                console.error('Error fetching course registrations:', error);
-                // Handle error here (e.g., show a message to the user)
-              });
-
+    
+        const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
+        
+        for (var i = 0; i < rowDataArray.length; i++) {
+            if ((rowDataArray[i].course.payment === "Cash" || rowDataArray[i].course.payment === "PayNow") && rowDataArray[i].status === "Paid") {
+                console.log("Generating Receipt for:", rowDataArray[i]._id);
+                const registration_id = rowDataArray[i]._id;
+                
+                try {
+                    // First, get the receipt number
+                    const response = await axios.post('http://localhost:3001/receipt', {
+                        purpose: 'getReceiptNo',
+                        courseLocation: rowDataArray[i].course.courseLocation
+                    });
+                    
+                    const receiptNo = response.data.result.receiptNumber;
+                    
+                    if (response.data.result.success === true) {
+                        // Now, fetch the PDF
+                        const pdfResponse = await axios.post('http://localhost:3001/courseregistration', {
+                            purpose: 'receipt',
+                            rowData: rowDataArray,
+                            staff: this.props.userName,
+                            receiptNo: receiptNo
+                        }, { responseType: 'blob' });
+    
+                        // Extract filename from Content-Disposition header
+                        const contentDisposition = pdfResponse.headers['content-disposition'];
+                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+    
+                        console.log(`Filename: ${filename}`);
+    
+                        // Create a Blob for the PDF
+                        const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+                        const url = window.URL.createObjectURL(blob);
+    
+                        // Open PDF in a new tab
+                        const pdfWindow = window.open();
+                        pdfWindow.location.href = url;
+    
+                        // Now, create the receipt in the database
+                        const receiptCreationResponse = await axios.post('http://localhost:3001/receipt', {
+                            purpose: 'createReceipt',
+                            receiptNo: receiptNo,
+                            registration_id: registration_id,
+                            url: url,
+                            staff: this.props.userName
+                        });
+    
+                        console.log("Receipt Created:", receiptCreationResponse.data);
+                    } else {
+                        console.error("Failed to generate receipt number.");
+                    }
+                } catch (error) {
+                    console.error('Error during receipt generation process:', error);
+                }
+            }
         }
-      }
+    }
     
 
     render() {

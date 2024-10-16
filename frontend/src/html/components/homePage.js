@@ -9,6 +9,7 @@
   import ViewToggle from './sub/viewToggleSection';
   import Pagination from './sub/paginationSection';
   import CreateAccountsSection from './sub/createAccountsSection';
+  import ReceiptSection from './sub/receiptSection';
   import SideBarContent from './sub/sideBarContent';
 
   class HomePage extends Component {
@@ -46,7 +47,8 @@
         roles: [],
         createAccount: false,
         displayedName: "",
-        isDropdownOpen: false
+        isDropdownOpen: false,
+        isReceiptVisible: false
       };
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
@@ -209,7 +211,8 @@
           isRegistrationPaymentVisible: false ,
           section: "courses",
           accountType: "",
-          createAccount: false
+          createAccount: false,
+          isReceiptVisible: false
         });
       } catch (error) {
         console.log(error);
@@ -367,6 +370,7 @@
 
     toggleRegistrationPaymentComponent(item)
     {
+      console.log("Selected Item:", item);
       if(item === "Registration And Payment Table")
       {
         this.setState({ resetSearch: true, }, () => {
@@ -382,9 +386,30 @@
             sidebarVisible: false,
             section: "registration",
             accountType: null,
-            createAccount: false
+            createAccount: false,
+            isReceiptVisible: false,
             //viewMode: "full"
         }));
+      }
+      else if(item === "Receipt Table")
+      {
+          this.setState({ resetSearch: true, }, () => {
+            this.setState({ resetSearch: false });
+          });
+  
+          this.setState((prevState) => ({
+              courseType: "",
+              isRegistrationPaymentVisible: false, // Toggle visibility
+              isPopupOpen: true,
+              popupMessage: "Loading In Progress",
+              popupType: "loading",
+              sidebarVisible: false,
+              section: "registration",
+              accountType: null,
+              createAccount: false,
+              isReceiptVisible: !prevState.isReceiptVisible,
+              //viewMode: "full"
+          }));
       }
   }
 
@@ -426,7 +451,7 @@
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
-      const { isDropdownOpen, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
+      const { isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
       return (
         <>
           <div className="dashboard">
@@ -576,7 +601,7 @@
                     </div>
                   </>
                 )}
-                {isRegistrationPaymentVisible && 
+                { isRegistrationPaymentVisible&& 
                   <>
                   <div className="search-section">
                       <Search
@@ -620,7 +645,53 @@
                         onPageChange={this.handlePageChange}
                       />
                     </div>
-                  </>} {/* Conditionally render the section */}
+                  </>}                 
+                  {isReceiptVisible && 
+                  <>
+                  <div className="search-section">
+                      <Search
+                        locations={locations}
+                        types={types}
+                        resetSearch={resetSearch}
+                        section={section}
+                        passSelectedValueToParent={this.handleRegPaymentSelectFromChild}
+                        passSearchedValueToParent={this.handleRegPaymentSearchFromChild}
+                      />
+                    </div>
+                    <div className="view-toggle-section">
+                      <ViewToggle
+                        language={language}
+                        viewMode={viewMode}
+                        onToggleView={this.toggleViewMode}
+                        onEntriesPerPageChange={this.handleEntriesPerPageChange}  
+                        getTotalNumber= {noofDetails}
+                      />
+                    </div>
+                    <div className="registration-payment-section">
+                    <ReceiptSection 
+                        closePopup={this.closePopup}
+                        section={section}
+                        passDataToParent={this.handleDataFromChild}
+                        selectedLocation={selectedLocation}
+                        selectedCourseType={selectedCourseType}
+                        searchQuery={searchQuery}
+                        resetSearch={resetSearch}
+                        getTotalNumberofDetails={this.getTotalNumberofDetails}
+                        currentPage={currentPage} // Pass current page
+                        entriesPerPage={this.state.entriesPerPage} // Pass entries per page
+                        userName = {userName}
+                    />
+                    </div>
+                    <div className="pagination-section">
+                      <Pagination
+                        viewMode = {viewMode}
+                        currentPage={currentPage} 
+                        totalPages={totalPages} 
+                        onPageChange={this.handlePageChange}
+                      />
+                    </div>
+                  </>} 
+                  {/* Conditionally render the section */}
               </div>
             </div>
             <div className="footer">

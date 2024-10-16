@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var RegistrationController = require('../Controller/Registration/RegistrationController');
-var PdfGenerator = require('../Others/Pdf/PdfGenerator')
+var ReceiptGenerator = require('../Controller/Receipt/ReceiptController');
+var PdfGenerator = require('../Others/Pdf/PdfGenerator');
 
 function getCurrentDateTime() {
     const now = new Date();
@@ -64,14 +65,18 @@ router.post('/', async function(req, res, next)
         var date = currentDateTime.date;
         var time = currentDateTime.time;
         var controller = new RegistrationController();
-        var result = await controller.updateOfficialUse(id, name, date, time);
+        const message = await controller.updateOfficialUse(id, name, date, time);
+        return res.json({"result": message}); 
+        // After the PDF is sent, you can send a confirmation response if necessary
+        //res.json({ message }); // Send confirmation response
     }
     else if(req.body.purpose === "receipt")
     {
         var pdf = new PdfGenerator();
-        pdf.generateReceipt(res);
-        //return res.json({"blob": result}); ; 
+        console.log(req.body); 
+        await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
     }
 });
 
 module.exports = router;
+

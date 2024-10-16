@@ -70,7 +70,8 @@ class PdfGenerator {
         }
     }
 
-    async addBody(doc, receiptNumber, currentPage, totalPages) {
+    async addBody(doc, dataArray, currentPage, totalPages, name, receiptNo) 
+    {
         const leftMargin = 2.54 * 28.35; // 2.54 cm to points
         const rightMargin = 15.93; // Right margin in points
 
@@ -86,8 +87,9 @@ class PdfGenerator {
         // Move down for spacing after the title
         doc.moveDown(2); // Adjust the space after the title
 
-        // Prepare the receipt number text
-        const receiptText = `Receipt No : ${receiptNumber}`;
+
+        var receiptNumber = "Unknown";
+        const receiptText = `Receipt No   : ${receiptNo}`;
 
         // Store the current y position
         let currentY = doc.y;
@@ -124,7 +126,7 @@ class PdfGenerator {
 
         // Add a new line before adding the date text
         var getCurrentDateTime = this.getCurrentDateTime();
-        const dateText = `Date          : ${getCurrentDateTime.date}`;
+        const dateText = `Date              : ${getCurrentDateTime.date}`;
 
         // Add the date on a new line
         doc.font(fontPathTimesRegular).fontSize(12).text(dateText, leftMargin, doc.y, {
@@ -133,7 +135,7 @@ class PdfGenerator {
         
         doc.moveDown(1);
          // Add a new line before adding the date text
-         const participantName = `Name         : Participant Name`;
+         const participantName = `Name            : ${dataArray[0].participant.name}`;
  
          // Add the date on a new line
          doc.font(fontPathTimesRegular).fontSize(12).text(participantName, leftMargin, doc.y, {
@@ -141,16 +143,24 @@ class PdfGenerator {
          });
 
          doc.moveDown(1);
-         this.createTable(doc);
+
+         this.createTable(doc, dataArray);
+
+         console.log(name);
+        var staffName = `Issue By: ${name}`;
+
+        doc.font(fontPathTimesRegular).fontSize(12).text(staffName, leftMargin, doc.y, {
+            align: 'right' // Align the date to the left
+        });
+        doc.moveDown(5);
     }
 
-    async createTable(doc) 
+    async createTable(doc, dataArray) 
     {
         const fontPathBold = path.join(__dirname, '../../fonts/ARIALBD.TTF'); // Path to your bold font file
         const fontPathRegular = path.join(__dirname, '../../fonts/ARIAL.TTF'); // Path to your regular font file
         const fontPathTimesRegular = path.join(__dirname, '../../fonts/timesNewRoman.ttf'); // Path to your Times New Roman font file
-        
-        // Define column positions and widths
+
         const leftMargin = 2.54 * 28.35; // Left margin (2.54 cm in points)
         const tableTop = doc.y; // Get the current Y position to place the table
 
@@ -167,25 +177,15 @@ class PdfGenerator {
         };
 
         const rowHeight = 40; // Height for the table header
-        const borderExternalThickness = 1.5; // Set the thickness of the external border
+        const borderExternalThickness = 2; // Set the thickness of the external border
         const borderInternalThickness = 1; // Set the thickness of the internal borders
-        const headerBgColor = '#FBFBFB'; // Set header background color
-        const headerHeight = rowHeight + 30;
+        const headerHeight = rowHeight; // Adjusted header height
 
-        // Draw the thick external border for the entire table
+        // Draw the header background and external border for the entire table
         doc.rect(leftMargin, tableTop, 
             columnWidths.serial + columnWidths.description + columnWidths.amount, 
-            rowHeight)
-        .fill(headerBgColor)
-
-        // Draw the thick external border for the header
-    doc.lineWidth(borderExternalThickness)
-    .rect(leftMargin, tableTop, 
-        columnWidths.serial + columnWidths.description + columnWidths.amount, 
-        headerHeight) // Height for the header
-             .stroke('black')
-
-            
+            headerHeight)
+            .fill('#FBFBFB'); // Set header background color
 
         // Set font and text size for the header
         doc.fontSize(12).fillColor('black').font(fontPathBold);
@@ -199,32 +199,137 @@ class PdfGenerator {
         // Draw inner vertical borders between columns
         doc.lineWidth(borderInternalThickness)
             .moveTo(columnPositions.serial + columnWidths.serial, tableTop)
-            .lineTo(columnPositions.serial + columnWidths.serial, tableTop + rowHeight)
+            .lineTo(columnPositions.serial + columnWidths.serial, tableTop + headerHeight)
             .stroke('black');
 
         doc.lineWidth(borderInternalThickness)
             .moveTo(columnPositions.description + columnWidths.description, tableTop)
-            .lineTo(columnPositions.description + columnWidths.description, tableTop + rowHeight)
+            .lineTo(columnPositions.description + columnWidths.description, tableTop + headerHeight)
             .stroke('black');
 
         // Optional: Draw a horizontal line separating the header from the body
         doc.lineWidth(borderExternalThickness)
-            .moveTo(leftMargin, tableTop + rowHeight)
-            .lineTo(leftMargin + columnWidths.serial + columnWidths.description + columnWidths.amount, tableTop + rowHeight)
+            .moveTo(leftMargin, tableTop + headerHeight)
+            .lineTo(leftMargin + columnWidths.serial + columnWidths.description + columnWidths.amount, tableTop + headerHeight)
             .stroke('black');
 
-        // Move the document cursor down after the header row
-        doc.moveDown(3); // Adjust as needed to leave space after the header
-}
+        let currentY = tableTop + headerHeight; // Start position for rows immediately after the header
+        doc.font(fontPathRegular).fontSize(12); // Set font for table rows
 
-    async addContent(doc, receiptNumber) {
+        let totalAmount = 0; 
+
+        dataArray.forEach((item, index) => {
+            // Add row content for each entry
+            doc.text(index + 1, columnPositions.serial + 35, currentY+12); // Serial number
+            doc.text(`${item.course.courseEngName} (${item.course.courseLocation})\n${item.course.courseDuration}`, columnPositions.description + 15, currentY+6); // Description
+            doc.text(item.course.coursePrice, columnPositions.amount + 45, currentY+12); // Amount
+
+            totalAmount += parseFloat(item.course.coursePrice.substring(1));
+
+            // Draw vertical borders dynamically between columns
+            doc.lineWidth(borderInternalThickness)
+                .moveTo(columnPositions.serial + columnWidths.serial, currentY)
+                .lineTo(columnPositions.serial + columnWidths.serial, currentY + rowHeight)
+                .stroke('black');
+
+            doc.lineWidth(borderInternalThickness)
+                .moveTo(columnPositions.description + columnWidths.description, currentY)
+                .lineTo(columnPositions.description + columnWidths.description, currentY + rowHeight)
+                .stroke('black');
+
+            // Move Y position for the next row
+            currentY += rowHeight;
+        });
+
+        const totalRowY = currentY; 
+        doc.font(fontPathRegular).fontSize(12).text('Total:', columnPositions.description + 15, currentY + 12); // Total label
+        doc.font(fontPathBold).fontSize(12).text(`$${totalAmount.toFixed(2)}`, columnPositions.amount + 45, currentY + 12); // Total amount
+
+        // Draw vertical borders for the total row
+        doc.lineWidth(borderInternalThickness)
+        .moveTo(columnPositions.serial + columnWidths.serial, totalRowY) // Vertical line after S/NO
+        .lineTo(columnPositions.serial + columnWidths.serial, totalRowY + rowHeight) // Extend line down
+        .stroke('black');
+
+        doc.lineWidth(borderInternalThickness)
+        .moveTo(columnPositions.description + columnWidths.description, totalRowY) // Vertical line after DESCRIPTION
+        .lineTo(columnPositions.description + columnWidths.description, totalRowY + rowHeight) // Extend line down
+        .stroke('black');
+
+        // Define the Y position for the top of the line (current row Y position)
+        const topLineY = currentY; // Adjust as necessary based on your layout
+
+        // Define the Y position for the bottom of the line (current row height)
+        const bottomLineY = currentY + rowHeight; // This assumes rowHeight is set correctly
+
+        doc.lineWidth(borderInternalThickness)
+            .moveTo(leftMargin + columnWidths.serial + columnWidths.description, topLineY) // Starting point at the left margin
+            .lineTo(leftMargin + columnWidths.serial + columnWidths.description + columnWidths.amount, topLineY) // Draw to the right
+            .stroke('black'); // Draw the top line
+            
+        // Optional: Uncomment to draw the external border around the entire table
+        doc.lineWidth(borderExternalThickness)
+        .rect(leftMargin, tableTop, 
+            columnWidths.serial + columnWidths.description + columnWidths.amount, 
+            currentY - tableTop + rowHeight) // Adjust height for total row
+        .stroke('black');
+
+
+        doc.moveDown(3);
+    }
+
+    drawRowBorders(doc, leftMargin, columnWidths, currentY, borderThickness, color)
+    {
+        // Draw left border for the row
+        doc.lineWidth(borderThickness)
+            .moveTo(leftMargin, currentY) // Start at the left margin
+            .lineTo(leftMargin, currentY + 40) // Draw line from top to bottom of the row
+            .stroke(color);
+
+        // Draw right border for the row
+        doc.lineWidth(borderThickness)
+            .moveTo(leftMargin + columnWidths.serial + columnWidths.description + columnWidths.amount, currentY) // Start at the right edge
+            .lineTo(leftMargin + columnWidths.serial + columnWidths.description + columnWidths.amount, currentY + 40) // Draw line down
+            .stroke(color);
+
+        // Draw top border for the row (optional)
+        if (currentY === leftMargin + 40) { // Draw only for the first row
+            doc.lineWidth(borderThickness)
+                .moveTo(leftMargin, currentY) // Start at the left margin
+                .lineTo(leftMargin + columnWidths.serial + columnWidths.description + columnWidths.amount, currentY) // Draw a line across the top of the row
+                .stroke(color);
+        }
+
+        // Draw bottom border for the row
+        doc.lineWidth(borderThickness)
+            .moveTo(leftMargin, currentY + 40) // Start at the bottom left
+            .lineTo(leftMargin + columnWidths.serial + columnWidths.description + columnWidths.amount, currentY + 40) // Draw a line across the bottom of the row
+            .stroke(color);
+        
+        // Draw internal vertical borders between columns dynamically
+        // Between Serial and Description columns
+        doc.lineWidth(borderThickness)
+            .moveTo(leftMargin + columnWidths.serial, currentY) // Start at the current row position
+            .lineTo(leftMargin + columnWidths.serial, currentY + 40) // Extend to the next row position
+            .stroke(color);
+
+        // Between Description and Amount columns
+        doc.lineWidth(borderThickness)
+            .moveTo(leftMargin + columnWidths.serial + columnWidths.description, currentY) // Start at the current row position
+            .lineTo(leftMargin + columnWidths.serial + columnWidths.description, currentY + 40) // Extend to the next row position
+            .stroke(color);
+    }
+
+    async addContent(doc, dataArray, name, receiptNo) 
+    {
+        console.log("Add Content:", name);
         await this.addHeader(doc); // Add header to the document
 
         let currentPage = 1; // Initialize current page
         let totalPages = 1; // Initialize total pages
 
         // Add body content
-        await this.addBody(doc, receiptNumber, currentPage, totalPages);
+        await this.addBody(doc, dataArray, currentPage, totalPages, name, receiptNo);
 
         // Example of adding content that might create new pages
         for (let i = 0; i < 5; i++) { // Simulate adding content that spans multiple page
@@ -232,7 +337,7 @@ class PdfGenerator {
             if (doc.y > doc.page.height - 50) { // Assuming 50 points is a safe margin for new page
                 doc.addPage(); // Add a new page
                 currentPage++; // Increment current page count
-                await this.addBody(doc, receiptNumber, currentPage, totalPages); // Add the body again with updated page numbers
+                await this.addBody(doc, receiptNumber, currentPage, totalPages, name); // Add the body again with updated page numbers
                 totalPages++; // Increment total pages count
             }
         }
@@ -242,34 +347,66 @@ class PdfGenerator {
     }
 
 
-    async generateReceipt(res, receiptNumber) {
-        try {
-            // Set headers for PDF
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', 'inline; filename="document.pdf"');
+    async generateReceipt(res, dataArray, name, receiptNo) 
+    {
+        return new Promise((resolve, reject) =>
+            {
+            try 
+            {
+                console.log("Staff Name:", name);
+                // Set headers for PDF
 
-            const doc = new PDFDocument();
+                const filename = `Moses.pdf`; 
 
-            // Add error listener
-            doc.on('error', (err) => {
-                console.error('Error while generating PDF:', err);
-                res.status(500).json({ error: 'Error generating PDF' });
-            });
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
 
-            doc.pipe(res);
-            await this.addContent(doc, receiptNumber); // Await the content addition
+                // Log headers just before sending the response
+                console.log('Sending headers:', {
+                        'Content-Type': 'application/pdf',
+                        'Content-Disposition': `inline; filename="${filename}"`
+                });
 
-            // Finalize the document
-            doc.end();
+                const doc = new PDFDocument();
 
-            res.on('finish', () => {
-                console.log('PDF response sent successfully.');
-            });
+                // Add error listener
+                doc.on('error', (err) => {
+                    console.error('Error while generating PDF:;', err);
+                    res.status(500).json({ error: 'Error generating PDF' });
+                });
 
-        } catch (error) {
-            console.error('Error in PDF generation:', error);
-            res.status(500).json({ error: 'An unexpected error occurred' });
-        }
+                doc.pipe(res);
+                
+                // Finalize the document
+                //doc.end();
+                // Ensure addContent is called correctly with await
+                this.addContent(doc, dataArray, name, receiptNo)
+                .then(() => {
+                    // Finalize the document
+                    doc.end();
+
+                    // Listen for the finish event to resolve the promise
+                    res.on('finish', () => {
+                        console.log('PDF response sent successfully.');
+                        resolve('PDF response sent successfully.');
+                    });
+                })
+                .catch(err => {
+                    console.error('Error adding content to PDF:', err);
+                    reject('Error adding content to PDF');
+                });
+
+                //res.on('finish', () => {
+                //    console.log('PDF response sent successfully.');
+                //    resolve('PDF response sent successfully.'); // Resolve the promise
+                //});
+            } 
+            catch (error) 
+            {
+                console.error('Error in PDF generation:', error);
+                reject('An unexpected error occurred'); 
+            }
+        });
     }
 }
 

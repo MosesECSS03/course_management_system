@@ -12,6 +12,7 @@ var coursesRouter = require("./routes/courses");
 var coursesRegistrationRouter = require("./routes/courseregistration");
 var accountDetailsRouter = require("./routes/accountDetails");
 var accessRightsRouter = require("./routes/accessRights");
+var receiptRouter = require("./routes/receipt");
 
 var app = express();
 
@@ -20,7 +21,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(cors());
+app.use(cors({
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Add any other methods you want to support
+  allowedHeaders: ['Content-Type', 'Authorization', 'Content-Disposition'],
+  exposedHeaders: ['Content-Disposition'], // Add this line to expose the header
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -34,7 +39,7 @@ app.use("/courses", coursesRouter);
 app.use("/courseregistration", coursesRegistrationRouter);
 app.use("/accountDetails", accountDetailsRouter);
 app.use("/accessRights", accessRightsRouter);
-
+app.use("/receipt", receiptRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

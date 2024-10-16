@@ -68,6 +68,10 @@ class SideBarContent extends Component {
        {
         this.props.toggleRegistrationPaymentComponent(subKey);
        }
+       else if(subKey === "Receipt Table")
+       {
+        this.props.toggleRegistrationPaymentComponent(subKey);
+       }
     }
 
     closeSubMenu = () =>

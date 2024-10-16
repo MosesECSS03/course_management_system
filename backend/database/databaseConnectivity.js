@@ -99,30 +99,55 @@ class DatabaseConnectivity {
         }
     }
 
-    async insertToDatabase(dbname, collectionName, data)
-    {
+    async insertToDatabase(dbname, collectionName, data) {
         console.log("Database:", dbname);
         console.log("Data:", data);
-        var db = this.client.db(dbname); // return the db object
-        try
-        {
-            if(db)
-            {
-                var table = db.collection(collectionName);
-                var result = await table.insertOne(data);
-                if(collectionName === "Accounts")
-                {
-                    return {acknowledged: result.acknowledged, accountId: result.insertedId };
+    
+        const db = this.client.db(dbname); // Get the database object
+        let result;
+    
+        try {
+            if (db) {
+                const table = db.collection(collectionName);
+                const count = await table.countDocuments();
+                console.log("No. of entry:", count)
+    
+                if (collectionName === "Receipts") {
+                    // Ensure registration_id is an ObjectId
+                    const registrationId = new ObjectId(data.registration_id);
+                    data.registration_id = registrationId;
+    
+                    // Check for existing document with the same registration_id
+                    const existingDocument = await table.findOne({ registration_id: registrationId });
+    
+                    if(count > 0)
+                    {
+                        if (!existingDocument) { // Check for duplicates
+                            result = await table.insertOne(data);
+                        } else {
+                            console.log(`Duplicate entry found for registration_id: ${registrationId}`);
+                            return { acknowledged: false, message: 'Duplicate entry' }; // Optionally return a message
+                        }
+                    }
+                    else
+                    {
+                        result = await table.insertOne(data);
+                    }
+                } else {
+                    // Insert data if not "Receipt" collection
+                    result = await table.insertOne(data);
                 }
-                else
-                {
-                    return {acknowledged: result.acknowledged};
+    
+                // Return the result based on the collection name
+                if (collectionName === "Accounts") {
+                    return { acknowledged: result.acknowledged, accountId: result.insertedId };
+                } else {
+                    return { acknowledged: result.acknowledged }; // For other collections
                 }
             }
-        }
-        catch(error)
-        {
-            console.log(error);
+        } catch (error) {
+            console.error('Error during database operation:', error);
+            return { acknowledged: false, error: error.message }; // Return error status
         }
     }
         
@@ -219,6 +244,41 @@ class DatabaseConnectivity {
         } catch (error) {
             console.log("Error updating database:", error);
         }
+    }
+
+    async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+        const db = this.client.db(databaseName);
+        const collection = db.collection(collectionName);
+    
+        // Retrieve all receipts matching the specified courseLocation
+        const existingReceipts = await collection.find({
+            receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with courseLocation -
+        }).toArray();
+    
+        console.log("Current:", existingReceipts);
+    
+        // If there are no receipts for the specific courseLocation, return '001'
+        if (existingReceipts.length === 0) {
+            return `${courseLocation} - 001`; // No existing receipts, start at '001'
+        }
+    
+        // Extract the numeric part and find the latest number for the specific courseLocation
+        const receiptNumbers = existingReceipts.map(receipt => {
+            const numberPart = receipt.receiptNo.substring(courseLocation.length + 3); // Extract the numeric part
+            return parseInt(numberPart, 10); // Convert to integer
+        }).filter(num => !isNaN(num)); // Filter out NaN values in case of invalid formats
+    
+        // Find the latest (maximum) existing number
+        const latestNumber = Math.max(...receiptNumbers);
+    
+        // Determine the next number
+        const nextNumber = latestNumber + 1;
+    
+        // Calculate the length dynamically based on the maximum length of existing numbers
+        const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3); // Ensure at least 3 digits
+    
+        // Return the next receipt number with dynamic length
+        return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
     }
     
 
