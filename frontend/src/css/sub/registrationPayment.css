@@ -41,3 +41,32 @@
   padding: 8px; /* Add padding */
   cursor: pointer; /* Pointer cursor on hover */
 }
+
+.button-row1 {
+  display: flex; /* Uses flexbox for layout */
+  justify-content: flex-start; /* Aligns buttons to the left */
+  margin-top: 1rem; /* Adds space above the button row (optional) */
+  width: 20rem;
+  margin-left: 8rem;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.file-input {
+  display: none; /* Hide the default file input */
+}
+
+.custom-file-input {
+  display: inline-block;
+  padding: 0.5rem 1rem; /* Adjust padding to match the button */
+  background-color: #007bff; /* Button background color */
+  color: #fff; /* Button text color */
+  border: none;
+  border-radius: 4px; /* Adjust border radius to match button */
+  cursor: pointer;
+  font-size: 1rem; /* Adjust font size to match button */
+}
+
+.custom-file-input:hover {
+  background-color: #0056b3; /* Darker background on hover */
+}

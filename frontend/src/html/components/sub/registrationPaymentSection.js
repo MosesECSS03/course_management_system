@@ -1,6 +1,8 @@
   import React, { Component } from 'react';
   import axios from 'axios';
   import '../../../css/sub/registrationPayment.css';
+  import * as XLSX from 'xlsx';
+  import ExcelJS from 'exceljs';
 
   class RegistrationPaymentSection extends Component {
     constructor(props) {
@@ -197,7 +199,7 @@
               const agreement = data.agreement || "";
   
               // Match 'All Languages' and 'All Locations'
-              const matchesLocation = selectedLocation === "All Languages" || 
+              const matchesLocation = selectedLocation === "All Locations" || 
                   selectedLocation === "所有语言" || 
                   selectedLocation === "" || 
                   !selectedLocation 
@@ -482,8 +484,226 @@
             }
         }
     }
-    
 
+    async saveData(paginatedDetails) {
+        console.log("Save Data:", paginatedDetails);
+    
+        // Prepare the data for Excel
+        const preparedData = [];
+
+        // Define the sub-headers
+        const headers = [
+            "Participant Name", "Participant NRIC", "Participant Residential Status", "Participant Race", "Participant Gender", "Participant Date of Birth",
+            "Participant Contact Number", "Participant Email", "Participant Postal Code", "Participant Education Level", "Participant Work Status",
+            "Course Type", "Course English Name", "Course Chinese Name", "Course Location",
+            "Course Price", "Course Duration", "Payment", "Agreement", "Payment Status",
+            "Staff Name", "Received Date", "Received Time"
+        ];
+    
+        preparedData.push(headers);
+    
+        // Add the values
+        paginatedDetails.forEach(detail => {
+            const row = [
+                detail.participant.name,
+                detail.participant.nric,
+                detail.participant.residentialStatus,
+                detail.participant.race,
+                detail.participant.gender,
+                detail.participant.dateOfBirth,
+                detail.participant.contactNumber,
+                detail.participant.email,
+                detail.participant.postalCode,
+                detail.participant.educationLevel,
+                detail.participant.workStatus,
+                detail.course.courseType,
+                detail.course.courseEngName,
+                detail.course.courseChiName,
+                detail.course.courseLocation,
+                detail.course.coursePrice,
+                detail.course.courseDuration,
+                detail.course.payment,
+                detail.agreement,
+                detail.status,
+                detail.official.name,
+                detail.official.date,
+                detail.official.time
+            ];
+            preparedData.push(row);
+        });
+    
+        // Convert the prepared data into a worksheet
+        const worksheet = XLSX.utils.aoa_to_sheet(preparedData);
+    
+        // Create a new workbook and add the worksheet
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Exported Data");
+
+        // Prompt user for filename input
+        const fileName = prompt("Please enter the file name (without extension):", "paginated_data.xlsx") || 'exported_data.xlsx';
+    
+        // Generate a binary string
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+        // Create a blob from the binary string
+        const blob = new Blob([excelBuffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+    
+        // Create a link element for downloading
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `${fileName}.xlsx`; // Specify the file name with .xlsx extension
+        link.click(); // Trigger the download
+      }
+
+     /*exportToLOP = async (paginatedDetails) => {
+        const fileInput = document.getElementById('fileInput');
+    
+        // Check if a file has been selected
+        if (!fileInput.files.length) {
+            alert("Please select an Excel file first!");
+            return;
+        }
+    
+        const file = fileInput.files[0];
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: 'array' });
+    
+        // Access the "LOP" sheet
+        const sheetName = "LOP";
+        const worksheet = workbook.Sheets[sheetName];
+    
+        if (!worksheet) {
+            alert(`Sheet "${sheetName}" not found!`);
+            return;
+        }
+    
+        const startRow = 9; // Row number where you want to start filling data
+    
+        // Fill data in the specified row without altering existing styles
+        paginatedDetails.forEach((detail, index) => {
+            const rowIndex = startRow + index; // Calculate the row index
+            console.log(`Filling row: ${rowIndex}`, "Detail:", detail);
+    
+            // Fill the data while keeping the existing styles intact
+            worksheet[`A${rowIndex}`] = { v: (index+1), ...worksheet[`A${rowIndex}`] };
+            worksheet[`B${rowIndex}`] = { v: detail.participant.name, ...worksheet[`B${rowIndex}`] };
+            worksheet[`C${rowIndex}`] = { v: detail.participant.nric, ...worksheet[`C${rowIndex}`] };
+            worksheet[`D${rowIndex}`] = { v: detail.participant.residentialStatus, ...worksheet[`D${rowIndex}`] };
+            worksheet[`E${rowIndex}`] = { v: detail.participant.dateOfBirth.split("/")[0].trim(), ...worksheet[`E${rowIndex}`] };
+            worksheet[`F${rowIndex}`] = { v: detail.participant.dateOfBirth.split("/")[1].trim(), ...worksheet[`F${rowIndex}`] };
+            worksheet[`G${rowIndex}`] = { v: detail.participant.dateOfBirth.split("/")[2].trim(), ...worksheet[`G${rowIndex}`] };
+            worksheet[`H${rowIndex}`] = { v: detail.participant.gender, ...worksheet[`H${rowIndex}`] };
+            worksheet[`I${rowIndex}`] = { v: detail.participant.race.substring(0,1), ...worksheet[`I${rowIndex}`] };
+            worksheet[`J${rowIndex}`] = { v: detail.participant.contactNumber, ...worksheet[`J${rowIndex}`] };
+            worksheet[`K${rowIndex}`] = { v: detail.participant.email, ...worksheet[`K${rowIndex}`] };
+            worksheet[`L${rowIndex}`] = { v: detail.participant.postalCode, ...worksheet[`L${rowIndex}`] };
+            worksheet[`M${rowIndex}`] = { v: detail.participant.educationLevel, ...worksheet[`M${rowIndex}`] };
+            worksheet[`N${rowIndex}`] = { v: detail.participant.workStatus, ...worksheet[`B${rowIndex}`] };
+            worksheet[`O${rowIndex}`] = { v: detail.course.courseEngName, ...worksheet[`O${rowIndex}`] };
+            worksheet[`P${rowIndex}`] = { v: detail.course.courseDuration.split("-")[0].trim(), ...worksheet[`P${rowIndex}`] };
+            worksheet[`Q${rowIndex}`] = { v: detail.course.courseDuration.split("-")[1].trim(), ...worksheet[`Q${rowIndex}`] };
+            worksheet[`R${rowIndex}`] = { v: detail.course.coursePrice, ...worksheet[`R${rowIndex}`] };
+            const paymentValue = detail.course.payment === "Skills Future" ? "SFC" : detail.course.payment;
+            worksheet[`S${rowIndex}`] = { v: paymentValue, ...worksheet[`S${rowIndex}`] };
+        });
+    
+        // Use the original file name for saving
+        const originalFileName = file.name;
+    
+        // Export the updated workbook back to the original file
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+    
+        // Create a link element for downloading the original file
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = originalFileName; // Use the original file name
+        link.click(); // Trigger the download
+    };*/
+    exportToLOP = async (paginatedDetails) => {
+      const fileInput = document.getElementById('fileInput');
+  
+      // Check if a file has been selected
+      if (!fileInput.files.length) {
+          alert("Please select an Excel file first!");
+          return;
+      }
+  
+      const file = fileInput.files[0];
+      const data = await file.arrayBuffer();
+  
+      // Create a new workbook
+      const workbook = new ExcelJS.Workbook();
+  
+      // Load the existing workbook
+      await workbook.xlsx.load(data);
+  
+      // Access the "LOP" sheet
+      const sourceSheet = workbook.getWorksheet('LOP');
+      if (!sourceSheet) {
+          alert(`Sheet "LOP" not found!`);
+          return;
+      }
+  
+      // Fill data starting from row 9
+      const startRow = 9;
+      paginatedDetails.forEach((detail, index) => {
+          const rowIndex = startRow + index;
+  
+          // Only overwrite the specified cells
+          sourceSheet.getCell(`A${rowIndex}`).value = index + 1; // Row number
+          sourceSheet.getCell(`B${rowIndex}`).value = detail.participant.name;
+          sourceSheet.getCell(`C${rowIndex}`).value = detail.participant.nric;
+          sourceSheet.getCell(`D${rowIndex}`).value = detail.participant.residentialStatus;
+          sourceSheet.getCell(`E${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[0].trim();
+          sourceSheet.getCell(`F${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[1].trim();
+          sourceSheet.getCell(`G${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[2].trim();
+          sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender;
+          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.substring(0, 1);
+          sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
+          sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
+          sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
+          sourceSheet.getCell(`M${rowIndex}`).value = detail.participant.educationLevel;
+          sourceSheet.getCell(`N${rowIndex}`).value = detail.participant.workStatus;
+          sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
+          // Assuming detail.course.courseDuration is in the format "DD/MM/YYYY - DD/MM/YYYY"
+          const durations = detail.course.courseDuration.split(" - ").map(duration => {
+            const parts = duration.split("/").map(part => part.trim()); // Split by '/' and trim whitespace
+            return `${parts[0]}/${parts[1]}/${parts[2]}`; // Format as DD/MM/YYYY
+          });
+
+          // Fill the cells with the formatted date
+          sourceSheet.getCell(`P${rowIndex}`).value = durations[0]; // Start date
+          sourceSheet.getCell(`Q${rowIndex}`).value = durations[1]; // End date
+          sourceSheet.getCell(`P${rowIndex}`).value = detail.course.courseDuration.split("-")[0].trim();
+          sourceSheet.getCell(`Q${rowIndex}`).value = detail.course.courseDuration.split("-")[1].trim();
+          sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
+          sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "Skills Future" ? "SFC" : detail.course.payment;
+      });
+  
+      // Use the original file name for saving but change the extension
+      const originalFileName = file.name.replace('.xlsx', '_new.xlsx');
+  
+      // Write the modified workbook to a buffer
+      const buffer = await workbook.xlsx.writeBuffer();
+  
+      // Create a blob and trigger the download
+      const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+  
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = originalFileName; // Use the modified file name
+      link.click(); // Trigger the download
+  };
+  
+  
+  
     render() {
       const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
@@ -491,6 +711,14 @@
         <div className="registration-payment-container">
           <div className="registration-payment-heading">
             <h1>{this.props.language === 'zh' ? '报名与支付' : 'Registration And Payment'}</h1>
+              <div className="button-row1">
+              <button onClick={() => this.saveData(paginatedDetails)}>Save Data</button>
+              <div>
+                <input type="file" id="fileInput" accept=".xlsx, .xls" className="file-input" />
+                <label htmlFor="fileInput" className="custom-file-input">Select File</label>
+                <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
+            </div>
+            </div>
             <div className="table-wrapper" ref={this.tableRef}>
               <table>
                 <thead>

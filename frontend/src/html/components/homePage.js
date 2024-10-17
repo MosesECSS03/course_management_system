@@ -48,7 +48,8 @@
         createAccount: false,
         displayedName: "",
         isDropdownOpen: false,
-        isReceiptVisible: false
+        isReceiptVisible: false,
+        item: ""
       };
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
@@ -388,6 +389,7 @@
             accountType: null,
             createAccount: false,
             isReceiptVisible: false,
+            item: item
             //viewMode: "full"
         }));
       }
@@ -408,6 +410,7 @@
               accountType: null,
               createAccount: false,
               isReceiptVisible: !prevState.isReceiptVisible,
+              item: item
               //viewMode: "full"
           }));
       }
@@ -451,7 +454,7 @@
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
-      const { isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
+      const { item,isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
       return (
         <>
           <div className="dashboard">
@@ -516,6 +519,7 @@
                         resetSearch={resetSearch}
                         section={section}
                         roles={roles}
+                        item={item}
                       />
                     </div>
                     <div className="view-toggle-section">
@@ -564,6 +568,7 @@
                         passSearchedValueToParent={this.searchResultFromChild}
                         resetSearch={resetSearch}
                         section={section}
+                        item={item}
                       />
                     </div>
                     <div className="view-toggle-section">
@@ -589,6 +594,7 @@
                         entriesPerPage={this.state.entriesPerPage} // Pass entries per page
                         resetSearch={resetSearch} 
                         section={section}
+                        item={item}
                       />
                     </div>
                     <div className="pagination-section">
@@ -611,6 +617,7 @@
                         section={section}
                         passSelectedValueToParent={this.handleRegPaymentSelectFromChild}
                         passSearchedValueToParent={this.handleRegPaymentSearchFromChild}
+                        item={item}
                       />
                     </div>
                     <div className="view-toggle-section">
@@ -656,6 +663,7 @@
                         section={section}
                         passSelectedValueToParent={this.handleRegPaymentSelectFromChild}
                         passSearchedValueToParent={this.handleRegPaymentSearchFromChild}
+                        item={item}
                       />
                     </div>
                     <div className="view-toggle-section">

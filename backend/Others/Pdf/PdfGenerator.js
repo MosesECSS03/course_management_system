@@ -70,12 +70,42 @@ class PdfGenerator {
         }
     }
 
+    addFooter = async(doc, currentPage, totalPages) =>
+    {
+        console.log("Add Footer");
+        const imagePath = "https://ecss.org.sg/wp-content/uploads/2024/10/ok.png";
+
+        const response = await axios.get(imagePath, { responseType: 'arraybuffer' });
+        const imageBuffer = Buffer.from(response.data);
+
+        // Use sharp to get the image dimensions
+        const { width, height } = await sharp(imageBuffer).metadata();
+
+        // Set the left and right margins in points
+        const leftMargin = 0.00 // 2.54 cm to points
+
+        const imageWidth = doc.page.width - leftMargin; // Full width minus margins
+        const imageHeight = (height / width) * imageWidth; // Maintain aspect ratio
+
+        const footerYPosition = doc.page.height-50; 
+
+        // Add the image to the document with the left margin
+        doc.image(imageBuffer, leftMargin, footerYPosition , {
+                width: imageWidth, // Set the image width to the page width minus margins
+                height: imageHeight, // Set the height to maintain the aspect ratio
+                align: 'center', // Center the image horizontally
+                valign: 'top' // Align the image to the top
+            });
+
+    }
+    
+
     async addBody(doc, dataArray, currentPage, totalPages, name, receiptNo) 
     {
         const leftMargin = 2.54 * 28.35; // 2.54 cm to points
         const rightMargin = 15.93; // Right margin in points
 
-        const fontPathBold = path.join(__dirname, '../../fonts/ARIALBD.TTF'); // Path to your bold font file
+        const fontPathBold = path.join(__dirname, '../../fonts/ARIALBD.TTF'); // Path to yourbold font file
         const fontPathRegular = path.join(__dirname, '../../fonts/ARIAL.TTF'); // Path to your regular font file
         const fontPathTimesRegular = path.join(__dirname, '../../fonts/timesNewRoman.ttf'); // Path to your Times New Roman font file
 
@@ -100,7 +130,7 @@ class PdfGenerator {
         });
 
         // Now add the page parts on the same line on the right
-        const rightX = doc.page.width - rightMargin - 225; // Adjust this value to align the page number properly
+        const rightX = doc.page.width - rightMargin - 300; // Adjust this value to align the page number properly
 
         const pageParts = [
             { text: 'Page ', font: fontPathRegular },
@@ -165,9 +195,9 @@ class PdfGenerator {
         const tableTop = doc.y; // Get the current Y position to place the table
 
         const columnWidths = {
-            serial: 80,          // Width for S/NO column
-            description: 300,    // Width for Description column
-            amount: 120          // Width for Amount column
+            serial: 40,          // Width for S/NO column
+            description: 340,    // Width for Description column
+            amount: 100          // Width for Amount column
         };
 
         const columnPositions = {
@@ -191,10 +221,10 @@ class PdfGenerator {
         doc.fontSize(12).fillColor('black').font(fontPathBold);
 
         // Add header column titles centered
-        doc.text('S/NO', columnPositions.serial + columnWidths.serial / 4 + 5, tableTop + 12);
+        doc.text('S/NO', columnPositions.serial + columnWidths.serial / 8, tableTop + 12);
         doc.text('DESCRIPTION', columnPositions.description + columnWidths.description / 3 + 15, tableTop + 12);
-        doc.text('AMOUNT', columnPositions.amount + columnWidths.amount / 4 + 5, tableTop + 5);
-        doc.text('(S$)', columnPositions.amount + columnWidths.amount / 3 + 10, tableTop + 19);
+        doc.text('AMOUNT', columnPositions.amount + columnWidths.amount / 5 + 5, tableTop + 5);
+        doc.text('(S$)', columnPositions.amount + columnWidths.amount / 4 + 10, tableTop + 19);
 
         // Draw inner vertical borders between columns
         doc.lineWidth(borderInternalThickness)
@@ -220,9 +250,9 @@ class PdfGenerator {
 
         dataArray.forEach((item, index) => {
             // Add row content for each entry
-            doc.text(index + 1, columnPositions.serial + 35, currentY+12); // Serial number
+            doc.text(index + 1, columnPositions.serial+15, currentY+12); // Serial number
             doc.text(`${item.course.courseEngName} (${item.course.courseLocation})\n${item.course.courseDuration}`, columnPositions.description + 15, currentY+6); // Description
-            doc.text(item.course.coursePrice, columnPositions.amount + 45, currentY+12); // Amount
+            doc.text(item.course.coursePrice, columnPositions.amount + 30, currentY+12); // Amount
 
             totalAmount += parseFloat(item.course.coursePrice.substring(1));
 
@@ -243,7 +273,7 @@ class PdfGenerator {
 
         const totalRowY = currentY; 
         doc.font(fontPathRegular).fontSize(12).text('Total:', columnPositions.description + 15, currentY + 12); // Total label
-        doc.font(fontPathBold).fontSize(12).text(`$${totalAmount.toFixed(2)}`, columnPositions.amount + 45, currentY + 12); // Total amount
+        doc.font(fontPathBold).fontSize(12).text(`$${totalAmount.toFixed(2)}`, columnPositions.amount + 30, currentY + 12); // Total amount
 
         // Draw vertical borders for the total row
         doc.lineWidth(borderInternalThickness)
@@ -320,32 +350,41 @@ class PdfGenerator {
             .stroke(color);
     }
 
-    async addContent(doc, dataArray, name, receiptNo) 
-    {
+    async addContent(doc, dataArray, name, receiptNo) {
         console.log("Add Content:", name);
-        await this.addHeader(doc); // Add header to the document
-
+        
+        // Initial header addition for the first page
+        await this.addHeader(doc); // Add header to the first page
+    
         let currentPage = 1; // Initialize current page
         let totalPages = 1; // Initialize total pages
-
-        // Add body content
+    
+        // Add body content for the first page
         await this.addBody(doc, dataArray, currentPage, totalPages, name, receiptNo);
-
+    
         // Example of adding content that might create new pages
-        for (let i = 0; i < 5; i++) { // Simulate adding content that spans multiple page
+        for (let i = 0; i < 5; i++) { // Simulate adding content that spans multiple pages
             // Check if the current content will overflow and create a new page
             if (doc.y > doc.page.height - 50) { // Assuming 50 points is a safe margin for new page
                 doc.addPage(); // Add a new page
                 currentPage++; // Increment current page count
-                await this.addBody(doc, receiptNumber, currentPage, totalPages, name); // Add the body again with updated page numbers
                 totalPages++; // Increment total pages count
+                
+                // Add header to the new page
+                await this.addHeader(doc); 
+    
+                // Add body content to the new page
+                await this.addBody(doc, dataArray, currentPage, totalPages, name, receiptNo);
             }
+            
+            // Optionally add footer if needed (after body content)
+            await this.addFooter(doc, currentPage, totalPages);
         }
-
-        // Finalize the total pages
-        // Here, if you know beforehand the total pages, you can set totalPages accordingly.
+    
+        // Finalize the total pages if necessary
+        // e.g. doc.text(`Total Pages: ${totalPages}`, ...);
     }
-
+    
 
     async generateReceipt(res, dataArray, name, receiptNo) 
     {

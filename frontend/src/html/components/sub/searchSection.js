@@ -32,7 +32,8 @@
             showLanguageDropdown: false,
             showTypeDropdown: false,
             showAccountTypeDropdown: false,
-            role: ''
+            role: '',
+            staffName: ''
           };
           this.locationDropdownRef = React.createRef();
           this.languageDropdownRef = React.createRef();
@@ -291,7 +292,7 @@
 
         
 render() {
-  const { searchQuery, centreLocation, language, filteredLocations, filteredLanguages, filteredTypes, showLocationDropdown, showLanguageDropdown, showTypeDropdown, courseType, showAccountTypeDropdown, role, roles, filteredRoles} = this.state;
+  const { showNameDropdown, typename, filteredName, staffName, searchQuery, centreLocation, language, filteredLocations, filteredLanguages, filteredTypes, showLocationDropdown, showLanguageDropdown, showTypeDropdown, courseType, showAccountTypeDropdown, role, roles, filteredRoles} = this.state;
   const { section } = this.props; // Destructure section from props
 
   return (
@@ -430,7 +431,7 @@ render() {
           </>
         )}
         
-        {section === "registration" && ( // Content for "registration"
+        {section === "registration" && this.props.item !== "Receipt Table" &&  ( // Content for "registration"
           <>
            <div className="form-group">
               <label htmlFor="centreLocation">{this.props.language === 'zh' ? '中心位置' : 'Locations'}</label>
@@ -495,6 +496,88 @@ render() {
                 <i className="fas fa-angle-down dropdown-icon"></i>
               </div>
               </div>
+              <div className="form-group">
+              <label htmlFor="searchQuery">{this.props.language === 'zh' ? '搜寻' : 'Search'}</label>
+              <div className="search-container">
+                <input
+                  type="text"
+                  id="searchQuery"
+                  name="searchQuery"
+                  value={searchQuery}
+                  onChange={this.handleChange}
+                  placeholder={this.props.language === 'zh' ? '搜索' : 'Search'}
+                  autoComplete="off"
+                />
+                <i className="fas fa-search search-icon"></i>
+              </div>
+            </div>
+          </>            
+        )}
+         {section === "registration" && this.props.item === "Receipt Table" &&  ( // Content for "registration"
+          <>
+           <div className="form-group">
+              <label htmlFor="centreLocation">{this.props.language === 'zh' ? '中心位置' : 'Locations'}</label>
+              <div
+                className={`dropdown-container ${showLocationDropdown ? 'open' : ''}`}
+                ref={this.locationDropdownRef}
+              >
+                <input
+                  type="text"
+                  id="centreLocation"
+                  name="centreLocation"
+                  value={centreLocation}
+                  onChange={this.handleChange}
+                  onClick={() => this.handleDropdownToggle('showLocationDropdown')}
+                  placeholder={this.props.language === 'zh' ? '按地点筛选' : 'Filter by location'}
+                  autoComplete="off"
+                />
+                {showLocationDropdown && (
+                  <ul className="dropdown-list">
+                    {filteredLocations.map((location, index) => (
+                      <li
+                        key={index}
+                        onClick={() => this.handleOptionSelect(location, 'showLocationDropdown')}
+                      >
+                        {location}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <i className="fas fa-angle-down dropdown-icon"></i>
+              </div>
+            </div>
+           {/* <div className="form-group">
+              <label htmlFor="staffName">{this.props.language === 'zh' ? '' : 'Name'}</label>
+              <div
+                className={`dropdown-container ${showTypeDropdown ? 'open' : ''}`}
+                ref={this.typeDropdownRef}
+              >
+                <input
+                  type="text"
+                  id="courseType"
+                  name="courseType"
+                  value={staffName}
+                  onChange={this.handleChange}
+                  onClick={() => this.handleDropdownToggle('showTypeDropdown')}
+                  placeholder={this.props.language === 'zh' ? '' : 'Filter by name'}
+                  autoComplete="off"
+                />
+                
+                {showTypeDropdown && (
+                  <ul className="dropdown-list">
+                    {filteredName.map((type, index) => (
+                      <li
+                        key={index}
+                        onClick={() => this.handleOptionSelect(type, 'showTypeDropdown')}
+                      >
+                        {typename}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <i className="fas fa-angle-down dropdown-icon"></i>
+              </div>
+              </div>*/}
               <div className="form-group">
               <label htmlFor="searchQuery">{this.props.language === 'zh' ? '搜寻' : 'Search'}</label>
               <div className="search-container">

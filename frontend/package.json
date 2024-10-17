@@ -8,6 +8,8 @@
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "axios": "^1.7.7",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "jose": "^5.9.3",
     "react": "^18.3.1",
     "react-datepicker": "^7.4.0",
@@ -15,7 +17,8 @@
     "react-router-dom": "^5.3.4",
     "react-scripts": "^5.0.1",
     "react-select": "^5.8.0",
-    "web-vitals": "^4.2.3"
+    "web-vitals": "^4.2.3",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -7,7 +7,7 @@ class ReceiptSection extends Component {
     super(props);
     this.state = {
       hideAllCells: false,
-      registerationDetails: [],
+      receiptDetails: [],
       isLoading: true,
       inputValues: {},
       dropdownVisible: {}, // Store input values for each row
@@ -28,11 +28,11 @@ class ReceiptSection extends Component {
   }
 
   getPaginatedDetails() {
-    const { registerationDetails } = this.state;
+    const { receiptDetails } = this.state;
     const { currentPage, entriesPerPage } = this.props;
     const indexOfLastCourse = currentPage * entriesPerPage;
     const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
-    return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
+    return receiptDetails.slice(indexOfFirstCourse, indexOfLastCourse);
   }
 
   fetchReceipt = async() =>
@@ -47,6 +47,23 @@ class ReceiptSection extends Component {
     const { language } = this.props;
     var data = await this.fetchReceipt();
     console.log(data);
+    var locations = this.getAllLocations(data);
+    console.log("Locations:", locations);
+    var names = this.getAllNames(data);
+    console.log("Names:", names);
+    this.props.passDataToParent(locations, names);
+
+    this.setState({
+      originalData: data,
+      receiptDetails: data, // Update with fetched dat
+      isLoading: false,
+      //inputValues: inputValues,  // Show dropdown for the focused input
+      locations: locations, // Set locations in state
+      names: names
+    });
+
+    await this.props.getTotalNumberofDetails(data.length);
+    
     this.props.closePopup();
     //console.log('Data:', data);
     /*var locations = this.getAllLocations(data);
@@ -66,7 +83,7 @@ class ReceiptSection extends Component {
 
     this.setState({
       originalData: data,
-      registerationDetails: data, // Update with fetched dat
+      receiptDetails: data, // Update with fetched dat
       isLoading: false, // Set loading to false after data is fetche
       inputValues: inputValues,  // Show dropdown for the focused input
       locations: locations, // Set locations in state
@@ -81,23 +98,22 @@ class ReceiptSection extends Component {
   async componentDidUpdate(prevProps) {
     const { selectedLocation, selectedCourseType, searchQuery} = this.props;
     if (selectedLocation !== prevProps.selectedLocation ||
-      selectedCourseType !== prevProps.selectedCourseType ||
       searchQuery !== prevProps.searchQuery 
     ) {
       this.filterRegistrationDetails();
     }
   }
 
-  filterRegistrationDetails() {
+ filterRegistrationDetails() {
     const { section } = this.props;
 
     if (section === "registration") {
         const { originalData } = this.state;
-        const { selectedLocation, selectedCourseType, searchQuery } = this.props;
+        const { selectedLocation, searchQuery } = this.props;
 
         // Reset filtered courses to all courses if the search query is empty
-        if (selectedCourseType === "All Types" && selectedLocation === "All Locations") {
-            this.setState({ registerationDetails: originalData });
+        if (selectedLocation === "All Loctions") {
+            this.setState({ receiptDetails: originalData });
             return;
         }
 
@@ -105,84 +121,54 @@ class ReceiptSection extends Component {
 
 
         const filteredDetails = originalData.filter(data => {
-            // Extract participant properties
-            const pName = data.participant.name.toLowerCase().trim() || ""; 
-            const pNric = data.participant.nric.toLowerCase().trim() || ""; 
-            const pRS = data.participant.residentialStatus.toLowerCase().trim() || ""; // Fixed to avoid calling it as a function
-            const pRace = data.participant.race.toLowerCase().trim() || ""; // Assuming race is a string
-            const pGender = data.participant.gender.toLowerCase().trim() || "";
-            const pDateOfBirth = data.participant.dateOfBirth || ""; // Ensure correct formatting if needed
-            const pContactNumber = data.participant.contactNumber || "";
-            const pEmail = data.participant.email.toLowerCase().trim() || "";
-            const pPostalCode = data.participant.postalCode || "";
-            const pEducationLevel = data.participant.educationLevel.toLowerCase().trim() || "";
-            const pWorkStatus = data.participant.workStatus.toLowerCase().trim() || "";
 
-            // Extract course properties
-            const location = data.course?.courseLocation?.toLowerCase().trim() || ""; 
-            const type = data.course?.courseType?.toLowerCase().trim() || "";
-            const courseEngName = data.course?.courseEngName?.toLowerCase().trim() || "";
-            const duration = data.course?.courseDuration || "";
-            const payment = data.course?.payment || "";
-            const agreement = data.agreement || "";
-
+          console.log("Substring:", data.receiptNo, selectedLocation,  data.receiptNo.includes(selectedLocation))
+          const receiptNo = data.receiptNo?.toLowerCase().trim() || "";
+          const staff = data.staff?.toLowerCase().trim() || "";
+          const url = data.url?.toLowerCase().trim() || "";
+          const date = data.date?.toLowerCase().trim() || "";
+          const time = data.time?.toLowerCase().trim() || "";
+          
             // Match 'All Languages' and 'All Locations'
-            const matchesLocation = selectedLocation === "All Languages" || 
+            const matchesLocation = selectedLocation === "All Locations" || 
                 selectedLocation === "所有语言" || 
                 selectedLocation === "" || 
                 !selectedLocation 
                 ? true 
-                : location === selectedLocation.toLowerCase().trim();
+                : data.receiptNo.includes(selectedLocation);
 
-            const matchesType = selectedCourseType === "All Types" || 
-                selectedCourseType === "所有地点" || 
-                selectedCourseType === "" || 
-                !selectedCourseType 
-                ? true 
-                : type === selectedCourseType.toLowerCase().trim();
+            console.log("Matches:", matchesLocation);
 
             const matchesSearchQuery = normalizedSearchQuery
-                ? (pName.includes(normalizedSearchQuery) ||
-                   pNric.includes(normalizedSearchQuery) ||
-                   pRS.includes(normalizedSearchQuery) ||
-                   pRace.includes(normalizedSearchQuery) ||
-                   pGender.includes(normalizedSearchQuery) ||
-                   pDateOfBirth.includes(normalizedSearchQuery) ||
-                   pContactNumber.includes(normalizedSearchQuery)||
-                   pEmail.includes(normalizedSearchQuery) ||
-                   pPostalCode.includes(normalizedSearchQuery) ||
-                   pEducationLevel.includes(normalizedSearchQuery) ||
-                   pWorkStatus.includes(normalizedSearchQuery)||  
-                   location.includes(normalizedSearchQuery)||
-                   type.includes(normalizedSearchQuery) ||
-                   courseEngName.includes(normalizedSearchQuery) ||
-                   duration.includes(normalizedSearchQuery) ||
-                   payment.includes(normalizedSearchQuery)||
-                   agreement.includes(normalizedSearchQuery))
+                ? (receiptNo.includes(normalizedSearchQuery) ||
+                   staff.includes(normalizedSearchQuery) ||
+                   url.includes(normalizedSearchQuery) ||
+                   date.includes(normalizedSearchQuery) ||
+                   time.includes(normalizedSearchQuery))
                 : true;
 
-            return matchesType && matchesLocation && matchesSearchQuery;
+            return matchesLocation && matchesSearchQuery;
         });
 
-        // If filteredDetails is empty, set registerationDetails to an empty array
-        this.setState({ registerationDetails: filteredDetails.length > 0 ? filteredDetails : [] });
+        // If filteredDetails is empty, set receiptDetails to an empty array
+        this.setState({ receiptDetails: filteredDetails.length > 0 ? filteredDetails : [] });
     }
-}
-    getAllLocations(datas) {
+  }
+
+  getAllLocations(datas) {
       return [...new Set(datas.map(data => {
-        return data.course.courseLocation;
+        return data.receiptNo.split("-")[0].trim();
       }))];
     }
 
-    // Method to get all languages
-    getAllType(datas) {
+    getAllNames(datas) {
       return [...new Set(datas.map(data => {
-        return data.course.courseType;
+        return data.staff;
       }))];
     }
 
   render() {
-    const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
+    const { hideAllCells, receiptDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
     const paginatedDetails = this.getPaginatedDetails();
     return (
       <div className="registration-payment-container">
@@ -203,7 +189,11 @@ class ReceiptSection extends Component {
                 {paginatedDetails.map((item, index) => (
                   <tr key={index}>
                     <td>{item.receiptNo}</td>
-                    <td>{item.url}</td>
+                    <td>
+                        <a href={item.url} target="_blank">
+                          <i className="fa-solid fa-receipt"></i>
+                        </a>
+                    </td>
                     <td>{item.staff}</td>
                     <td>{item.date}</td>
                     <td>{item.time}</td>
