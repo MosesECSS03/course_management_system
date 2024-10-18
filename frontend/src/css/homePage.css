@@ -3,7 +3,6 @@
     display: grid;
     grid-template-rows: auto 1fr auto auto; /* Header, content, and footer */
     height: 100vh; /* Full viewport height */
-    
   }
 
 
@@ -143,15 +142,15 @@
     grid-row: 3; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;
-    margin-top: -20rem;
+    /*margin-top: -20rem;*/
   }
 
- .registration-payment-section 
+ .registration-payment-section, .receipt-section
   {
     grid-row: 3; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;
-    margin-top: -30rem;
+   /* margin-top: -30rem;*/
     height: fit-content;
   }
 

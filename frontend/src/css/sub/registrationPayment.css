@@ -42,31 +42,40 @@
   cursor: pointer; /* Pointer cursor on hover */
 }
 
-.button-row1 {
-  display: flex; /* Uses flexbox for layout */
+.button-row3 {
+  display: flex; /* Flexbox layout for aligning items in a row */
+  align-items: center; /* Vertically aligns items in the center */
   justify-content: flex-start; /* Aligns buttons to the left */
-  margin-top: 1rem; /* Adds space above the button row (optional) */
-  width: 20rem;
+  margin-top: 1rem;
   margin-left: 8rem;
   margin-bottom: 2rem;
-  gap: 1rem;
+  gap: 1rem; /* Adds consistent space between items */
+}
+
+.button-row3 button, 
+.button-row3 .custom-file-input {
+  width: 7rem; /* Set uniform width for buttons and file label */
+  height: 2rem; /* Set uniform height for buttons and file label */
+  display: flex; /* Use flexbox for centering text */
+  justify-content: center; /* Horizontally center the text */
+  align-items: center; /* Vertically center the text */
+  cursor: pointer;
+  border: none; /* Remove default borders */
+  border-radius: 0.25rem; /* Optional: rounded corners */
+  text-align: center;
+}
+
+.button-row3 .custom-file-input {
+  background-color: #007bff; /* Example background color */
+  color: white;
+  margin-bottom: 0rem;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .file-input {
-  display: none; /* Hide the default file input */
-}
-
-.custom-file-input {
-  display: inline-block;
-  padding: 0.5rem 1rem; /* Adjust padding to match the button */
-  background-color: #007bff; /* Button background color */
-  color: #fff; /* Button text color */
-  border: none;
-  border-radius: 4px; /* Adjust border radius to match button */
-  cursor: pointer;
-  font-size: 1rem; /* Adjust font size to match button */
-}
-
-.custom-file-input:hover {
-  background-color: #0056b3; /* Darker background on hover */
+  display: none; /* Keep the actual file input hidden */
 }

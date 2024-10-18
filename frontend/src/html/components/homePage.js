@@ -35,7 +35,7 @@
         regPaymentSearchQuery: '',
         resetSearch: false,
         currentPage: 1,
-        entriesPerPage: 10,
+        entriesPerPage: 100000000000,
         totalPages: 1,
         nofCourses: 0,
         noofDetails: 0,
@@ -675,7 +675,7 @@
                         getTotalNumber= {noofDetails}
                       />
                     </div>
-                    <div className="registration-payment-section">
+                    <div className="receipt-section">
                     <ReceiptSection 
                         closePopup={this.closePopup}
                         section={section}

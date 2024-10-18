@@ -19,14 +19,14 @@
         focusedInputIndex: null,
         originalData: [],
         currentPage: 1, // Add this
-        entriesPerPage: 10 // Add this
+        entriesPerPage: 100 // Add this
       };
       this.tableRef = React.createRef();
     }
 
     handleEntriesPerPageChange = (e) => {
       this.setState({
-        entriesPerPage: parseInt(e.target.value, 10),
+        entriesPerPage: parseInt(e.target.value, 100),
         currentPage: 1 // Reset to the first page when changing entries per page
       });
     }
@@ -525,9 +525,9 @@
                 detail.course.payment,
                 detail.agreement,
                 detail.status,
-                detail.official.name,
-                detail.official.date,
-                detail.official.time
+                detail.official?.name,
+                detail.official?.date,
+                detail.official?.time
             ];
             preparedData.push(row);
         });
@@ -624,85 +624,115 @@
         link.download = originalFileName; // Use the original file name
         link.click(); // Trigger the download
     };*/
-    exportToLOP = async (paginatedDetails) => {
-      const fileInput = document.getElementById('fileInput');
-  
-      // Check if a file has been selected
-      if (!fileInput.files.length) {
-          alert("Please select an Excel file first!");
-          return;
-      }
-  
-      const file = fileInput.files[0];
-      const data = await file.arrayBuffer();
-  
-      // Create a new workbook
-      const workbook = new ExcelJS.Workbook();
-  
-      // Load the existing workbook
-      await workbook.xlsx.load(data);
-  
-      // Access the "LOP" sheet
-      const sourceSheet = workbook.getWorksheet('LOP');
-      if (!sourceSheet) {
-          alert(`Sheet "LOP" not found!`);
-          return;
-      }
-  
-      // Fill data starting from row 9
-      const startRow = 9;
-      paginatedDetails.forEach((detail, index) => {
-          const rowIndex = startRow + index;
-  
-          // Only overwrite the specified cells
-          sourceSheet.getCell(`A${rowIndex}`).value = index + 1; // Row number
-          sourceSheet.getCell(`B${rowIndex}`).value = detail.participant.name;
-          sourceSheet.getCell(`C${rowIndex}`).value = detail.participant.nric;
-          sourceSheet.getCell(`D${rowIndex}`).value = detail.participant.residentialStatus;
-          sourceSheet.getCell(`E${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[0].trim();
-          sourceSheet.getCell(`F${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[1].trim();
-          sourceSheet.getCell(`G${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[2].trim();
-          sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender;
-          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.substring(0, 1);
-          sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
-          sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
-          sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
-          sourceSheet.getCell(`M${rowIndex}`).value = detail.participant.educationLevel;
-          sourceSheet.getCell(`N${rowIndex}`).value = detail.participant.workStatus;
-          sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
-          // Assuming detail.course.courseDuration is in the format "DD/MM/YYYY - DD/MM/YYYY"
-          const durations = detail.course.courseDuration.split(" - ").map(duration => {
-            const parts = duration.split("/").map(part => part.trim()); // Split by '/' and trim whitespace
-            return `${parts[0]}/${parts[1]}/${parts[2]}`; // Format as DD/MM/YYYY
-          });
 
-          // Fill the cells with the formatted date
-          sourceSheet.getCell(`P${rowIndex}`).value = durations[0]; // Start date
-          sourceSheet.getCell(`Q${rowIndex}`).value = durations[1]; // End date
-          sourceSheet.getCell(`P${rowIndex}`).value = detail.course.courseDuration.split("-")[0].trim();
-          sourceSheet.getCell(`Q${rowIndex}`).value = detail.course.courseDuration.split("-")[1].trim();
-          sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
-          sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "Skills Future" ? "SFC" : detail.course.payment;
-      });
+exportToLOP = async (paginatedDetails) => {
+    const fileInput = document.getElementById('fileInput');
+
+    // Check if a file has been selected
+    if (!fileInput.files.length) {
+        alert("Please select an Excel file first!");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const data = await file.arrayBuffer();
+
+    // Create a new workbook
+    const workbook = new ExcelJS.Workbook();
+
+    // Load the existing workbook
+    await workbook.xlsx.load(data);
+
+    // Access the "LOP" sheet
+    const sourceSheet = workbook.getWorksheet('LOP');
+    if (!sourceSheet) {
+        alert(`Sheet "LOP" not found!`);
+        return;
+    }
+
+    var originalRow = sourceSheet.getRow(9);
+
+
+    var extra = paginatedDetails.length - 10;
+    console.log(extra);
+
+    for (let i = 0; i < extra; i++) {
+        sourceSheet.insertRow(19); // Inserts a new row at position 19 each time
+    }
+
+    // Start appending data from row 9
+    const startRow = 9;
+    let rowIndex;
+
+    paginatedDetails.forEach((detail, index) => {
+        rowIndex = startRow + index; // Calculate the row index for the new row
+
+        // Create a new row and set its height based on the first original row
+        const newDataRow = sourceSheet.getRow(rowIndex);
+        newDataRow.height = originalRow.height; // Use the height from the first original row
+
+        // Add new row data using the specified format
+        sourceSheet.getCell(`A${rowIndex}`).value = rowIndex - startRow + 1; // Row number
+        sourceSheet.getCell(`B${rowIndex}`).value = detail.participant.name;
+        sourceSheet.getCell(`C${rowIndex}`).value = detail.participant.nric;
+        sourceSheet.getCell(`D${rowIndex}`).value = detail.participant.residentialStatus.substring(0,2);
+        sourceSheet.getCell(`E${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[0].trim(); // Day
+        sourceSheet.getCell(`F${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[1].trim(); // Month
+        sourceSheet.getCell(`G${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[2].trim(); // Year
+        sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender;
+        sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.substring(0, 1); // First letter of race
+        sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
+        sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
+        sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
+        sourceSheet.getCell(`M${rowIndex}`).value = detail.participant.educationLevel;
+        sourceSheet.getCell(`N${rowIndex}`).value = detail.participant.workStatus.split(" ")[1];
+        sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
+
+        const durations = detail.course.courseDuration.split(" - ");
+
+        // Fill the cells with the formatted date
+        sourceSheet.getCell(`P${rowIndex}`).value = durations[0]; // Start date
+        sourceSheet.getCell(`Q${rowIndex}`).value = durations[1]; // End date
+        sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
+        sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "SkillsFuture" ? "SFC" : detail.course.payment;
+
+        // Copy styles from originalRow
+        originalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            const newCell = newDataRow.getCell(colNumber);
+            newCell.style = cell.style; // Copy cell style from the original row
+        });
+    });
+
+      const fillPattern = {
+        type: 'pattern',
+        pattern: 'darkTrellis',
+        fgColor: { argb: '0000000' }, // Dot color
+        bgColor: { argb: 'FFFFFFFF' } // Background color
+    };
   
-      // Use the original file name for saving but change the extension
-      const originalFileName = file.name.replace('.xlsx', '_new.xlsx');
-  
-      // Write the modified workbook to a buffer
-      const buffer = await workbook.xlsx.writeBuffer();
-  
-      // Create a blob and trigger the download
-      const blob = new Blob([buffer], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      });
-  
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = originalFileName; // Use the modified file name
-      link.click(); // Trigger the download
-  };
-  
-  
+  // Set fill for the cell
+  sourceSheet.getCell(`B26`).fill = fillPattern;
+
+    // Use the original file name for saving but change the extension
+    const originalFileName = file.name.replace('.xlsx', '_new.xlsx');
+
+    // Write the modified workbook to a buffer
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // Create a blob and trigger the download
+    const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = originalFileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
   
     render() {
       const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
@@ -711,13 +741,13 @@
         <div className="registration-payment-container">
           <div className="registration-payment-heading">
             <h1>{this.props.language === 'zh' ? '报名与支付' : 'Registration And Payment'}</h1>
-              <div className="button-row1">
-              <button onClick={() => this.saveData(paginatedDetails)}>Save Data</button>
-              <div>
+            <div className="button-row3">
+              <button onClick={() => this.saveData(paginatedDetails)}>Save Data</button>             
+              <div className="file-input-wrapper">
                 <input type="file" id="fileInput" accept=".xlsx, .xls" className="file-input" />
                 <label htmlFor="fileInput" className="custom-file-input">Select File</label>
-                <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
-            </div>
+              </div>            
+              <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
             </div>
             <div className="table-wrapper" ref={this.tableRef}>
               <table>
@@ -806,9 +836,9 @@
                         )}
 
                       </td>
-                      <td onClick={(event) => this.receiptGenerator(event, item)}>{item.official.name}</td>
-                      <td>{item.official.date}</td>                      
-                      <td>{item.official.time}</td>
+                      <td onClick={(event) => this.receiptGenerator(event, item)}>{item.official?.name}</td>
+                      <td>{item.official?.date}</td>                      
+                      <td>{item.official?.time}</td>
                     </tr>
                   ))}
                 </tbody>
