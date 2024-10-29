@@ -99,6 +99,40 @@ class DatabaseConnectivity {
         }
     }
 
+    async resetPassword(dbname, collectionName, username, password)
+    {
+        const db = this.client.db(dbname);
+        try
+        {
+            var table = db.collection(collectionName);
+            // Find a user with matching email and password
+            const result = await table.updateOne(
+                {email: username }, // Filter
+                { $set: {   password: password,
+                            first_time_log_in: "No"
+                 } } // Update
+            );
+            console.log(result);
+            if (result) {
+            // User found, login successful
+            return {
+                success: true,
+                message: 'Change Password Successful',
+            };
+            } else {
+            // No user found, login failed
+            return {
+                success: false,
+                message: 'Change Password Failure'
+            };
+            }
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
+    }
+
     async insertToDatabase(dbname, collectionName, data) {
         console.log("Database:", dbname);
         console.log("Data:", data);

@@ -625,114 +625,165 @@
         link.click(); // Trigger the download
     };*/
 
-exportToLOP = async (paginatedDetails) => {
-    const fileInput = document.getElementById('fileInput');
-
-    // Check if a file has been selected
-    if (!fileInput.files.length) {
-        alert("Please select an Excel file first!");
-        return;
+    convertDateFormat(dateString) {
+      const months = {
+        January: '01',
+        February: '02',
+        March: '03',
+        April: '04',
+        May: '05',
+        June: '06',
+        July: '07',
+        August: '08',
+        September: '09',
+        October: '10',
+        November: '11',
+        December: '12'
+      };
+    
+      // Split the date string into parts
+      const [day, fullMonth, year] = dateString.split(' ');
+    
+      const monthNumber = months[fullMonth];
+    
+      if (!monthNumber) {
+        return 'Invalid date format'; // Handle invalid month names
+      }
+    
+      // Return the date in the dd/mm/yyyy format
+      return `${day}/${monthNumber}/${year}`;
     }
 
-    const file = fileInput.files[0];
-    const data = await file.arrayBuffer();
-
-    // Create a new workbook
-    const workbook = new ExcelJS.Workbook();
-
-    // Load the existing workbook
-    await workbook.xlsx.load(data);
-
-    // Access the "LOP" sheet
-    const sourceSheet = workbook.getWorksheet('LOP');
-    if (!sourceSheet) {
-        alert(`Sheet "LOP" not found!`);
-        return;
-    }
-
-    var originalRow = sourceSheet.getRow(9);
-
-
-    var extra = paginatedDetails.length - 10;
-    console.log(extra);
-
-    for (let i = 0; i < extra; i++) {
-        sourceSheet.insertRow(19); // Inserts a new row at position 19 each time
-    }
-
-    // Start appending data from row 9
-    const startRow = 9;
-    let rowIndex;
-
-    paginatedDetails.forEach((detail, index) => {
-        rowIndex = startRow + index; // Calculate the row index for the new row
-
-        // Create a new row and set its height based on the first original row
-        const newDataRow = sourceSheet.getRow(rowIndex);
-        newDataRow.height = originalRow.height; // Use the height from the first original row
-
-        // Add new row data using the specified format
-        sourceSheet.getCell(`A${rowIndex}`).value = rowIndex - startRow + 1; // Row number
-        sourceSheet.getCell(`B${rowIndex}`).value = detail.participant.name;
-        sourceSheet.getCell(`C${rowIndex}`).value = detail.participant.nric;
-        sourceSheet.getCell(`D${rowIndex}`).value = detail.participant.residentialStatus.substring(0,2);
-        sourceSheet.getCell(`E${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[0].trim(); // Day
-        sourceSheet.getCell(`F${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[1].trim(); // Month
-        sourceSheet.getCell(`G${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[2].trim(); // Year
-        sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender;
-        sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.substring(0, 1); // First letter of race
-        sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
-        sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
-        sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
-        sourceSheet.getCell(`M${rowIndex}`).value = detail.participant.educationLevel;
-        sourceSheet.getCell(`N${rowIndex}`).value = detail.participant.workStatus.split(" ")[1];
-        sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
-
-        const durations = detail.course.courseDuration.split(" - ");
-
-        // Fill the cells with the formatted date
-        sourceSheet.getCell(`P${rowIndex}`).value = durations[0]; // Start date
-        sourceSheet.getCell(`Q${rowIndex}`).value = durations[1]; // End date
-        sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
-        sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "SkillsFuture" ? "SFC" : detail.course.payment;
-
-        // Copy styles from originalRow
-        originalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-            const newCell = newDataRow.getCell(colNumber);
-            newCell.style = cell.style; // Copy cell style from the original row
-        });
-    });
-
-      const fillPattern = {
-        type: 'pattern',
-        pattern: 'darkTrellis',
-        fgColor: { argb: '0000000' }, // Dot color
-        bgColor: { argb: 'FFFFFFFF' } // Background color
-    };
+    exportToLOP = async (paginatedDetails) => {
+      const fileInput = document.getElementById('fileInput');
   
-  // Set fill for the cell
-  sourceSheet.getCell(`B26`).fill = fillPattern;
-
-    // Use the original file name for saving but change the extension
-    const originalFileName = file.name.replace('.xlsx', '_new.xlsx');
-
-    // Write the modified workbook to a buffer
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    // Create a blob and trigger the download
-    const blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = originalFileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-};
-
+      // Check if a file has been selected
+      if (!fileInput.files.length) {
+          alert("Please select an Excel file first!");
+          return;
+      }
+  
+      const file = fileInput.files[0];
+      const data = await file.arrayBuffer();
+  
+      // Create a new workbook
+      const workbook = new ExcelJS.Workbook();
+  
+      // Load the existing workbook
+      await workbook.xlsx.load(data);
+  
+      // Access the "LOP" sheet
+      const sourceSheet = workbook.getWorksheet('LOP');
+      if (!sourceSheet) {
+          alert(`Sheet "LOP" not found!`);
+          return;
+      }
+  
+      const originalRow = sourceSheet.getRow(9);
+      const extra = paginatedDetails.length - 10;
+      console.log(extra);
+  
+      for (let i = 0; i < extra; i++) {
+          sourceSheet.insertRow(19); // Inserts a new row at position 19 each time
+      }
+  
+      // Start appending data from row 9
+      const startRow = 9;
+      let rowIndex;
+  
+      paginatedDetails.forEach((detail, index) => {
+          rowIndex = startRow + index; // Calculate the row index for the new row
+  
+          // Create a new row and set its height based on the first original row
+          const newDataRow = sourceSheet.getRow(rowIndex);
+          newDataRow.height = originalRow.height; // Use the height from the first original row
+  
+          // Add new row data using the specified format
+          sourceSheet.getCell(`A${rowIndex}`).value = rowIndex - startRow + 1; // Row number
+          sourceSheet.getCell(`B${rowIndex}`).value = detail.participant.name;
+          sourceSheet.getCell(`C${rowIndex}`).value = detail.participant.nric;
+          sourceSheet.getCell(`D${rowIndex}`).value = detail.participant.residentialStatus.substring(0, 2);
+          sourceSheet.getCell(`E${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[0].trim(); // Day
+          sourceSheet.getCell(`F${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[1].trim(); // Month
+          sourceSheet.getCell(`G${rowIndex}`).value = detail.participant.dateOfBirth.split("/")[2].trim(); // Year
+          sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender;
+          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.substring(0, 1); // First letter of race
+          sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
+          sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
+          sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
+  
+          if (detail.participant.educationLevel.split(" ").length === 3) {
+              sourceSheet.getCell(`M${rowIndex}`).value = detail.participant.educationLevel.split(" ")[0] + " " + detail.participant.educationLevel.split(" ")[1];
+          } else {
+              sourceSheet.getCell(`M${rowIndex}`).value = detail.participant.educationLevel.split(" ")[0];
+          }
+  
+          if (detail.participant.workStatus.split(" ").length === 3) {
+              sourceSheet.getCell(`N${rowIndex}`).value = detail.participant.workStatus.split(" ")[0] + " " + detail.participant.workStatus.split(" ")[1];
+          } else {
+              sourceSheet.getCell(`N${rowIndex}`).value = detail.participant.workStatus.split(" ")[0];
+          }
+  
+          sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
+  
+          const durations = detail.course.courseDuration.split(" - ");
+  
+          // Fill the cells with the formatted date
+          sourceSheet.getCell(`P${rowIndex}`).value = this.convertDateFormat(durations[0]); // Start date
+          sourceSheet.getCell(`Q${rowIndex}`).value = this.convertDateFormat(durations[1]); // End date
+          sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
+          sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "SkillsFuture" ? "SFC" : detail.course.payment;
+  
+          // Copy styles from originalRow
+          originalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+              const newCell = newDataRow.getCell(colNumber);
+              newCell.style = cell.style; // Copy cell style from the original row
+          });
+      });
+  
+      // Ensure rows 60 to 74 remain unchanged and have the same styles
+      for (let i = 60; i <= 74; i++) {
+          const originalRow60to74 = sourceSheet.getRow(i);
+          const targetRow60to74 = sourceSheet.getRow(i); // Get the same row to keep unchanged
+  
+          // Copy styles and properties, including wrapping
+          originalRow60to74.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+              const targetCell = targetRow60to74.getCell(colNumber);
+              targetCell.style = cell.style; // Copy cell style from the original row
+              targetCell.alignment = cell.alignment; // Copy alignment
+              targetCell.font = cell.font; // Copy font
+              targetCell.protection = cell.protection; // Copy protection settings
+              targetCell.border = cell.border; // Copy border
+              targetCell.fill = cell.fill; // Copy fill
+              targetCell.numberFormat = cell.numberFormat; // Copy number format
+              targetCell.width = cell.width; // Copy column width
+              targetCell.wrapText = cell.wrapText; // Ensure wrap text is copied
+          });
+      }
+  
+      // Merge cells B61:D61
+      sourceSheet.mergeCells('B61:D61');
+  
+      // Use the original file name for saving but change the extension
+      const originalFileName = file.name.replace('.xlsx', '_new.xlsx');
+  
+      // Write the modified workbook to a buffer
+      const buffer = await workbook.xlsx.writeBuffer();
+  
+      // Create a blob and trigger the download
+      const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+  
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = originalFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  };
+  
   
     render() {
       const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;

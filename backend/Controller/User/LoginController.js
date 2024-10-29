@@ -88,6 +88,36 @@ class LoginController
       await this.databaseConnectivity.close(); // Ensure the connection is closed
     }   
   }
+
+  async resetPassword(username, password) 
+  {
+    try 
+    { 
+      console.log("Reset Password");
+      var result = await this.databaseConnectivity.initialize();
+      if(result === "Connected to MongoDB Atlas!")
+      {
+        var databaseName = "Courses-Management-System";
+        var collectionName = "Accounts";
+        var connectedDatabase = await this.databaseConnectivity.resetPassword(databaseName, collectionName, username, password);
+        return {"message": connectedDatabase.message, "success": connectedDatabase.success};   
+      }
+    } 
+    catch (error) 
+    {
+      return {
+        success: false,
+        message: "Error registering user",
+        error: error
+      };
+    }
+    finally 
+    {
+      await this.databaseConnectivity.close(); // Ensure the connection is closed
+    }   
+  }
 }
+
+
 
 module.exports = LoginController;

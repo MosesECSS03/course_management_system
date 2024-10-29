@@ -278,3 +278,133 @@
   cursor: pointer;
   color: #333;
 }
+
+#new-password1
+{
+  width: 22em;
+}
+
+.forgot-password-message {
+  width: auto;
+  margin: 0 auto; /* Center the form horizontally */
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.forgot-password-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.submit-button {
+  padding: 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.error-message {
+  color: #ff4d4d; /* Red color for error messages */
+  margin-top: 10px;
+}
+
+.success-message {
+  color: #28a745; /* Green color for success messages */
+  margin-top: 10px;
+}
+
+
+.no-activity-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff; /* Solid black background */
+  padding: 1.5rem; /* Padding around the content */
+  border-radius: 0.625rem; /* Rounded corners */
+  height: 12.5rem; /* Set the width of the popup */
+  text-align: center;
+  height: auto;
+}
+
+.no-activity-title {
+  color: #000000; /* Green color for success */
+  font-size: 1.5rem; /* Title size */
+  font-weight: bold;
+  margin: 1rem 0; /* Space around the title */
+}
+
+.button-container1 {
+  display: flex;
+  justify-content: space-between; /* Spreads the buttons evenly */
+  margin-top: 1rem; /* Adds some spacing above the buttons */
+}
+
+.button-container1 button {
+  padding: 0.5rem 1rem; /* Adjust button padding */
+  flex-grow: 1; /* Makes both buttons equally wide */
+  margin-right: 12rem; /* Adds space between the buttons */
+  font-weight: bold;
+  width: 5rem;
+}
+
+.button-container1 button:last-child {
+  margin-right: 0; /* Removes the right margin for the last button */
+}
+
+.edit-account-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff; /* Solid black background */
+  padding: 1.5rem; /* Padding around the content */
+  border-radius: 0.625rem; /* Rounded corners */
+  height: fit-content; /* Set the width of the popup */
+  text-align: center;
+  width: fit-content;
+}
+
+.edit-account-title {
+  color: #000000; /* Green color for success */
+  font-size: 1.5rem; /* Title size */
+  font-weight: bold;
+  margin: 1rem 0; /* Space around the title */
+}
+
+.button-container2 {
+  display: flex;
+  justify-content: space-between; /* Spreads the buttons evenly */
+  margin-top: 1rem; /* Adds some spacing above the buttons */
+}
+
+.button-container2 button {
+  padding: 0.5rem 1rem; /* Adjust button padding */
+  flex-grow: 1; /* Makes both buttons equally wide */
+  margin-right: 12rem; /* Adds space between the buttons */
+  font-weight: bold;
+  width: fit-content;
+  height: fit-content;
+  white-space: nowrap;
+}
+
+.button-container2 button:last-child {
+  margin-right: 0; /* Removes the right margin for the last button */
+}
+
+.close-button12 {
+  background: none; /* No background */
+  border: none; /* No border */
+  font-size: 1.5rem; /* Size of the close button */
+  color: #000000; /* Initial color of the close button */
+  cursor: pointer; /* Cursor change on hover */
+  position: absolute; /* Position the button in the corner */
+  top: 1em; /* Distance from the top */
+  right: 10px; /* Distance from the right */
+  transition: color 0.2s ease; /* Smooth color transition */
+  margin-right: -12em;
+}

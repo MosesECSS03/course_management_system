@@ -93,7 +93,7 @@ class CoursesSection extends Component {
   
   async componentDidMount() {
     var { accountType } = this.props;
-    console.log("ComponentDidMount:", accountType);
+   // console.log("ComponentDidMount:", accountType);
     if (accountType && !this.state.dataFetched && accountType === "Accounts") {
       await this.fetchAccounts();
     }
@@ -107,7 +107,7 @@ class CoursesSection extends Component {
   componentDidUpdate(prevProps)
   {
    var { accountType, selectedAccountType, language, searchQuery } = this.props;
-    console.log("Component Did Update:", accountType, prevProps.accountType, accountType !== prevProps.accountType);
+    //console.log("Component Did Update:", accountType, prevProps.accountType, accountType !== prevProps.accountType);
    // Check if any of the relevant props have changed
    if (
      accountType !== prevProps.accountType ||
@@ -149,7 +149,7 @@ class CoursesSection extends Component {
 
   getPaginatedAccessDetails()
   {
-    console.log("getPaginatedAccessDetails()", this.props);
+    //console.log("getPaginatedAccessDetails()", this.props);
     const { filteredAccessRights } = this.state;
     const { currentPage, entriesPerPage } = this.props;
     const indexOfLastCourse = currentPage * entriesPerPage;
@@ -261,6 +261,12 @@ filterAccessRights()
     }
 }
 
+accountInfo = async(account) =>
+{
+  //console.log("Account Information:", account._id);
+  this.props.edit(account._id)
+}
+
   render() 
   {
     const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType } = this.state;
@@ -294,7 +300,7 @@ filterAccessRights()
                 <tbody>
                 {paginatedDetails.map((account, index) => { 
                       return (
-                        <tr key={index}>
+                        <tr key={index} onClick={() => this.accountInfo(account)}>
                           <td>{account.name}</td>
                           <td>{account.email}</td>
                           <td>{account.password}</td>

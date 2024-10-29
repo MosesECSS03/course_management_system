@@ -13,6 +13,14 @@ router.post("/", async function(req, res)
         var result = await controller.changePassword(accountId, newPassword);
         res.json(result);
     }
+    else if(req.body.purpose === "resetPassword")
+    {
+        var {purpose, username, password} = req.body;
+        console.log(req.body);
+        var controller = new LoginController();
+        var result = await controller.resetPassword(username, password);
+        res.json(result);
+    }
     else
     {
         var email = req.body.email;

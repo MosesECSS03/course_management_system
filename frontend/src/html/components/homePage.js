@@ -11,6 +11,7 @@
   import CreateAccountsSection from './sub/createAccountsSection';
   import ReceiptSection from './sub/receiptSection';
   import SideBarContent from './sub/sideBarContent';
+  import { withAuth } from '../../AuthContext';
 
   class HomePage extends Component {
     constructor(props) {
@@ -49,7 +50,8 @@
         displayedName: "",
         isDropdownOpen: false,
         isReceiptVisible: false,
-        item: ""
+        item: "",
+        isInactive: false
       };
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
@@ -61,6 +63,8 @@
       this.toggleViewMode = this.toggleViewMode.bind(this); 
       this.toggleRegistrationPaymentComponent = this.toggleRegistrationPaymentComponent.bind(this);
       this.createAccountPopupMessage = this.createAccountPopupMessage.bind(this);
+      this.inactivityTimeout = null;
+      this.editAccountPopupMessage = this.editAccountPopupMessage.bind(this);
       //this.getTotalNumberofDetails = this.getTotalNumberofDetails.bind(this);
     }
 
@@ -219,6 +223,25 @@
         console.log(error);
       }
     };
+
+    componentDidMount() {
+      // Start the inactivity detection timeout
+      this.resetInactivity();
+      // Adding event listeners to reset inactivity
+      window.addEventListener('mousemove', this.resetInactivity);
+      window.addEventListener('keypress', this.resetInactivity);
+      window.addEventListener('click', this.resetInactivity);
+      window.addEventListener('scroll', this.resetInactivity);
+    }
+  
+    componentWillUnmount() {
+      // Cleanup the timeout and event listeners
+      clearTimeout(this.inactivityTimeout); // Clear any existing timeouts
+      window.removeEventListener('mousemove', this.resetInactivity);
+      window.removeEventListener('keypress', this.resetInactivity);
+      window.removeEventListener('click', this.resetInactivity);
+      window.removeEventListener('scroll', this.resetInactivity);
+    }
 
     toggleAccountsComponent = async (accountType) => 
     {
@@ -414,10 +437,10 @@
               //viewMode: "full"
           }));
       }
-  }
+  } 
 
   logOut = async() =>
-  {
+  {   
     //this.props.history.push('/');  
     this.setState({
       isPopupOpen: true,
@@ -427,8 +450,32 @@
     });
   }
 
+  // This method is called when no activity is detected for the specified time
+  noActivityDetected = async () => {
+    this.setState({ isInactive: true });
+    //console.log('User has been inactive for 1 minute.');
+    this.setState({
+      isPopupOpen: true,
+      popupMessage: "",
+      popupType: "no-activity"
+    });
+    //this.goBackHome();
+  };
+
+  // This method can be called to reset the inactivity state
+  resetInactivity = () => {
+    this.setState({ isInactive: false });
+    //console.log('User is active again. Resetting inactivity timer.');
+    clearTimeout(this.inactivityTimeout); // Clear the timeout if user becomes active
+
+    // Restart the inactivity timeout
+    //this.inactivityTimeout = setTimeout(this.noActivityDetected, 10000); // 1 minute*/
+    this.inactivityTimeout = setTimeout(this.noActivityDetected, 360000); // 1 minute*/
+  };
+
   goBackHome = async() =>
   {
+    this.props.auth.logout();
     this.props.history.push("/");
   }
 
@@ -450,6 +497,18 @@
         isDropdownOpen: !prevState.isDropdownOpen,
       }));
     };
+
+    editAccountPopupMessage(accountId) {
+      // Log the account ID for debugging purposes
+     // console.log("Account Id:", accountId);
+    
+      // Set the popup state with a relevant message
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: `Editing account with ID: ${accountId}`, // Informative message
+        popupType: "edit-account"
+      });
+    }
 
     render() 
     {
@@ -544,6 +603,7 @@
                         entriesPerPage={this.state.entriesPerPage} // Pass entries per page
                         resetSearch={resetSearch} 
                         section={section}
+                        edit = {this.editAccountPopupMessage}
                       />
                     </div>
                     <div className="pagination-section">
@@ -713,4 +773,4 @@
     }
   }
 
-  export default withRouter(HomePage);
+  export default withAuth(HomePage);

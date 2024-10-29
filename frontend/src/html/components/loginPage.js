@@ -3,7 +3,7 @@ import '../../css/loginPage.css';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import Popup from './popup/popupMessage';
-
+import { AuthContext, withAuth } from '../../AuthContext';
 
 class LoginPage extends Component {
   constructor(props) {
@@ -66,7 +66,7 @@ class LoginPage extends Component {
     return '';
   };
 
-  handleSubmit = async (e) => {
+/*handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission (page reload)
     const { email, password } = this.state;
 
@@ -125,7 +125,79 @@ class LoginPage extends Component {
           this.setState({ isPopupOpen: false, name: '', email: '', password: '', role: ''});
       }, 5000);
       }
+  };*/
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email, password } = this.state;
+    const { auth } = this.props; // Access auth context here
+
+    const emailError = this.validateEmail(email);
+    const passwordError = this.validatePassword(password);
+
+    if (emailError || passwordError) {
+      this.setState({ emailError, passwordError });
+      return;
+    }
+
+    // Clear error messages
+    this.setState({ emailError: '', passwordError: '' });
+
+    try {
+      // Replace with your API endpoint and payload
+      const response = await axios.post('http://localhost:3001/login', {
+        email,
+        password,
+      });
+
+      if (response.data?.message?.message === "Login successful") {
+        // Set the authentication state
+        auth.login(); // Call login from the context
+
+        this.setState({
+          isPopupOpen: true,
+          popupMessage: response.data.message.message,
+          popupType: "success-message",
+        });
+
+        //console.log(auth.logout());
+        // Redirect or perform other actions...
+        setTimeout(() => {
+          this.setState({ isPopupOpen: false });
+          this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}});
+        }, 5000);
+      } else {
+        this.setState({
+          isPopupOpen: true,
+          popupMessage: "Login Failure",
+          popupType: "error-message",
+        });
+         // Redirect or perform other actions...
+         setTimeout(() => {
+          this.setState({ isPopupOpen: false, name: '', password: '', role: ''});
+      }, 5000);
+      }
+    } catch (error) {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "An error occurred. Please try again later.",
+        popupType: "error-message",
+      });
+      setTimeout(() => {
+        this.setState({ isPopupOpen: false, name: '', password: '', role: ''});
+    }, 5000);
+    }
   };
+
+  resetPassword = async() =>
+  {
+    this.setState({
+      isPopupOpen: true,
+      popupMessage: "",
+      popupType: "forgot-password",
+    });
+  }
+
 
   passPopupMessage = (success, message) =>
   {
@@ -209,7 +281,7 @@ class LoginPage extends Component {
                   language === 'en' ? 'Enter your email' : '请输入电子邮件...'
                 }
               />
-              {emailError && <small class="error-message">{emailError}</small>}
+              {emailError && <small class="error-message1">{emailError}</small>}
 
               <label htmlFor="password">
               {language === 'en' ? 'Password:' : '密码：'}
@@ -228,8 +300,19 @@ class LoginPage extends Component {
                 onClick={this.togglePasswordVisibility}
               ></i>
             </div>
-              {passwordError && <small class="error-message">{passwordError}</small>}
-
+            {passwordError && <small class="error-message1">{passwordError}</small>}
+            <a 
+            style={{
+              fontWeight: 'bold',
+              color: 'blue',
+              fontSize: '0.75em',
+              textDecoration: 'underline',
+              cursor: 'pointer'
+            }}
+            onClick={this.resetPassword}
+          >
+            Reset password
+          </a>
               <button type="submit">
                 {language === 'en' ? 'Login' : '登录'}
               </button>
@@ -252,4 +335,4 @@ class LoginPage extends Component {
   }
 }
 
-export default withRouter(LoginPage);
+export default withAuth(LoginPage);
