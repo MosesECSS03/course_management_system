@@ -61,6 +61,35 @@ class LoginController
     }   
   }
 
+  async logout(accountId) 
+  {
+    try 
+    {
+      var result = await this.databaseConnectivity.initialize();
+      if(result === "Connected to MongoDB Atlas!")
+      {
+        var databaseName = "Courses-Management-System";
+        var collectionName = "Accounts";
+        var currentDateTime = getCurrentDateTime();
+        var connectedDatabase = await this.databaseConnectivity.logout(databaseName, collectionName, accountId, currentDateTime.date, currentDateTime.time);
+        //console.log(connectedDatabase.message);
+        return {"message": connectedDatabase.message};   
+      }
+    } 
+    catch (error) 
+    {
+      return {
+        success: false,
+        message: "Error registering user",
+        error: error
+      };
+    }
+    finally 
+    {
+      await this.databaseConnectivity.close(); // Ensure the connection is closed
+    }   
+  }
+
   async changePassword(accountId, password) 
   {
     try 

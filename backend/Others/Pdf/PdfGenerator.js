@@ -386,67 +386,60 @@ class PdfGenerator {
     }
     
 
-    async generateReceipt(res, dataArray, name, receiptNo) 
-    {
-        return new Promise((resolve, reject) =>
-            {
-            try 
-            {
+    async generateReceipt(res, dataArray, name, receiptNo) {
+        return new Promise((resolve, reject) => {
+            try {
                 console.log("Staff Name:", name);
                 // Set headers for PDF
-
                 const filename = `Moses.pdf`; 
-
+    
                 res.setHeader('Content-Type', 'application/pdf');
                 res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-
+    
+                // Set cache headers to allow permanent access
+                res.setHeader('Cache-Control', 'public, max-age=315360000'); // Cache for 10 years (in seconds)
+                res.setHeader('Expires', new Date(Date.now() + 315360000 * 1000).toUTCString()); // Expires in 10 years
+    
                 // Log headers just before sending the response
                 console.log('Sending headers:', {
-                        'Content-Type': 'application/pdf',
-                        'Content-Disposition': `inline; filename="${filename}"`
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': `inline; filename="${filename}"`,
+                    'Cache-Control': 'public, max-age=315360000',
+                    'Expires': new Date(Date.now() + 315360000 * 1000).toUTCString()
                 });
-
+    
                 const doc = new PDFDocument();
-
+    
                 // Add error listener
                 doc.on('error', (err) => {
-                    console.error('Error while generating PDF:;', err);
+                    console.error('Error while generating PDF:', err);
                     res.status(500).json({ error: 'Error generating PDF' });
                 });
-
+    
                 doc.pipe(res);
                 
-                // Finalize the document
-                //doc.end();
                 // Ensure addContent is called correctly with await
                 this.addContent(doc, dataArray, name, receiptNo)
-                .then(() => {
-                    // Finalize the document
-                    doc.end();
-
-                    // Listen for the finish event to resolve the promise
-                    res.on('finish', () => {
-                        console.log('PDF response sent successfully.');
-                        resolve('PDF response sent successfully.');
+                    .then(() => {
+                        // Finalize the document
+                        doc.end();
+    
+                        // Listen for the finish event to resolve the promise
+                        res.on('finish', () => {
+                            console.log('PDF response sent successfully.');
+                            resolve('PDF response sent successfully.');
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error adding content to PDF:', err);
+                        reject('Error adding content to PDF');
                     });
-                })
-                .catch(err => {
-                    console.error('Error adding content to PDF:', err);
-                    reject('Error adding content to PDF');
-                });
-
-                //res.on('finish', () => {
-                //    console.log('PDF response sent successfully.');
-                //    resolve('PDF response sent successfully.'); // Resolve the promise
-                //});
-            } 
-            catch (error) 
-            {
+            } catch (error) {
                 console.error('Error in PDF generation:', error);
                 reject('An unexpected error occurred'); 
             }
         });
     }
-}
+}    
 
 module.exports = PdfGenerator;

@@ -167,6 +167,13 @@ class ReceiptSection extends Component {
       }))];
     }
 
+    handleDownload = (receiptNumber, blobUrl) => {
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `${receiptNumber}.pdf`; // Set the default filename for download
+        link.click(); // Programmatically click the link to trigger the download
+  };
+
   render() {
     const { hideAllCells, receiptDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
     const paginatedDetails = this.getPaginatedDetails();
@@ -190,7 +197,7 @@ class ReceiptSection extends Component {
                   <tr key={index}>
                     <td>{item.receiptNo}</td>
                     <td>
-                        <a href={item.url} target="_blank">
+                        <a onClick={() => this.handleDownload(item.receiptNo, item.url)} >
                           <i className="fa-solid fa-receipt"></i>
                         </a>
                     </td>

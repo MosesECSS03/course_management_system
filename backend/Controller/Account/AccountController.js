@@ -120,6 +120,35 @@ class AccountController
             await this.databaseConnectivity.close(); // Ensure the connection is closed
         }    
     }  
+
+    async deleteAccount(accountId) 
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System";
+                var collectionName = "Accounts";
+                var connectedDatabase = await this.databaseConnectivity.deleteAccount(databaseName, collectionName, accountId);
+                return connectedDatabase;
+                //console.log(connectedDatabase);
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error retrieving all user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }  
  }
 
 module.exports = AccountController;

@@ -8,6 +8,7 @@ class SideBarContent extends Component {
         this.state = {
             accessRights: {}, // State to hold access rights
             openKey: null, // State to manage which main key is open
+            accessRightsUpdated: false
         };
     }
 
@@ -16,12 +17,49 @@ class SideBarContent extends Component {
         await this.getAccessRight(accountId);
     }
 
+    // Helper function to compare access rights
+    isEqual = (obj1, obj2) => {
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+        
+        if (keys1.length !== keys2.length) {
+            return false; // Different number of keys
+        }
+
+        for (const key of keys1) {
+            if (obj1[key] !== obj2[key]) {
+                return false; // Values are different
+            }
+        }
+
+        return true; // Objects are equal
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        // Check if accountId has changed
+        if (prevProps.accountId !== this.props.accountId) {
+            this.getAccessRight(this.props.accountId);
+        }
+    
+        // Only refresh when accessRights differ and it's the first call after accountId change
+        if (!this.isEqual(prevState.accessRights, this.state.accessRights)) {
+            // Avoid calling getAccessRight again if accessRights is already being updated
+            if (!this.accessRightsUpdated) {
+                this.accessRightsUpdated = true; // Set the flag to indicate we've called it
+                this.getAccessRight(this.props.accountId);
+            }
+        } else {
+            // Reset the flag if accountId hasn't changed
+            this.accessRightsUpdated = false;
+        }
+    }
     getAccessRight = async (accountId) => {
         try {
             const response = await axios.post('http://localhost:3001/accessRights', {
                 "purpose": "retrieveAccessRight",
                 "accountId": accountId
             });
+            console.log(response);
 
             // Store the access rights in state
             this.setState({ accessRights: response.data.result });

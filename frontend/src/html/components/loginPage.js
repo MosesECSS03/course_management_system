@@ -129,8 +129,9 @@ class LoginPage extends Component {
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = this.state;
+    var { email, password } = this.state;
     const { auth } = this.props; // Access auth context here
+    email = email.toLowerCase();
 
     const emailError = this.validateEmail(email);
     const passwordError = this.validatePassword(password);
@@ -147,8 +148,9 @@ class LoginPage extends Component {
       // Replace with your API endpoint and payload
       const response = await axios.post('http://localhost:3001/login', {
         email,
-        password,
+        password
       });
+      console.log(response.data.message)
 
       if (response.data?.message?.message === "Login successful") {
         // Set the authentication state
@@ -164,7 +166,20 @@ class LoginPage extends Component {
         // Redirect or perform other actions...
         setTimeout(() => {
           this.setState({ isPopupOpen: false });
-          this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}});
+          if(response.data.message.details.first_time_log_in === "Yes")
+            {
+              this.setState({
+                isPopupOpen: true,
+                popupMessage: response.data.message.message,
+                popupType: "change-password",
+                accountId: response.data.message.details._id,
+                name: response.data.message.details.name
+              });
+            }
+            else
+            {
+              this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}}); 
+            }
         }, 5000);
       } else {
         this.setState({

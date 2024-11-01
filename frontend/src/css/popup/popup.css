@@ -408,3 +408,59 @@
   transition: color 0.2s ease; /* Smooth color transition */
   margin-right: -12em;
 }
+
+.access-right-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff; /* Solid black background */
+  padding: 1.5rem; /* Padding around the content */
+  border-radius: 0.625rem; /* Rounded corners */
+  height: 20rem; /* Set the width of the popup */
+  text-align: center;
+  width: 40rem;
+  margin: 20px;
+  overflow-y: auto;
+}
+
+.main-key {
+  margin-bottom: 20px;
+}
+
+.sub-keys {
+  border: 1px solid #ccc; /* Box border */
+  padding: 10px;
+  border-radius: 5px; /* Rounded corners */
+}
+
+.checkbox-container {
+  display: flex; /* Use flex for layout */
+  flex-wrap: wrap; /* Allow items to wrap into the next line */
+  gap: 30px; /* Space between items */
+}
+
+.checkbox-box {
+  padding: 10px;
+  display: flex; /* Flexbox for label alignment */
+  align-items: center; /* Center items vertically */
+  justify-content: flex-start; /* Align items to the start */
+  height: 60px; /* Fixed height for uniform boxes */
+  width: calc(23.33% -0px); /* 3 boxes per row, minus the gap */
+}
+
+.checkbox-label {
+  display: flex; /* Use flex for label and checkbox alignment */
+  align-items: center; /* Center items vertically */
+  white-space: nowrap;
+}
+
+.checkbox-label input {
+  margin-right: 10px; /* Space between checkbox and label */
+}
+
+.access-right-title {
+  color: #000000; /* Green color for success */
+  font-size: 1.5rem; /* Title size */
+  font-weight: bold;
+  margin: 1rem 0; /* Space around the title */
+}

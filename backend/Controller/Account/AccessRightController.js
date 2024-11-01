@@ -97,6 +97,64 @@ class AccessRightController
             await this.databaseConnectivity.close(); // Ensure the connection is closed
         }    
     }  
+
+    async deleteAccessRights(accountId) 
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System";
+                var collectionName = "Access Rights";
+                var connectedDatabase = await this.databaseConnectivity.deleteAccessRights(databaseName, collectionName, accountId);
+                return connectedDatabase;
+                //console.log(connectedDatabase);
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error retrieving all user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }  
+
+    async updateAccessRight(accessRightId, accessRight) 
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System";
+                var collectionName = "Access Rights";
+                var connectedDatabase = await this.databaseConnectivity.updateAccessRight(databaseName, collectionName, accessRightId, accessRight);
+                return connectedDatabase;
+                //console.log(connectedDatabase);
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error retrieving all user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }  
  }
 
 module.exports = AccessRightController;

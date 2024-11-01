@@ -17,11 +17,12 @@
   .table-wrapper {
     width: 80vw; /* Table wrapper occupies 80% of the width of its container */
     max-width: 120rem; /* Maximum width for large screens */
-    height: auto;/*height: 50vh*/ /* Table wrapper occupies 70% of the viewport height */
+    height: fit-content;/*height: 50vh*/ /* Table wrapper occupies 70% of the viewport height */
     overflow: auto; /* Enable both vertical and horizontal scrolling */
     margin: 0 auto; /* Center the wrapper horizontally */
     margin-left: 8rem;
   }
+  
   
   /* Ensure table takes full width */
   .table-wrapper table {

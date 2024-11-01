@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var AccountController = require('../Controller/Account/AccountController'); 
 var Email = require('../Others/Email/Email');
+var AccessRightController = require('../Controller/Account/AccessRightController'); 
 
 function getCurrentDateTime() {
     const now = new Date();
@@ -138,7 +139,20 @@ router.post('/', async function(req, res, next) {
         var result = await controller.allAccounts();
         return res.json({"result": result}); 
     }
-
+    else if(req.body.purpose === "deleteAccount")
+    {
+       var controller = new AccountController();
+        //console.log(req.body);
+        var accountId = req.body.accountId;
+        var result = await controller.deleteAccount(accountId);
+        var controller1 = new AccessRightController();
+        var result1 = await controller1.deleteAccessRights(accountId);
+        console.log(result1);
+        if(result === true&& result1 === true)
+        {
+            return res.json({"result": result}); 
+        }
+    }
 });
 
 module.exports = router;

@@ -61,11 +61,12 @@ router.post('/', async function(req, res, next)
         console.log("Official Use");
         var id = req.body.registration_id;
         var name = req.body.staff;
+        var status = req.body.status;
         const currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
         var controller = new RegistrationController();
-        const message = await controller.updateOfficialUse(id, name, date, time);
+        const message = await controller.updateOfficialUse(id, name, date, time, status);
         return res.json({"result": message}); 
         // After the PDF is sent, you can send a confirmation response if necessary
         //res.json({ message }); // Send confirmation response

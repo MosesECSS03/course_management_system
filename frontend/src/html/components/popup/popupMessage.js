@@ -18,16 +18,25 @@ class Popup extends Component {
       message: '',
       error: '',
       password: '',
-      countdown: 10
+      countdown: 10,
+      checked: true, 
+      message4: null,
     };
     this.countdownInterval = null;
   }
 
-  componentDidMount() {
+  componentDidMount = async() => {
     // Check the type prop to decide whether to start the countdown
     if (this.props.type === "no-activity") {
       console.log("Start CountDown");
       this.startCountdown();
+    }
+    if (this.props.type === "update-access-right") {
+      console.log("Update Access Right", this.props.message);
+      this.setState({ message4: this.props.message }, () => {
+          // Callback to log the new state after it's been set
+          console.log("Updated message4 state:", this.state.message4);
+      });
     }
   }
 
@@ -39,7 +48,13 @@ class Popup extends Component {
       if (this.props.type === "no-activity") {
         console.log("Restart CountDown");
         this.startCountdown();
-      } else {
+      }else if (this.props.type === "update-access-right" && this.props.message !== prevProps.message) {
+        console.log("Update Access Right", this.props.message);
+        this.setState({ message4: this.props.message }, () => {
+            // Log the new state after it's been set
+            console.log("Updated message4 state:", this.state.message4);
+        });
+    } else {
         clearInterval(this.countdownInterval);
         this.setState({ countdown: 10 });
         // If the type changed to something else, clear the countdown
@@ -236,16 +251,67 @@ class Popup extends Component {
     });*/
   };
 
-  manageAccountInfo(action)
+  manageAccountInfo = async(action) =>
   {
     if(action === "Delete")
     {
       console.log("Delete Account");
+      //console.log("Delete Account", this.props);
+      var accountId = this.props.message;
+      var response = await axios.post(`http://localhost:3001/accountDetails`, {"purpose": "deleteAccount",  "accountId": accountId});
+      if(response.data.success === true)
+      {
+          //console.log("Change Password Successfully");
+          this.props.closePopupMessage(response.data.success, "Delete Account Successfully");
+      }
+      else
+      {
+        //console.log("Change Password Error");
+        this.props.closePopupMessage(response.data.success, "DeleteAccount Failure");
+      }
     }
   }
 
+  handleCheckboxChange = (mainKey, subKey) => {
+    //var {message4} = this.state 
+    var {message4} = this.state 
+    // Get the current value from props
+    const currentValue = message4[mainKey][subKey];
   
-
+    console.log("Main Key:", mainKey);
+    console.log("Sub Key:", subKey);
+    console.log("Current Value:", currentValue);
+  
+    // Create a new message4 object with the updated value
+    const updatedMessage4 = {
+      ...message4,
+      [mainKey]: {
+        ...message4[mainKey],
+        [subKey]: !currentValue, // Toggle the value
+      },
+    };
+  
+    // Set the state with the new message4
+    this.setState({ message4: updatedMessage4 });
+  };
+  
+  updateAccessRight = async() =>
+  {
+    var accessRight = this.state.message4;
+    var accessRightId = this.props.message._id;
+    var response = await axios.post(`http://localhost:3001/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
+    if(response.data.success === true)
+      {
+          //console.log("Change Password Successfully");
+          this.props.closePopupMessage(response.data.success, "Update Access Rights Successfully");
+      }
+      else
+      {
+        //console.log("Change Password Error");
+        this.props.closePopupMessage(response.data.success, "Update Access Rights Failure");
+      }
+  }
+ 
   render() {
     const { message, isOpen, onClose, type } = this.props;
     const {newPassword,
@@ -260,7 +326,8 @@ class Popup extends Component {
       username,
       message1,
       error,
-      countdown
+      countdown, 
+      message4
     } = this.state;
 
     if (!isOpen) return null;
@@ -405,11 +472,53 @@ class Popup extends Component {
                <h2 className="edit-account-title">Account</h2>
               <p>Click on the button below:</p>
               <div className="button-container2">
-                <button  onClick={() => this.manageAccountInfo("Edit")}>Edit Account Info</button>
+                <button onClick={() => this.manageAccountInfo("Edit")}>Edit Account Info</button>
                 <button onClick={() => this.manageAccountInfo("Delete")}>Delete Account</button>              
               </div>
             </div>
-          ):(
+          ): 
+          type === "update-access-right" && message4 && Object.keys(message4).length > 0 ? (
+            <div className="access-right-message">
+              <h2 className="access-right-title">Update Access Rights</h2>
+              {Object.keys(message4)
+                .filter(mainKey => mainKey !== "_id") // Exclude mainKey named "_id"
+                .map((mainKey) => (
+                  <div key={mainKey} className="main-key">
+                    <h3>{mainKey}</h3>
+                    <div className="sub-keys">
+                      <div className="checkbox-container">
+                        {Object.keys(message4[mainKey]).
+                         filter(subKey => subKey !== "Account ID").
+                         map((subKey) => {
+                          const value = message4[mainKey][subKey];
+                          
+                          return (
+                            <div key={subKey} className="checkbox-box">
+                              <label className="checkbox-label">
+                                {/* Render checkbox only for boolean values */}
+                                {typeof value === "boolean" ? (
+                                  <input 
+                                    type="checkbox" 
+                                    checked={value}
+                                    onChange={() => this.handleCheckboxChange(mainKey, subKey)}
+                                  />
+                                ) : null}
+                                <strong>{subKey}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
+                              </label>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="button-container1">
+                  <button onClick={this.cancel}>Cancel</button>
+                  <button onClick={() => this.updateAccessRight()}>Update</button>
+                </div>
+            </div>
+          )
+          :(
             // Default layout for other types (like "message")
             <>  
             </>

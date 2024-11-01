@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import '../../../css/sub/accounts.css';
 
-class CoursesSection extends Component {
+class AccountsSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -111,9 +111,9 @@ class CoursesSection extends Component {
    // Check if any of the relevant props have changed
    if (
      accountType !== prevProps.accountType ||
-     language !== prevProps.language
+     language !== prevProps.language 
    ) {
-         if(accountType === "Accounts")
+      if(accountType === "Accounts")
      {
         this.fetchAccounts();
      }
@@ -136,6 +136,9 @@ class CoursesSection extends Component {
             this.filterAccessRights();
            //this.props.closePopup();
         }
+  }
+  else if (prevProps.key !== this.props.key) {
+    this.filterAccounts();
   }
  }
 
@@ -267,6 +270,12 @@ accountInfo = async(account) =>
   this.props.edit(account._id)
 }
 
+accessRightInfo = async(accessRight) =>
+{
+    console.log("Access Rights  :", accessRight);
+    this.props.updateAccessRights(accessRight);
+}
+
   render() 
   {
     const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType } = this.state;
@@ -349,7 +358,7 @@ accountInfo = async(account) =>
                   <tbody>
                   {paginatedDetails1.map((accessRight, index) => { 
                       return (
-                        <tr key={index}>
+                        <tr key={index} onClick={() => this.accessRightInfo(accessRight)}>
                           <td>{accessRight["Account Details"]["Name"]}</td> 
                           <td>{accessRight["Account Details"]["Role"]}</td>
                           <td><input type="checkbox" checked={accessRight["Account"]["Account Table"]} disabled readOnly/></td> 
@@ -380,4 +389,4 @@ accountInfo = async(account) =>
   
 }
 
-export default CoursesSection;
+export default AccountsSection;

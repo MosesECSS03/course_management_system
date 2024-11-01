@@ -21,6 +21,15 @@ router.post("/", async function(req, res)
         var result = await controller.resetPassword(username, password);
         res.json(result);
     }
+    else if(req.body.purpose === "logout")
+    {
+        var accountId = req.body.accountId;
+        //console.log(email, password);
+        var controller = new LoginController();
+        var result = await controller.logout(accountId);
+        console.log(result);
+        res.json({"message": result});
+    }
     else
     {
         var email = req.body.email;

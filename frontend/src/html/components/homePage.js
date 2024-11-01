@@ -12,6 +12,7 @@
   import ReceiptSection from './sub/receiptSection';
   import SideBarContent from './sub/sideBarContent';
   import { withAuth } from '../../AuthContext';
+  import axios from 'axios';  
 
   class HomePage extends Component {
     constructor(props) {
@@ -51,7 +52,8 @@
         isDropdownOpen: false,
         isReceiptVisible: false,
         item: "",
-        isInactive: false
+        isInactive: false,
+        refreshKey: 0
       };
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
@@ -470,13 +472,18 @@
 
     // Restart the inactivity timeout
     //this.inactivityTimeout = setTimeout(this.noActivityDetected, 10000); // 1 minute*/
-    this.inactivityTimeout = setTimeout(this.noActivityDetected, 360000); // 1 minute*/
+    this.inactivityTimeout = setTimeout(this.noActivityDetected, 60*1000); // 1 minute*/
   };
 
   goBackHome = async() =>
   {
-    this.props.auth.logout();
-    this.props.history.push("/");
+    console.log("Logout");
+    var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    if(response.data.message.message === "Logout successful")
+    {
+      this.props.auth.logout();
+      this.props.history.push("/");
+    }
   }
 
     createAccountPopupMessage(result, message, popupType)
@@ -505,8 +512,35 @@
       // Set the popup state with a relevant message
       this.setState({
         isPopupOpen: true,
-        popupMessage: `Editing account with ID: ${accountId}`, // Informative message
+        popupMessage: accountId, // Informative message
         popupType: "edit-account"
+      });
+    }
+
+   closePopupMessage = async () => {
+        // Close the popup
+        this.setState({
+            isPopupOpen: false
+        }, () => {
+            // Call refreshChild after the state has updated
+            this.refreshChild();
+        });
+    };
+
+    // Method to refresh the child component
+    refreshChild = () => {
+        this.setState((prevState) => ({
+            refreshKey: prevState.refreshKey + 1 // Increment refreshKey to trigger a refresh
+        }));
+    };
+
+    updateAccessRights = async(accessRight) =>
+    {
+      console.log("Updated Access Right:", accessRight);
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: accessRight, // Informative message
+        popupType: "update-access-right"
       });
     }
 
@@ -604,6 +638,8 @@
                         resetSearch={resetSearch} 
                         section={section}
                         edit = {this.editAccountPopupMessage}
+                        updateAccessRights = {this.updateAccessRights}
+                        key={this.state.refreshKey}
                       />
                     </div>
                     <div className="pagination-section">
@@ -702,6 +738,8 @@
                         currentPage={currentPage} // Pass current page
                         entriesPerPage={this.state.entriesPerPage} // Pass entries per page
                         userName = {userName}
+                        key={this.state.refreshKey}
+                        refreshChild={this.refreshChild}
                     />
                     </div>
                     <div className="pagination-section">
@@ -767,7 +805,7 @@
                 All rights reserved.</p>
             </div>
           </div>
-          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} goBackLoginPage={this.goBackHome}/>
+          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage}/>
         </>
       );
     }

@@ -16,6 +16,12 @@ router.post('/', async function(req, res, next)
         var result = await controller.allAccessRights(req.body.accountId);
         return res.json({"result": result});
     }
+    else if(req.body.purpose === "updateAccessRight")
+    {
+        var controller = new AccessRightController();
+        var result = await controller.updateAccessRight(req.body.accessRightId, req.body.accessRight) ;
+        return res.json({"result": result});
+    }
 });
 
 module.exports = router;

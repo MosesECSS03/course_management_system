@@ -65,6 +65,44 @@ class DatabaseConnectivity {
         }
     }
 
+    async logout(dbname, collectionName, accountId, date, time)
+    {
+        const db = this.client.db(dbname);
+        try
+        {
+            var table = db.collection(collectionName);
+            // Find a user with matching email and password
+            const user = await table.findOne({ _id: new ObjectId(accountId) });
+            if (user) {
+                await table.updateOne(
+                    { _id: user._id }, // Filter to find the user
+                    {
+                        $set: {
+                            date_log_out: date,
+                            time_log_out: time
+                        }
+                    }
+                );
+    
+            // User found, login successful
+            return {
+                success: true,
+                message: 'Logout successful',
+            };
+            } else {
+            // No user found, login failed
+            return {
+                success: false,
+                message: 'Invalid email or password'
+            };
+            }
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
+    }
+
     async changePassword(dbname, collectionName, accountId, newPassword)
     {
         const db = this.client.db(dbname);
@@ -211,8 +249,8 @@ class DatabaseConnectivity {
             if (db) {
                 var table = db.collection(collectionName);
                 // Use findOne to get the document by nested field
-                var result = await table.findOne({ "Account Details.Account ID": new ObjectId(id) }); // Convert id to ObjectId
-                console.log(result); // Log the result
+                var result = await table.findOne({ "Account Details.Account ID": new ObjectId(id)}); // Convert id to ObjectId
+                console.log("Retrieve:", result); // Log the result
                 return result; // Return the single document
             }
         } catch (error) {
@@ -248,27 +286,44 @@ class DatabaseConnectivity {
         }
     }
 
-    async updatePaymentOfficialUse(dbname,  id, name, date, time) {
+    async updatePaymentOfficialUse(dbname,  id, name, date, time, status) {
         var db = this.client.db(dbname); // return the db object
         try {
             if (db) {
                 var tableName = "Registration Forms";
                 var table = db.collection(tableName);
+                var update = null;
     
                 // Use updateOne to update a single document
                 const filter = { _id: new ObjectId(id) };
 
                 // Add the new key "confirmation" to the update data
-                const update = {
-                    $set: {
-                        official:
-                        {
-                            name: name,
-                            date: date,
-                            time: time
+                if(status === "Paid")
+                {                
+                     update = {
+                        $set: {
+                            official:
+                            {
+                                name: name,
+                                date: date,
+                                time: time
+                            }
                         }
-                    }
-                };
+                    };
+                }
+                else
+                {                
+                     update = {
+                            $set: {
+                                official:
+                                {
+                                    name: "",
+                                    date: "",
+                                    time: ""
+                                }
+                            }   
+                        };
+                }
     
                // Call updateOne
                 const result = await table.updateOne(filter, update);
@@ -314,6 +369,92 @@ class DatabaseConnectivity {
         // Return the next receipt number with dynamic length
         return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
     }
+
+    async deleteAccount(databaseName, collectionName, id) {
+        const db = this.client.db(databaseName);
+        const table = db.collection(collectionName);
+    
+        try {
+            const filter = { _id: new ObjectId(id) }; // Find document by ID
+            const result = await table.deleteOne(filter);
+    
+            if (result.deletedCount === 1) {
+                console.log("Successfully deleted the document.");
+                return { success: true, message: "Document deleted successfully." };
+            } else {
+                console.log("No document found with that ID.");
+                return { success: false, message: "No document found with that ID." };
+            }
+        } catch (error) {
+            console.log("Error deleting document:", error);
+            return { success: false, error };
+        }
+    }
+
+    async deleteAccessRights(databaseName, collectionName, id) {
+        const db = this.client.db(databaseName);
+        const table = db.collection(collectionName);
+    
+        try {
+            // Using bracket notation to access 'Account ID' under 'Account Details'
+            const filter = { "Account Details.Account ID": new ObjectId(id) }; 
+    
+            const result = await table.deleteOne(filter);
+    
+            if (result.deletedCount === 1) {
+                console.log("Successfully deleted the access right.");
+                return { success: true, message: "Document deleted successfully." };
+            } else {
+                console.log("No document found with that ID.");
+                return { success: false, message: "No document found with that ID." };
+            }
+        } catch (error) {
+            console.log("Error deleting document:", error);
+            return { success: false, error };
+        }
+    }
+
+    async updateAccessRight(databaseName, collectionName, id, updateAccessRight) {
+        const db = this.client.db(databaseName);
+        const table = db.collection(collectionName);
+    
+        try {
+            // Define your filter to find the correct document
+            const filter = { _id: new ObjectId(id) };
+            console.log("Filter:", filter);
+    
+            // Exclude _id from the updateAccessRight if it exists
+            const { _id, "Account Details": accountDetails, ...updateData } = updateAccessRight; 
+    
+            // Prepare the update object
+            const update = {
+                $set: {}
+            };
+
+    
+            // Add any other fields from updateData
+            for (const key in updateData) {
+                update.$set[key] = updateData[key];
+            }
+    
+            console.log("Update object:", update);
+    
+            // Perform the update operation
+            const result = await table.updateOne(filter, update);
+    
+            if (result.modifiedCount === 1) {
+                console.log("Successfully updated the access right.");
+                return { success: true, message: "Document updated successfully." };
+            } else {
+                console.log("No document found with that ID or no changes made.");
+                return { success: false, message: "No document found with that ID or no changes made." };
+            }
+        } catch (error) {
+            console.log("Error updating document:", error);
+            return { success: false, error };
+        }
+    }
+    
     
 
     // Close the connection to the database
