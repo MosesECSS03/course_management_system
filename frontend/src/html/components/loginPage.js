@@ -277,11 +277,11 @@ class LoginPage extends Component {
         <div class="login-main-content">
           <div class="left-section">
             <div class="title-and-image">
-              <img
+              {/*<img
                 src="https://ecss.org.sg/wp-content/uploads/2023/07/En_logo_Final_Large_RGB.png"
                 alt="Logo"
                 class="title-image"
-              />
+              />*/}
               <h1 class="title">{title}</h1>
             </div>
             <h2>{loginText}</h2>
