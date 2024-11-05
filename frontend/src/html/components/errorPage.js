@@ -8,7 +8,7 @@ class ErrorPage extends Component
   {
     setTimeout(() => {
       this.props.history.push({ pathname: '/'});
-    }, 10000);
+    }, 10*1000);
   }
 
   render() {
@@ -19,7 +19,7 @@ class ErrorPage extends Component
           <p className="errorpage-message">
             Sorry, the page you are looking for does not exist.
           </p>
-          We will redirect you back to the login page.
+          We will redirect you back to the login page. 
         </div>
       </div>
     );
