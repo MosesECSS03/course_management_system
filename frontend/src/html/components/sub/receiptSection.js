@@ -37,7 +37,8 @@ class ReceiptSection extends Component {
 
   fetchReceipt = async() =>
   {
-    var response = await axios.post(`http://localhost:3001/receipt`, { "purpose": "retrieve"});
+    var response = await axios.post(`https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/receipt`, { "purpose": "retrieve"});
+    //var response = await axios.post(`http://localhost:3001/receipt`, { "purpose": "retrieve"});
     return response.data.result
   }
 

@@ -146,7 +146,11 @@ class LoginPage extends Component {
 
     try {
       // Replace with your API endpoint and payload
-      const response = await axios.post('http://localhost:3001/login', {
+      /*const response = await axios.post('http://localhost:3001/login', {
+        email,
+        password
+      });*/
+      const response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/login', {
         email,
         password
       });

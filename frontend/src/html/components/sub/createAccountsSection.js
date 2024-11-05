@@ -217,7 +217,8 @@ class CreateAccountsSection extends Component {
         {
             var accountDetails = {"name": name, "email": email, "password": password, "role": role, "site": site};
         }
-        axios.post('http://localhost:3001/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
+        axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
+       // axios.post('http://localhost:3001/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
         .then((response) => {
             if(response.data.message === 'New account with respectively access rights created successfully')
             {
