@@ -150,7 +150,7 @@ class LoginPage extends Component {
         email,
         password
       });*/
-      const response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/login', {
+      const response = await axios.post('https://ecss-moses-ver1.azurewebsites.net/login', {
         email,
         password
       });
