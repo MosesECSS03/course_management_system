@@ -17,7 +17,7 @@
   class HomePage extends Component {
     constructor(props) {
       super(props);
-      this.state = {
+     /*this.state = {
         submenuVisible: null,
         language: 'en',
         courseType: null,
@@ -54,7 +54,49 @@
         item: "",
         isInactive: false,
         refreshKey: 0
+      };*/
+      const savedState = localStorage.getItem('myComponentState');
+       var initialState = savedState ? JSON.parse(savedState) : {
+        submenuVisible: null,
+        language: 'en',
+        courseType: null,
+        isPopupOpen: false,
+        popupMessage: '',
+        popupType: '',
+        sidebarVisible: false,
+        locations: [],
+        languages: [],
+        types: [],
+        selectedCourseLanguage: '',
+        selectedCourseLocation: '',
+        selectedCourseType: '',
+        courseSearchQuery: '',
+        selectedRegPaymentLanguage: '',
+        selectedRegPaymentLocation: '',
+        regPaymentSearchQuery: '',
+        resetSearch: false,
+        currentPage: 1,
+        entriesPerPage: 100000000000,
+        totalPages: 1,
+        nofCourses: 0,
+        noofDetails: 0,
+        nofAccounts: 0,
+        viewMode: 'full',
+        isRegistrationPaymentVisible: false,
+        section: '',
+        accountType: null,
+        roles: [],
+        createAccount: false,
+        displayedName: '',
+        isDropdownOpen: false,
+        isReceiptVisible: false,
+        item: '',
+        isInactive: false,
+        refreshKey: 0,
       };
+  
+      // Set the initial state
+      this.state = initialState;
 
       this.handleDataFromChild = this.handleDataFromChild.bind(this);
       this.searchResultFromChild = this.searchResultFromChild.bind(this);
@@ -234,7 +276,17 @@
       window.addEventListener('keypress', this.resetInactivity);
       window.addEventListener('click', this.resetInactivity);
       window.addEventListener('scroll', this.resetInactivity);
+      window.addEventListener('beforeunload', this.handleBeforeUnload);
     }
+
+    handleBeforeUnload = (event) => {
+      // Save the current state to local storage before the page unloads
+      localStorage.setItem('myComponentState', JSON.stringify(this.state));
+
+      // Show a warning dialog when the user tries to refresh or close the page
+     event.preventDefault();
+     // event.returnValue = ''; // Trigger the confirmation dialog
+    };
   
     componentWillUnmount() {
       // Cleanup the timeout and event listeners
@@ -243,6 +295,8 @@
       window.removeEventListener('keypress', this.resetInactivity);
       window.removeEventListener('click', this.resetInactivity);
       window.removeEventListener('scroll', this.resetInactivity);
+     window.removeEventListener('beforeunload', this.handleBeforeUnload);
+     localStorage.removeItem('myComponentState');
     }
 
     toggleAccountsComponent = async (accountType) => 
@@ -472,7 +526,7 @@
 
     // Restart the inactivity timeout
     //this.inactivityTimeout = setTimeout(this.noActivityDetected, 10000); // 1 minute*/
-    this.inactivityTimeout = setTimeout(this.noActivityDetected, 60*1000); // 1 minute*/
+    this.inactivityTimeout = setTimeout(this.noActivityDetected, 60*60*1000); // 1 minute*/
   };
 
   goBackHome = async() =>
