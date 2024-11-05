@@ -282,6 +282,7 @@
     handleBeforeUnload = (event) => {
       // Save the current state to local storage before the page unloads
       localStorage.setItem('myComponentState', JSON.stringify(this.state));
+      console.log("OK");
 
       // Show a warning dialog when the user tries to refresh or close the page
      event.preventDefault();
