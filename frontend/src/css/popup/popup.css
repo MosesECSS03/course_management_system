@@ -436,7 +436,7 @@
 .checkbox-container {
   display: flex; /* Use flex for layout */
   flex-wrap: wrap; /* Allow items to wrap into the next line */
-  gap: 30px; /* Space between items */
+  gap: 40px; /* Space between items */
 }
 
 .checkbox-box {
