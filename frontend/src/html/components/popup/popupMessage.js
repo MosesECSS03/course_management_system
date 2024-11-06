@@ -488,7 +488,14 @@ class Popup extends Component {
                 .filter(mainKey => mainKey !== "_id") // Exclude mainKey named "_id"
                 .map((mainKey) => (
                   <div key={mainKey} className="main-key">
-                    <h3>{mainKey}</h3>
+                    {mainKey === "Registration And Payment Table" ? (
+                      <>
+                        <h3>Registration And</h3>
+                        <h3>Payment Table</h3>
+                      </>
+                    ) : (
+                      <h3>{mainKey}</h3>
+                    )}
                     <div className="sub-keys">
                       <div className="checkbox-container">
                         {Object.keys(message4[mainKey]).
