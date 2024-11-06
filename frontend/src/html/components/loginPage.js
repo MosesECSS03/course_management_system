@@ -252,6 +252,11 @@ class LoginPage extends Component {
     }, 5000);
     }
   }
+  
+  componentDidMount()
+  {
+    localStorage.clear();
+  }
 
   render() {
     const { language, emailError, passwordError, showPassword, isPopupOpen, popupMessage, popupType, accountId} = this.state;
