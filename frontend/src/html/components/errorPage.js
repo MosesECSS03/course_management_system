@@ -6,6 +6,7 @@ class ErrorPage extends Component
 {
   componentDidMount = async() =>
   {
+    console.log("ok");
     setTimeout(() => {
       this.props.history.push({ pathname: '/'});
     }, 10*1000);

@@ -55,7 +55,7 @@
 
     fetchCourseRegistrations(language) {
       return axios
-        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
+        .post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
         .then(response => {
           const array = this.languageDatabase(response.data.result, language);
           return array;
@@ -335,7 +335,7 @@
     updateDatabaseForRegistrationPayment = async (value, id, page) => {
       console.log(value, id);
       return axios
-        .post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
+        .post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
@@ -371,14 +371,14 @@
     updateWooCommerceForRegistrationPayment(value, id, page)
     {
       console.log("WooCommerce");
-      axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courses', { type: 'update', page: page, status: value })
+      axios.post('https://moses-ecss-course.azurewebsites.net/courses', { type: 'update', page: page, status: value })
       //axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
           console.log("Update Woo Commerce", response.data);
           if(response.data.result ===  true)
           {
             console.log(this.props);
-            axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
             //axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
               if(response.data.result ===  true)
               {
@@ -450,7 +450,7 @@
                 
                 try {
                     // First, get the receipt number
-                    const response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/receipt', {
+                    const response = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
                       purpose: 'getReceiptNo',
                       courseLocation: rowDataArray[i].course?.courseLocation
                   });
@@ -463,7 +463,7 @@
                     
                     if (response.data.result.success === true) {
                         // Now, fetch the PDF
-                        const pdfResponse = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/courseregistration', {
+                        const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
                             rowData: rowDataArray,
                             staff: this.props.userName,
@@ -492,7 +492,7 @@
                         pdfWindow.location.href = url;
     
                         // Now, create the receipt in the database
-                        const receiptCreationResponse = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/receipt', {
+                        const receiptCreationResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
                           purpose: 'createReceipt',
                           receiptNo: receiptNo,
                           registration_id: registration_id,
