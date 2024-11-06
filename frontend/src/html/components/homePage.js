@@ -270,6 +270,7 @@
 
     componentDidMount() {
       // Start the inactivity detection timeout
+      sessionStorage.clear();
       this.resetInactivity();
       // Adding event listeners to reset inactivity
       window.addEventListener('mousemove', this.resetInactivity);
