@@ -182,6 +182,13 @@ class LoginPage extends Component {
             }
             else
             {
+              this.setState({
+                isPopupOpen: false,
+                popupMessage: "",
+                popupType: "",
+                accountId: "",
+                name: ""
+              });
               this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}}); 
             }
         }, 5000);
