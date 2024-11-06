@@ -48,7 +48,7 @@ router.post("/", async function(req, res) {
             return res.status(500).send("Failed to initialize connection");
         }
     } catch (error) {
-      console.error("Error:", error.message);
+      console.error("Error :", error.message);
       return res.status(500).send("Internal Server Error");
     }
   });
