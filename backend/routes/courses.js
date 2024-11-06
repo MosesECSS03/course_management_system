@@ -30,7 +30,7 @@ router.post("/", async function(req, res) {
             else if(type === "update")
             {
               const productId = await controller.getProductID(page);
-              console.log("Product ID: ", productId);
+              console.log("Product ID:", productId);
               const updateProductStock = await controller.updateProductStock(productId, status);
               //console.log("Update Product Stock:", updateProductStock);
               if(updateProductStock === "Stock Updated Successfully")
