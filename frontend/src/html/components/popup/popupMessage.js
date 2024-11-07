@@ -495,22 +495,49 @@ class Popup extends Component {
                          filter(subKey => subKey !== "Account ID").
                          map((subKey) => {
                           const value = message4[mainKey][subKey];
-                          
                           return (
-                            <div key={subKey} className="checkbox-box">
-                              <label className="checkbox-label">
-                                {/* Render checkbox only for boolean values */}
-                                {typeof value === "boolean" ? (
-                                  <input 
-                                    type="checkbox" 
-                                    checked={value}
-                                    onChange={() => this.handleCheckboxChange(mainKey, subKey)}
-                                  />
-                                ) : null}
-                                <strong>{subKey}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
-                              </label>
-                            </div>
-                          );
+                            <>
+                              {subKey === "Registration And Payment Table" ? (
+                                <div key={subKey}>
+                                  <label className="checkbox-label">
+                                    {/* Render checkbox only for boolean values */}
+                                    {typeof value === "boolean" ? (
+                                      <input 
+                                        type="checkbox" 
+                                        checked={value}
+                                        onChange={() => this.handleCheckboxChange(mainKey, subKey)}
+                                      />
+                                    ) : null}
+                                    <strong>
+                                      <h3 style={{ display: "block" }}>Registration And</h3>
+                                      <h3>Payment Table</h3>
+                                    </strong>
+                                    &nbsp;
+                                    {typeof value === "string" ? value : ''}
+                                  </label>
+                                </div>
+                              ) : (
+                                <div key={subKey} className="checkbox-box">
+                                  <label className="checkbox-label">
+                                    {/* Render checkbox only for boolean values */}
+                                    {typeof value === "boolean" ? (
+                                      <input 
+                                        type="checkbox" 
+                                        checked={value}
+                                        onChange={() => this.handleCheckboxChange(mainKey, subKey)}
+                                      />
+                                    ) : null}
+                                    <strong>
+                                      {subKey}
+                                      {typeof value === "boolean" ? ' ' : ': '}
+                                    </strong>
+                                    &nbsp;
+                                    {typeof value === "string" ? value : ''}
+                                  </label>
+                                </div>
+                              )}
+                            </>
+                          );                          
                         })}
                       </div>
                     </div>
