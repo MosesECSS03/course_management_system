@@ -473,9 +473,9 @@
                     
                     if (response.data.result.success === true) 
                     {
-                      this.setState({
+                      /*this.setState({
                         isPopupOpen: false
-                      });
+                      });*/
                         // Now, fetch the PDF
                         const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
