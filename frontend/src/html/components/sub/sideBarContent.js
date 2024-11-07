@@ -41,15 +41,15 @@ class SideBarContent extends Component {
             this.getAccessRight(this.props.accountId);
         }
 
-        const response = await axios.post('https://moses-ecss-course.azurewebsites.net/accessRights', {
+       /* const response = await axios.post('https://moses-ecss-course.azurewebsites.net/accessRights', {
                     "purpose": "retrieveAccessRight",
                     "accountId": this.props.accountId
-                });
+                });*/
 
-        var accessRights = response.data.result;
+        //var accessRights = response.data.result;
         
         // Only refresh when accessRights differ and it's the first call after accountId change
-        if (prevState.accessRights !== accessRights) {
+        if (prevState.accessRights !== this.state.accessRights) {
             // Avoid calling getAccessRight again if accessRights is already being updated
             if (!this.accessRightsUpdated) {
                 this.accessRightsUpdated = true; // Set the flag to indicate we've called it
