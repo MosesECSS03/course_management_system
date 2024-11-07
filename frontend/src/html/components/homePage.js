@@ -384,6 +384,15 @@
       });
     };
 
+    updatePaymentPopup = () => {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Updating Payment Status...",
+        popupType: "loading"
+      });
+    };
+
+
     handlePageChange(page) {
       console.log("Total No Of Pages:", this.state.totalPages);
       if (page >= 1 && page <= this.state.totalPages) {
@@ -807,6 +816,7 @@
                         key={this.state.refreshKey}
                         refreshChild={this.refreshChild}
                         generateReceiptPopup = {this.generateReceiptPopup}
+                        updatePaymentPopup = {this.updatePaymentPopup}
                     />
                     </div>
                     <div className="pagination-section">

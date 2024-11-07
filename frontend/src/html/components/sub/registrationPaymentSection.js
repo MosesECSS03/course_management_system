@@ -302,6 +302,7 @@
     };
 
     handleSuggestionClick = (index, value, id, page) => {
+      this.props.updatePaymentPopup();
       // Log the index and value for debugging
       console.log("Index:", index);
       console.log("Value:", value);
@@ -380,6 +381,7 @@
           if(response.data.result ===  true)
           {
             console.log(this.props);
+            this.props.closePopup()
             ///moses-ecss-course.azurewebsites.net
            axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
             //axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
@@ -467,7 +469,6 @@
                     
                     if (response.data.result.success === true) 
                     {
-                      this.props.closePopup();
                         // Now, fetch the PDF
                         const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
@@ -514,6 +515,7 @@
                         });*/
     
                         console.log("Receipt Created:", receiptCreationResponse.data);
+                        this.props.closePopup();
                     } else {
                         console.error("Failed to generate receipt number.");
                     }
