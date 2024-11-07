@@ -897,7 +897,7 @@
             </div>
           </div>
         </div>
-         <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType}/>
+         {/*<Popup isOpen={isPopupOpen} message={popupMessage} type={popupType}/>*/}
       </>
       );
     }
