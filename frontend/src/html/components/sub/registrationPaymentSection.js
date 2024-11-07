@@ -448,7 +448,7 @@
         this.setState({
           isPopupOpen: true,
           popupMessage: "Generating Receipt...",
-          popupType: "loading",
+          popupType: "loading"
         });
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
@@ -785,7 +785,7 @@
   };
   
     render() {
-      const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
+      const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex, isPopupOpen, popupMessage, popupType } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
         <>
@@ -897,7 +897,7 @@
             </div>
           </div>
         </div>
-         <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage}/>
+         <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType}/>
       </>
       );
     }
