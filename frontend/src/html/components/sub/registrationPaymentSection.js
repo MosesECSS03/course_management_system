@@ -19,7 +19,10 @@
         focusedInputIndex: null,
         originalData: [],
         currentPage: 1, // Add this
-        entriesPerPage: 100 // Add this
+        entriesPerPage: 100, // Add this
+        isPopupOpen: false,
+        popupMessage: '',
+        popupType: '',
       };
       this.tableRef = React.createRef();
     }
@@ -442,6 +445,11 @@
 
       receiptGenerator = async (event, rowData) => {
         event.stopPropagation();
+        this.setState({
+          isPopupOpen: true,
+          popupMessage: "Generating Receipt...",
+          popupType: "loading",
+        });
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
         
@@ -463,7 +471,13 @@
                     
                     const receiptNo = response.data.result.receiptNumber;
                     
-                    if (response.data.result.success === true) {
+                    if (response.data.result.success === true) 
+                    {
+                      this.setState({
+                        isPopupOpen: false,
+                        popupMessage: "",
+                        popupType: "",
+                      });
                         // Now, fetch the PDF
                         const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
@@ -776,6 +790,7 @@
       const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
+        <>
         <div className="registration-payment-container">
           <div className="registration-payment-heading">
             <h1>{this.props.language === 'zh' ? '报名与支付' : 'Registration And Payment'}</h1>
@@ -884,6 +899,8 @@
             </div>
           </div>
         </div>
+         <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage}/>
+      </>
       );
     }
   }
