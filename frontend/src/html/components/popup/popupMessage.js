@@ -490,7 +490,7 @@ class Popup extends Component {
                   <div key={mainKey} className="main-key">
                       <h3>{mainKey}</h3>
                     <div className="sub-keys">
-                      <div className="checkbox-container">
+                      <div className={subKey === "Registration And Payment Table" ? "checkbox-box special-class" : "checkbox-container"}>
                         {Object.keys(message4[mainKey]).
                          filter(subKey => subKey !== "Account ID").
                          map((subKey) => {
@@ -507,16 +507,7 @@ class Popup extends Component {
                                     onChange={() => this.handleCheckboxChange(mainKey, subKey)}
                                   />
                                 ) : null}
-                                <strong>{subKey === "Registration And Payment Table" ? (
-                                  <>
-                                  <h3>
-                                    Registration And
-                                    <span style={{ display: 'block' }}>Payment Table</span>
-                                  </h3>
-                                  </>
-                                ) : (
-                                  <h3>{subKey}</h3>
-                                )}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
+                                <strong>{subKey}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
                               </label>
                             </div>
                           );
