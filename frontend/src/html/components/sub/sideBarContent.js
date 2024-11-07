@@ -35,14 +35,21 @@ class SideBarContent extends Component {
         return true; // Objects are equal
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate = async (prevProps, prevState) => {
         // Check if accountId has changed
-       //if (prevProps.accountId !== this.props.accountId) {
+       if (prevProps.accountId !== this.props.accountId) {
             this.getAccessRight(this.props.accountId);
-        //}
-    
-       /* // Only refresh when accessRights differ and it's the first call after accountId change
-        if (prevState.accessRights !== this.state.accessRights) {
+        }
+
+        const response = await axios.post('https://moses-ecss-course.azurewebsites.net/accessRights', {
+                    "purpose": "retrieveAccessRight",
+                    "accountId": accountId
+                });
+
+        var accessRights = response.data.result;
+        
+        // Only refresh when accessRights differ and it's the first call after accountId change
+        if (prevState.accessRights !== accessRights) {
             // Avoid calling getAccessRight again if accessRights is already being updated
             if (!this.accessRightsUpdated) {
                 this.accessRightsUpdated = true; // Set the flag to indicate we've called it
@@ -52,8 +59,9 @@ class SideBarContent extends Component {
         } else {
             // Reset the flag if accountId hasn't changed
             this.accessRightsUpdated = false;
-        }*/
+        }
     }
+
     getAccessRight = async (accountId) => {
         try {
             const response = await axios.post('https://moses-ecss-course.azurewebsites.net/accessRights', {
