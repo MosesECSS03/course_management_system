@@ -339,7 +339,7 @@
         .then(response => {
           if(response.data.result ===  true)
           {
-            this.updateWooCommerceForRegistrationPayment(value, page)
+            this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
         })
       /*return axios
@@ -368,20 +368,20 @@
         });*/
     };
 
-    updateWooCommerceForRegistrationPayment(value, id, page)
+    updateWooCommerceForRegistrationPayment = async (value, id, page) =>
     {
       console.log("WooCommerce");
       //moses-ecss-course.azurewebsites.net
-     // axios.post('https://moses-ecss-course.azurewebsites.net/courses', { type: 'update', page: page, status: value })
-      axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
+      axios.post('https://moses-ecss-course.azurewebsites.net/courses', { type: 'update', page: page, status: value })
+      //axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
           console.log("Update Woo Commerce", response.data);
           if(response.data.result ===  true)
           {
             console.log(this.props);
             ///moses-ecss-course.azurewebsites.net
-           // axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
-            axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+           axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            //axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
               if(response.data.result ===  true)
               {
                 //this.props.createAccountPopupMessage(true, response.data.message, response.data.message);
