@@ -643,6 +643,7 @@
                   toggleAccountsComponent = {this.toggleAccountsComponent}
                   toggleCourseComponent = {this.toggleCourseComponent}
                   toggleRegistrationPaymentComponent = {this.toggleRegistrationPaymentComponent}
+                  key={this.state.refreshKey}
                 />
               </div>
               <div className="main-content">

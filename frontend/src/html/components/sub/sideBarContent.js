@@ -46,7 +46,7 @@ class SideBarContent extends Component {
             // Avoid calling getAccessRight again if accessRights is already being updated
             if (!this.accessRightsUpdated) {
                 this.accessRightsUpdated = true; // Set the flag to indicate we've called it
-                this.getAccessRight(this.props.accountId);
+                this.props.refreshChild();
             }
         } else {
             // Reset the flag if accountId hasn't changed

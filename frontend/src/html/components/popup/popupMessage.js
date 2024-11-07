@@ -509,8 +509,9 @@ class Popup extends Component {
                                       />
                                     ) : null}
                                     <strong>
-                                      <h3>Registration And</h3>
-                                      <h3>Payment Table</h3>
+                                      <h3 style={{fontSize: "1em"}}>Registration And</h3>
+                                      <h3 style={{fontSize: "1em"}}>Payment Table</h3>
+                                      {typeof value === "boolean" ? ' ' : ': '}
                                     </strong>
                                     &nbsp;
                                     {typeof value === "string" ? value : ''}
