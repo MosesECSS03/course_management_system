@@ -270,6 +270,7 @@
 
     componentDidMount() {
       // Start the inactivity detection timeout
+      //sessionStorage.clear();
       this.resetInactivity();
       // Adding event listeners to reset inactivity
       window.addEventListener('mousemove', this.resetInactivity);
@@ -373,6 +374,24 @@
         popupType: '',
       });
     };
+
+    
+    generateReceiptPopup = () => {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Generating Receipt...",
+        popupType: "loading"
+      });
+    };
+
+    updatePaymentPopup = () => {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Updating Payment Status...",
+        popupType: "loading"
+      });
+    };
+
 
     handlePageChange(page) {
       console.log("Total No Of Pages:", this.state.totalPages);
@@ -642,6 +661,7 @@
                   toggleAccountsComponent = {this.toggleAccountsComponent}
                   toggleCourseComponent = {this.toggleCourseComponent}
                   toggleRegistrationPaymentComponent = {this.toggleRegistrationPaymentComponent}
+                  key={this.state.refreshKey}
                 />
               </div>
               <div className="main-content">
@@ -795,6 +815,8 @@
                         userName = {userName}
                         key={this.state.refreshKey}
                         refreshChild={this.refreshChild}
+                        generateReceiptPopup = {this.generateReceiptPopup}
+                        updatePaymentPopup = {this.updatePaymentPopup}
                     />
                     </div>
                     <div className="pagination-section">

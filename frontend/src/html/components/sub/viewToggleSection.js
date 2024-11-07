@@ -67,7 +67,8 @@ class ViewToggleSection extends Component {
         }).map(segment => segment.toString()); // Convert to strings
     
         // Convert the dropdown list to a Set to ensure unique values
-        const uniqueDropdownList = new Set(dropdownList);
+        const filteredList = dropdownList.filter(item => parseInt(item) > 0);
+        const uniqueDropdownList = new Set(filteredList);
     
         // Return as an array
         return Array.from(uniqueDropdownList);

@@ -3,6 +3,7 @@
   import '../../../css/sub/registrationPayment.css';
   import * as XLSX from 'xlsx';
   import ExcelJS from 'exceljs';
+  import Popup from '../popup/popupMessage';
 
   class RegistrationPaymentSection extends Component {
     constructor(props) {
@@ -19,7 +20,7 @@
         focusedInputIndex: null,
         originalData: [],
         currentPage: 1, // Add this
-        entriesPerPage: 100 // Add this
+        entriesPerPage: 100, // Add this
       };
       this.tableRef = React.createRef();
     }
@@ -301,6 +302,7 @@
     };
 
     handleSuggestionClick = (index, value, id, page) => {
+      this.props.updatePaymentPopup();
       // Log the index and value for debugging
       console.log("Index:", index);
       console.log("Value:", value);
@@ -339,7 +341,7 @@
         .then(response => {
           if(response.data.result ===  true)
           {
-            this.updateWooCommerceForRegistrationPayment(value, page)
+            this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
         })*/
       return axios
@@ -368,18 +370,18 @@
         });*/
     };
 
-    updateWooCommerceForRegistrationPayment(value, id, page)
+    updateWooCommerceForRegistrationPayment = async (value, id, page) =>
     {
       console.log("WooCommerce");
-      //axios.post('https://moses-ecss-course.azurewebsites.net/courses', { type: 'update', page: page, status: value })
-      axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
+      axios.post('https://moses-ecss-course.azurewebsites.net/courses', { type: 'update', page: page, status: value })
+      //axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
           console.log("Update Woo Commerce", response.data);
           if(response.data.result ===  true)
           {
             console.log(this.props);
-            //axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
-            axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            //axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
               if(response.data.result ===  true)
               {
                 //this.props.createAccountPopupMessage(true, response.data.message, response.data.message);
@@ -440,6 +442,7 @@
 
       receiptGenerator = async (event, rowData) => {
         event.stopPropagation();
+        this.props.generateReceiptPopup();
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
         
@@ -461,7 +464,8 @@
                     
                     const receiptNo = response.data.result.receiptNumber;
                     
-                    if (response.data.result.success === true) {
+                    if (response.data.result.success === true) 
+                    {
                         // Now, fetch the PDF
                         /*const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
@@ -508,6 +512,7 @@
                         });
     
                         console.log("Receipt Created:", receiptCreationResponse.data);
+                        this.props.closePopup();
                     } else {
                         console.error("Failed to generate receipt number.");
                     }
@@ -774,6 +779,7 @@
       const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
+        <>
         <div className="registration-payment-container">
           <div className="registration-payment-heading">
             <h1>{this.props.language === 'zh' ? '报名与支付' : 'Registration And Payment'}</h1>
@@ -882,6 +888,7 @@
             </div>
           </div>
         </div>
+      </>
       );
     }
   }

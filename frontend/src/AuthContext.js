@@ -8,7 +8,7 @@ const AuthContext = createContext();
 class AuthProvider extends Component {
   constructor(props) {
     super(props);
-    const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true'; // Read from local storage
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'; // Read from local storage
 
     this.state = {
       isAuthenticated,
@@ -17,13 +17,13 @@ class AuthProvider extends Component {
 
   login = () => {
     this.setState({ isAuthenticated: true }, () => {
-      sessionStorage.setItem('isAuthenticated', 'true'); // Store in local storage
+      localStorage.setItem('isAuthenticated', 'true'); // Store in local storage
     });
   };
 
   logout = () => {
     this.setState({ isAuthenticated: false }, () => {
-      sessionStorage.removeItem('isAuthenticated'); // Remove from local storage
+      localStorage.removeItem('isAuthenticated'); // Remove from local storage
     });
   };
 

@@ -182,6 +182,13 @@ class LoginPage extends Component {
             }
             else
             {
+              this.setState({
+                isPopupOpen: false,
+                popupMessage: "",
+                popupType: "",
+                accountId: "",
+                name: ""
+              });
               this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}}); 
             }
         }, 5000);
@@ -244,6 +251,11 @@ class LoginPage extends Component {
         this.setState({ isPopupOpen: false, name: '', email: '', password: '', role: ''});
     }, 5000);
     }
+  }
+  
+  componentDidMount()
+  {
+    localStorage.clear();
   }
 
   render() {

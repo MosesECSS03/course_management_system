@@ -35,27 +35,36 @@ class SideBarContent extends Component {
         return true; // Objects are equal
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate = async (prevProps, prevState) => {
         // Check if accountId has changed
-        if (prevProps.accountId !== this.props.accountId) {
+       if (prevProps.accountId !== this.props.accountId) {
             this.getAccessRight(this.props.accountId);
         }
-    
+
+       /* const response = await axios.post('https://moses-ecss-course.azurewebsites.net/accessRights', {
+                    "purpose": "retrieveAccessRight",
+                    "accountId": this.props.accountId
+                });*/
+
+        //var accessRights = response.data.result;
+        
         // Only refresh when accessRights differ and it's the first call after accountId change
-        if (!this.isEqual(prevState.accessRights, this.state.accessRights)) {
+        if (prevState.accessRights !== this.state.accessRights) {
             // Avoid calling getAccessRight again if accessRights is already being updated
             if (!this.accessRightsUpdated) {
                 this.accessRightsUpdated = true; // Set the flag to indicate we've called it
                 this.getAccessRight(this.props.accountId);
+                //this.props.refreshChild();
             }
         } else {
             // Reset the flag if accountId hasn't changed
             this.accessRightsUpdated = false;
         }
     }
+
     getAccessRight = async (accountId) => {
         try {
-            /*const response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/accessRights', {
+            const response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/accessRights', {
                 "purpose": "retrieveAccessRight",
                 "accountId": accountId
             });*/
