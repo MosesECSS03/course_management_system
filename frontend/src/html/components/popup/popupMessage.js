@@ -490,7 +490,7 @@ class Popup extends Component {
                   <div key={mainKey} className="main-key">
                       <h3>{mainKey}</h3>
                     <div className="sub-keys">
-                      <div className={subKey === "Registration And Payment Table" ? "checkbox-box special-class" : "checkbox-container"}>
+                      <div className="checkbox-container">
                         {Object.keys(message4[mainKey]).
                          filter(subKey => subKey !== "Account ID").
                          map((subKey) => {
