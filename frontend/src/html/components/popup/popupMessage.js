@@ -488,15 +488,7 @@ class Popup extends Component {
                 .filter(mainKey => mainKey !== "_id") // Exclude mainKey named "_id"
                 .map((mainKey) => (
                   <div key={mainKey} className="main-key">
-                    {mainKey === "Registration And Payment Table" ? (
-                      <>
-                        <h3>Registration And</h3>
-                        <br/>
-                        <h3>Payment Table</h3>
-                      </>
-                    ) : (
                       <h3>{mainKey}</h3>
-                    )}
                     <div className="sub-keys">
                       <div className="checkbox-container">
                         {Object.keys(message4[mainKey]).
@@ -515,7 +507,15 @@ class Popup extends Component {
                                     onChange={() => this.handleCheckboxChange(mainKey, subKey)}
                                   />
                                 ) : null}
-                                <strong>{subKey}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
+                                <strong>{subKey === "Registration And Payment Table" ? (
+                      <>
+                        <h3>Registration And</h3>
+                        <br/>
+                        <h3>Payment Table</h3>
+                      </>
+                    ) : (
+                      <h3>{subKey}</h3>
+                    )}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
                               </label>
                             </div>
                           );
