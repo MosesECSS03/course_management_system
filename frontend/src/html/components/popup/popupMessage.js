@@ -510,7 +510,6 @@ class Popup extends Component {
                                     ) : null}
                                     <strong>
                                       <h3>Registration And</h3>
-                                      <br/>
                                       <h3>Payment Table</h3>
                                     </strong>
                                     &nbsp;
