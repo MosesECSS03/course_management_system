@@ -37,21 +37,20 @@ class SideBarContent extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         // Check if accountId has changed
-        if (prevProps.accountId !== this.props.accountId) {
             this.getAccessRight(this.props.accountId);
-        }
     
-        // Only refresh when accessRights differ and it's the first call after accountId change
-        if (!this.isEqual(prevState.accessRights, this.state.accessRights)) {
+       /* // Only refresh when accessRights differ and it's the first call after accountId change
+        if (prevState.accessRights !== this.state.accessRights) {
             // Avoid calling getAccessRight again if accessRights is already being updated
             if (!this.accessRightsUpdated) {
                 this.accessRightsUpdated = true; // Set the flag to indicate we've called it
-                this.props.refreshChild();
+                this.getAccessRight(this.props.accountId);
+                //this.props.refreshChild();
             }
         } else {
             // Reset the flag if accountId hasn't changed
             this.accessRightsUpdated = false;
-        }
+        }*/
     }
     getAccessRight = async (accountId) => {
         try {
