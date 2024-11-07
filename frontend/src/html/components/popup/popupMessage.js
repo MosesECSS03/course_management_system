@@ -508,14 +508,15 @@ class Popup extends Component {
                                   />
                                 ) : null}
                                 <strong>{subKey === "Registration And Payment Table" ? (
-                      <>
-                        <h3>Registration And</h3>
-                        <br/>
-                        <h3>Payment Table</h3>
-                      </>
-                    ) : (
-                      <h3>{subKey}</h3>
-                    )}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
+                                  <>
+                                  <h3>
+                                    Registration And
+                                    <span style={{ display: 'block' }}>Payment Table</span>
+                                  </h3>
+                                  </>
+                                ) : (
+                                  <h3>{subKey}</h3>
+                                )}{typeof value === "boolean" ? ' ' : ': '}</strong> &nbsp;{typeof value === "string" ? value : ''}
                               </label>
                             </div>
                           );
