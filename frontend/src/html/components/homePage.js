@@ -375,6 +375,15 @@
       });
     };
 
+    
+    generateReceiptPopup = () => {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Generating Receipt...",
+        popupType: "loading"
+      });
+    };
+
     handlePageChange(page) {
       console.log("Total No Of Pages:", this.state.totalPages);
       if (page >= 1 && page <= this.state.totalPages) {
@@ -797,6 +806,7 @@
                         userName = {userName}
                         key={this.state.refreshKey}
                         refreshChild={this.refreshChild}
+                        generateReceiptPopup = {this.generateReceiptPopup}
                     />
                     </div>
                     <div className="pagination-section">

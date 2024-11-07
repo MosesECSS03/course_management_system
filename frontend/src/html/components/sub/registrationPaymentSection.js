@@ -21,9 +21,6 @@
         originalData: [],
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
-        isPopupOpen: false,
-        popupMessage: '',
-        popupType: '',
       };
       this.tableRef = React.createRef();
     }
@@ -446,11 +443,7 @@
 
       receiptGenerator = async (event, rowData) => {
         event.stopPropagation();
-        this.setState({
-          isPopupOpen: true,
-          popupMessage: "Generating Receipt...",
-          popupType: "loading"
-        });
+       
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
         
@@ -474,9 +467,6 @@
                     
                     if (response.data.result.success === true) 
                     {
-                      this.setState({
-                        isPopupOpen: false
-                      });
                         // Now, fetch the PDF
                         const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
@@ -786,7 +776,7 @@
   };
   
     render() {
-      const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex, isPopupOpen, popupMessage, popupType } = this.state;
+      const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
         <>
@@ -898,7 +888,6 @@
             </div>
           </div>
         </div>
-         <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType}/>
       </>
       );
     }
