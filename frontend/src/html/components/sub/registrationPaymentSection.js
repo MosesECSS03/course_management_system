@@ -443,7 +443,7 @@
 
       receiptGenerator = async (event, rowData) => {
         event.stopPropagation();
-       
+        this.props.generateReceiptPopup();
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
         
@@ -467,6 +467,7 @@
                     
                     if (response.data.result.success === true) 
                     {
+                      this.props.closePopup();
                         // Now, fetch the PDF
                         const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
