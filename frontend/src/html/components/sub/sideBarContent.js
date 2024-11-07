@@ -43,7 +43,7 @@ class SideBarContent extends Component {
 
         const response = await axios.post('https://moses-ecss-course.azurewebsites.net/accessRights', {
                     "purpose": "retrieveAccessRight",
-                    "accountId": accountId
+                    "accountId": this.props.accountId
                 });
 
         var accessRights = response.data.result;
