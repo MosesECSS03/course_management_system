@@ -445,11 +445,11 @@
 
       receiptGenerator = async (event, rowData) => {
         event.stopPropagation();
-        this.setState({
+        /*this.setState({
           isPopupOpen: true,
           popupMessage: "Generating Receipt...",
           popupType: "loading"
-        });
+        });*/
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
         
