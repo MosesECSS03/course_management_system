@@ -3,7 +3,7 @@
   import '../../../css/sub/registrationPayment.css';
   import * as XLSX from 'xlsx';
   import ExcelJS from 'exceljs';
-  import Popup from './popup/popupMessage';
+  import Popup from '../popup/popupMessage';
 
   class RegistrationPaymentSection extends Component {
     constructor(props) {
