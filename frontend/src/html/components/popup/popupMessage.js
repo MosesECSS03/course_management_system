@@ -491,6 +491,7 @@ class Popup extends Component {
                     {mainKey === "Registration And Payment Table" ? (
                       <>
                         <h3>Registration And</h3>
+                        <br/>
                         <h3>Payment Table</h3>
                       </>
                     ) : (
