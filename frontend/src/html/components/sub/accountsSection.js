@@ -349,7 +349,6 @@ accessRightInfo = async(accessRight) =>
                       <th>{this.props.language === 'zh' ? '' : 'Update Courses'}</th>
                       <th>{this.props.language === 'zh' ? '' : 'Delete Courses'}</th>
                       <th>{this.props.language === 'zh' ? '' : 'Registration And Payment Table'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Receipt Table'}</th>
                       <th>{this.props.language === 'zh' ? '' : 'Inovice Table'}</th>
                       <th>{this.props.language === 'zh' ? '' : 'Create QR Code'}</th>
                       <th>{this.props.language === 'zh' ? '' : 'QR Code Table'}</th>
@@ -371,7 +370,6 @@ accessRightInfo = async(accessRight) =>
                           <td><input type="checkbox" checked={accessRight["Courses"]["Update Courses"]} disabled readOnly/></td>
                           <td><input type="checkbox" checked={accessRight["Courses"]["Delete Courses"]} disabled readOnly/></td>
                           <td><input type="checkbox" checked={accessRight["Registration And Payment"]["Registration And Payment Table"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["Registration And Payment"]["Receipt Table"]} disabled readOnly/></td>
                           <td><input type="checkbox" checked={accessRight["Registration And Payment"]["Invoice Table"]} disabled readOnly/></td>
                           <td><input type="checkbox" checked={accessRight["QR Code"]["Create QR Code"]} disabled readOnly/></td>
                           <td><input type="checkbox" checked={accessRight["QR Code"]["QR Code Table"]} disabled readOnly/></td>

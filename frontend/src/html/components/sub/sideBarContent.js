@@ -64,7 +64,7 @@ class SideBarContent extends Component {
 
     getAccessRight = async (accountId) => {
         try {
-            const response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/accessRights', {
+            /*const response = await axios.post('https://moses-course-testing-dqghhsbcgseccyfa.japaneast-01.azurewebsites.net/accessRights', {
                 "purpose": "retrieveAccessRight",
                 "accountId": accountId
             });*/
@@ -116,10 +116,6 @@ class SideBarContent extends Component {
          this.props.toggleCourseComponent(subKey);
        }
        else if(subKey === "Registration And Payment Table")
-       {
-        this.props.toggleRegistrationPaymentComponent(subKey);
-       }
-       else if(subKey === "Receipt Table")
        {
         this.props.toggleRegistrationPaymentComponent(subKey);
        }
