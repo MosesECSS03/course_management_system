@@ -15,21 +15,10 @@ class AccountsSection extends Component {
       dataFetched: false,
       clearTable: false,
       currentPage: 1, // Add this
-      entriesPerPage: 10, // Add this
-      visiblePasswords: {}
+      entriesPerPage: 10 // Add this
     };
     this.tableRef = React.createRef();
   }
-
-  togglePasswordVisibility = (event, accountId) => {
-    event.stopPropagation(); // Prevents the event from bubbling up
-    this.setState((prevState) => ({
-      visiblePasswords: {
-        ...prevState.visiblePasswords,
-        [accountId]: !prevState.visiblePasswords[accountId] // Toggle specific row
-      }
-    }));
-  };
 
 
   async fetchAccounts() 
@@ -328,20 +317,6 @@ accessRightInfo = async(accessRight) =>
                         <tr key={index} onClick={() => this.accountInfo(account)}>
                           <td>{account.name}</td>
                           <td>{account.email}</td>
-                          <td>
-                            {showPassword ? account.password : '••••••••'}
-                            <button
-                              onClick={(e) => this.togglePasswordVisibility(e, account.id)}
-                              style={{ border: 'none', background: 'none', marginLeft: '8px', cursor: 'pointer' }}
-                              aria-label={showPassword ? "Hide password" : "Show password"}
-                            >
-                              <i
-                                className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-                                style={{ color: "#000000" }}
-                                aria-hidden="true"
-                              ></i>
-                            </button>
-                          </td>
                           <td>{account.role}</td>
                           <td>{account.date_created}</td>
                           <td>{account.time_created}</td>

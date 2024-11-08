@@ -1,4 +1,5 @@
 var DatabaseConnectivity = require("../../database/databaseConnectivity"); // Import the class
+//Ok
 
 class AccessRightController 
 {
