@@ -14,6 +14,7 @@ router.post('/', async function(req, res, next)
     {
         var controller = new AccessRightController();
         var result = await controller.allAccessRights(req.body.accountId);
+        console.log("All Accounts With Access Right:", result);
         return res.json({"result": result});
     }
     else if(req.body.purpose === "updateAccessRight")
