@@ -16,17 +16,21 @@ class AccountsSection extends Component {
       clearTable: false,
       currentPage: 1, // Add this
       entriesPerPage: 10, // Add this
-      showPassword: false
+      visiblePasswords: {}
     };
     this.tableRef = React.createRef();
   }
 
-  togglePasswordVisibility = (event) => {
+  togglePasswordVisibility = (event, accountId) => {
     event.stopPropagation(); // Prevents the event from bubbling up
     this.setState((prevState) => ({
-      showPassword: !prevState.showPassword
+      visiblePasswords: {
+        ...prevState.visiblePasswords,
+        [accountId]: !prevState.visiblePasswords[accountId] // Toggle specific row
+      }
     }));
   };
+
 
   async fetchAccounts() 
   {
@@ -288,7 +292,9 @@ accessRightInfo = async(accessRight) =>
 
   render() 
   {
-    const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType, showPassword } = this.state;
+    const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType } = this.state;
+    const { visiblePasswords } = this.state;
+    const showPassword = visiblePasswords[account.id]; // Check if
     var paginatedDetails = this.getPaginatedDetails();
     var paginatedDetails1 = this.getPaginatedAccessDetails();
 
@@ -323,19 +329,19 @@ accessRightInfo = async(accessRight) =>
                           <td>{account.name}</td>
                           <td>{account.email}</td>
                           <td>
-                          {showPassword ? account.password : '••••••••'}
-                          <button
-                              onClick={(e) => this.togglePasswordVisibility(e)}
-                            style={{ border: 'none', background: 'none', marginLeft: '-8px', cursor: 'pointer', color: "#000000" }}
-                            aria-label={showPassword ? "Hide password" : "Show password"}
-                          >
-                            <i
-                              className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-                              style={{ color: "#000000" }}
-                              aria-hidden="true"
-                            ></i>
-                          </button>
-                         </td>
+                            {showPassword ? account.password : '••••••••'}
+                            <button
+                              onClick={(e) => this.togglePasswordVisibility(e, account.id)}
+                              style={{ border: 'none', background: 'none', marginLeft: '8px', cursor: 'pointer' }}
+                              aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                              <i
+                                className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                                style={{ color: "#000000" }}
+                                aria-hidden="true"
+                              ></i>
+                            </button>
+                          </td>
                           <td>{account.role}</td>
                           <td>{account.date_created}</td>
                           <td>{account.time_created}</td>
