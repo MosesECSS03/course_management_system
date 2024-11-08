@@ -56,7 +56,7 @@ class Popup extends Component {
         });
     } else {
         clearInterval(this.countdownInterval);
-        //this.setState({ countdown: 10 });
+       // this.setState({ countdown: 10 });
         // If the type changed to something else, clear the countdown
       }
     }
@@ -74,7 +74,7 @@ class Popup extends Component {
           //console.log(prevState.countdown);
          clearInterval(this.countdownInterval);
           this.props.goBackLoginPage();
-            return { countdown: 10 };
+            return { countdown: 0 };
         }
         console.log(prevState.countdown);
         return { countdown: prevState.countdown - 1 };
