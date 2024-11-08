@@ -326,7 +326,7 @@ accessRightInfo = async(accessRight) =>
                           {showPassword ? account.password : '••••••••'}
                           <button
                               onClick={(e) => this.togglePasswordVisibility(e)}
-                            style={{ border: 'none', background: 'none', marginLeft: '8px', cursor: 'pointer' }}
+                            style={{ border: 'none', background: 'none', marginLeft: '-8px', cursor: 'pointer', color: "#000000" }}
                             aria-label={showPassword ? "Hide password" : "Show password"}
                           >
                             <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
