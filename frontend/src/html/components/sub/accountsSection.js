@@ -15,7 +15,7 @@ class AccountsSection extends Component {
       dataFetched: false,
       clearTable: false,
       currentPage: 1, // Add this
-      entriesPerPage: 10 // Add this
+      entriesPerPage: 10// Add this
     };
     this.tableRef = React.createRef();
   }
@@ -282,8 +282,6 @@ accessRightInfo = async(accessRight) =>
   render() 
   {
     const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType } = this.state;
-    const { visiblePasswords } = this.state;
-    const showPassword = visiblePasswords[account.id]; // Check if
     var paginatedDetails = this.getPaginatedDetails();
     var paginatedDetails1 = this.getPaginatedAccessDetails();
 
@@ -300,7 +298,6 @@ accessRightInfo = async(accessRight) =>
                   <tr>
                     <th>{this.props.language === 'zh' ? '' : 'Name'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Email'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Password'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Account Type'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Date Created'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Time Created'}</th>
