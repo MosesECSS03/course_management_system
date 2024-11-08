@@ -44,12 +44,12 @@ router.post('/', async function(req, res, next) {
         //Test
         // If account creation is successful, send the email
          if (result.success === true) {
-            var text = `Dear ${name},<br/>
+            var text = `Dear11 ${name},<br/>
                     Thank you for creating an account with us! We're excited to have you on board.
                     <br/><br/>
                     Your account has been successfully created, and you can now enjoy all the features and benefits we offer.
                     <br/><br/>
-                    Here are your account details:
+                    Here are your account details:  
                     <br/><br/>
                     Email: <a href="javascript:void(0);">${email}</a><br/>  
                     Password: ${password}
