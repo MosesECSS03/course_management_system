@@ -551,8 +551,8 @@
   goBackHome = async() =>
   {
     console.log("Logout");
-    //var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
-    var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    //var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
     if(response.data.message.message === "Logout successful")
     {
       this.props.auth.logout();

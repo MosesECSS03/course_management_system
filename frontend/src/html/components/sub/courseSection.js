@@ -37,7 +37,7 @@
     async fetchCourses(courseType) {
       try {
         this.setState({ loading: true });
-       // var response = await axios.post(`http://localhost:3001/courses`, { "courseType": courseType });
+        //var response = await axios.post(`http://localhost:3001/courses`, { "courseType": courseType });
         var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/courses`, { "courseType": courseType });
         var courses = response.data;
 

@@ -55,18 +55,18 @@
     }
 
     fetchCourseRegistrations(language) {
-     /* return axios
+      return axios
         .post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
         .then(response => {
           const array = this.languageDatabase(response.data.result, language);
           return array;
-        })*/
-      return axios
+        })
+      /*return axios
         .post('http://localhost:3001/courseregistration', { purpose: 'retrieve' })
         .then(response => {
           const array = this.languageDatabase(response.data.result, language);
           return array;
-        })
+        })*/
         .catch(error => {
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
@@ -336,22 +336,22 @@
 
     updateDatabaseForRegistrationPayment = async (value, id, page) => {
       console.log(value, id);
-     /* return axios
+     return axios
         .post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
             this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
-        })*/
-      return axios
+        })
+      /*return axios
         .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
             this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
-        })
+        })*/
         .catch(error => {
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
@@ -453,32 +453,32 @@
                 
                 try {
                     // First, get the receipt number
-                    /*const response = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
+                    const response = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
                       purpose: 'getReceiptNo',
                       courseLocation: rowDataArray[i].course?.courseLocation
-                  });*/
-                    const response = await axios.post('http://localhost:3001/receipt', {
+                  });
+                   /* const response = await axios.post('http://localhost:3001/receipt', {
                         purpose: 'getReceiptNo',
                         courseLocation: rowDataArray[i].course?.courseLocation
-                    });
+                    });*/
                     
                     const receiptNo = response.data.result.receiptNumber;
                     
                     if (response.data.result.success === true) 
                     {
                         // Now, fetch the PDF
-                        /*const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
+                        const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
                           purpose: 'receipt',
                             rowData: rowDataArray,
                             staff: this.props.userName,
                             receiptNo: receiptNo
-                        }, { responseType: 'blob' });*/
-                        const pdfResponse = await axios.post('http://localhost:3001/courseregistration', {
+                        }, { responseType: 'blob' });
+                        /*const pdfResponse = await axios.post('http://localhost:3001/courseregistration', {
                             purpose: 'receipt',
                             rowData: rowDataArray,
                             staff: this.props.userName,
                             receiptNo: receiptNo
-                        }, { responseType: 'blob' });
+                        }, { responseType: 'blob' });*/
     
                         // Extract filename from Content-Disposition header
                         const contentDisposition = pdfResponse.headers['content-disposition'];
@@ -496,20 +496,20 @@
                         pdfWindow.location.href = url;
     
                         // Now, create the receipt in the database
-                       /* const receiptCreationResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
+                        const receiptCreationResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
                           purpose: 'createReceipt',
                           receiptNo: receiptNo,
                           registration_id: registration_id,
                           url: url,
                           staff: this.props.userName
-                      });*/
-                      const receiptCreationResponse = await axios.post('http://localhost:3001/receipt', {
+                      });
+                      /*const receiptCreationResponse = await axios.post('http://localhost:3001/receipt', {
                             purpose: 'createReceipt',
                             receiptNo: receiptNo,
                             registration_id: registration_id,
                             url: url,
                             staff: this.props.userName
-                        });
+                        });*/
     
                         console.log("Receipt Created:", receiptCreationResponse.data);
                         this.props.closePopup();
