@@ -54,11 +54,12 @@
       return `${year}年${monthNumber}月${parseInt(day)}日`;
     }
 
-    fetchCourseRegistrations(language) {
+    fetchCourseRegistrations = async (language) => {
       axios
         .post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
         .then(response => {
           const array = this.languageDatabase(response.data.result, language);
+          console.log("Course Registration:", array);
           return array;
         })
       /*return axios

@@ -46,6 +46,7 @@ router.post('/', async function(req, res, next)
         //console.log("Retrieve From Database")
         var controller = new RegistrationController();
         var result = await controller.allParticipants();
+        console.log("Retrieve Payment:", result)
         return res.json({"result": result}); 
     }
     else if(req.body.purpose === "update")
