@@ -329,7 +329,11 @@ accessRightInfo = async(accessRight) =>
                             style={{ border: 'none', background: 'none', marginLeft: '-8px', cursor: 'pointer', color: "#000000" }}
                             aria-label={showPassword ? "Hide password" : "Show password"}
                           >
-                            <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+                            <i
+                              className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+                              style={{ color: "#000000" }}
+                              aria-hidden="true"
+                            ></i>
                           </button>
                          </td>
                           <td>{account.role}</td>
