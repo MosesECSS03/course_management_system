@@ -429,7 +429,8 @@
       // Method to get all locations
       getAllLocations(datas) {
         return [...new Set(datas.map(data => {
-          return data.course.courseLocation;
+          console.log(data.course)
+          //return data.course.courseLocation;
         }))];
       }
   
