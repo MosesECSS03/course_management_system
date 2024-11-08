@@ -545,7 +545,7 @@
 
     // Restart the inactivity timeout
     //this.inactivityTimeout = setTimeout(this.noActivityDetected, 10000); // 1 minute*/
-    this.inactivityTimeout = setTimeout(this.noActivityDetected, 90*1000); // 1 minute*/
+    this.inactivityTimeout = setTimeout(this.noActivityDetected, 10*1000); // 1 minute*/
   };
 
   goBackHome = async() =>
