@@ -55,24 +55,22 @@
     }
 
     fetchCourseRegistrations = async (language) => {
-      axios
-        .post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
-        .then(response => {
-          const array = this.languageDatabase(response.data.result, language);
-          console.log("Course Registration:", array);
-          return array;
-        })
-      /*return axios
-        .post('http://localhost:3001/courseregistration', { purpose: 'retrieve' })
-        .then(response => {
-          const array = this.languageDatabase(response.data.result, language);
-          return array;
-        })*/
-        .catch(error => {
-          console.error('Error fetching course registrations:', error);
-          return []; // Return an empty array in case of error
-        });
-    }
+      try {
+        const response = await axios.post(
+          'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
+          { purpose: 'retrieve' }
+        );
+
+        console.log("Course Registration:", response);
+    
+        const array = this.languageDatabase(response.data.result, language);
+        return array;
+    
+      } catch (error) {
+        console.error('Error fetching course registrations:', error);
+        return []; // Return an empty array in case of error
+      }
+    };
 
     languageDatabase(array, language) {
       for (let i = 0; i < array.length; i++) {
@@ -153,7 +151,7 @@
         types: types
       });
     
-      this.props.closePopup();
+        
     }
     
     
