@@ -41,7 +41,7 @@ router.post('/', async function(req, res, next) {
 
         // Log the result if needed
         // console.log(result);
-        
+        //Test
         // If account creation is successful, send the email
          if (result.success === true) {
             var text = `Dear ${name},<br/>
