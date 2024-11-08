@@ -302,8 +302,8 @@ class Popup extends Component {
   {
     var accessRight = this.state.message4;
     var accessRightId = this.props.message._id;
-    var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
-    //var response = await axios.post(`http://localhost:3001/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
+    //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
+    var response = await axios.post(`http://localhost:3001/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
     if(response.data.success === true)
       {
           //console.log("Change Password Successfully");
