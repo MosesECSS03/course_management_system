@@ -21,7 +21,8 @@ class AccountsSection extends Component {
     this.tableRef = React.createRef();
   }
 
-  togglePasswordVisibility = () => {
+  togglePasswordVisibility = (event) => {
+    event.stopPropagation(); // Prevents the event from bubbling up
     this.setState((prevState) => ({
       showPassword: !prevState.showPassword
     }));
@@ -287,7 +288,7 @@ accessRightInfo = async(accessRight) =>
 
   render() 
   {
-    const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType } = this.state;
+    const { hideAllCells, clearTable, currentPage, entriesPerPage, accounts, filteredAccounts, accessRights, filteredAccessRights, accountType, showPassword } = this.state;
     var paginatedDetails = this.getPaginatedDetails();
     var paginatedDetails1 = this.getPaginatedAccessDetails();
 
@@ -324,7 +325,7 @@ accessRightInfo = async(accessRight) =>
                           <td>
                           {showPassword ? account.password : '••••••••'}
                           <button
-                            onClick={this.togglePasswordVisibility}
+                              onClick={(e) => this.togglePasswordVisibility(e)}
                             style={{ border: 'none', background: 'none', marginLeft: '8px', cursor: 'pointer' }}
                             aria-label={showPassword ? "Hide password" : "Show password"}
                           >
