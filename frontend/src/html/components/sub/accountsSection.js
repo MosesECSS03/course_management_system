@@ -24,8 +24,8 @@ class AccountsSection extends Component {
   {
     try {
       this.setState({ loading: true });
-      //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accountDetails`, { "purpose": "retrieve"});
-      var response = await axios.post(`http://localhost:3001/accountDetails`, { "purpose": "retrieve"});
+      var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accountDetails`, { "purpose": "retrieve"});
+      //var response = await axios.post(`http://localhost:3001/accountDetails`, { "purpose": "retrieve"});
       console.log(response.data.result);
       var roles = this.getAllRoles(response.data.result);
 
