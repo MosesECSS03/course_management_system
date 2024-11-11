@@ -618,6 +618,19 @@
       });
     }
 
+    warningPopUpMessage = async(message) =>
+    {
+        this.setState({
+          isPopupOpen: true,
+          popupMessage: message,
+          popupType: "error-message",
+        });
+        // Redirect or perform other actions...
+        setTimeout(() => {
+          this.setState({ isPopupOpen: false, name: '', password: '', role: ''});
+      }, 5000);
+    } 
+
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
@@ -817,6 +830,7 @@
                         refreshChild={this.refreshChild}
                         generateReceiptPopup = {this.generateReceiptPopup}
                         updatePaymentPopup = {this.updatePaymentPopup}
+                        warningPopUpMessage = {this.warningPopUpMessage}
                     />
                     </div>
                     <div className="pagination-section">

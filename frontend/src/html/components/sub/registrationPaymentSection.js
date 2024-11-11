@@ -578,7 +578,9 @@
         XLSX.utils.book_append_sheet(workbook, worksheet, "Exported Data");
 
         // Prompt user for filename input
-        const fileName = prompt("Please enter the file name (without extension):", "paginated_data") || 'exported_data';
+        var date = new Date();
+        const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}${date.getFullYear()}`;
+        const fileName = `exported data ${formattedDate}`;
     
         // Generate a binary string
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -624,12 +626,20 @@
       return `${day}/${monthNumber}/${year}`;
     }
 
+    convertDateFormat(dateString) {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure two-digit month (0-based index)
+      const year = date.getFullYear();
+      
+      return `${day}/${month}/${year}`;
+    }
+
     exportToLOP = async (paginatedDetails) => {
       const fileInput = document.getElementById('fileInput');
   
       if (!fileInput.files.length) {
-          alert("Please select an Excel file first!");
-          return;
+          return this.props.warningPopUpMessage("Please select an Excel file first!");
       }
   
       const file = fileInput.files[0];
@@ -642,8 +652,7 @@
   
       const sourceSheet = workbook.getWorksheet('LOP');
       if (!sourceSheet) {
-          alert(`Sheet "LOP" not found!`);
-          return;
+        return this.props.warningPopUpMessage("Sheet 'LOP' not found!");
       }
   
       const originalRow = sourceSheet.getRow(9);
@@ -694,8 +703,8 @@
           sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName.split("–")[0].trim();
   
           const [startDate, endDate] = detail.course.courseDuration.split(" - ");
-          sourceSheet.getCell(`P${rowIndex}`).value = this.convertDateFormat(startDate);
-          sourceSheet.getCell(`Q${rowIndex}`).value = this.convertDateFormat(endDate);
+          sourceSheet.getCell(`P${rowIndex}`).value = this.convertDateFormat1(startDate);
+          sourceSheet.getCell(`Q${rowIndex}`).value = this.convertDateFormat1(endDate);
   
           sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
           sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "SkillsFuture" ? "SFC" : detail.course.payment;
