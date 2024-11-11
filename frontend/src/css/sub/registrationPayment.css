@@ -35,6 +35,28 @@
   margin-left: 8rem;
 }
 
+  
+::-webkit-scrollbar {
+  width: 0; /* Hides vertical scrollbar */
+  height: 8px; /* Keeps horizontal scrollbar */
+}
+
+/* Customize horizontal scrollbar */
+::-webkit-scrollbar-horizontal {
+  height: 8px; /* Set height for horizontal scrollbar */
+}
+
+/* Optional: Customize the appearance of the horizontal scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+}
+
+/* Optional: Customize the scrollbar track */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Color of the scrollbar track */
+}
+
 .suggestions-list {
   list-style-type: none; /* Remove bullets */
   margin: 0;

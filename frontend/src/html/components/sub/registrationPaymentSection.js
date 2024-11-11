@@ -181,6 +181,7 @@
           }
 
           const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
+          console.log("normalizedSearchQuery:", normalizedSearchQuery);
 
   
           const filteredDetails = originalData.filter(data => {
@@ -190,20 +191,27 @@
               const pRS = data.participant.residentialStatus.toLowerCase().trim() || ""; // Fixed to avoid calling it as a function
               const pRace = data.participant.race.toLowerCase().trim() || ""; // Assuming race is a string
               const pGender = data.participant.gender.toLowerCase().trim() || "";
-              const pDateOfBirth = data.participant.dateOfBirth || ""; // Ensure correct formatting if needed
-              const pContactNumber = data.participant.contactNumber || "";
+              const pDateOfBirth = data.participant.dateOfBirth.toLowerCase().trim() || ""; // Ensure correct formatting if needed
+              const pContactNumber = data.participant.contactNumber.toLowerCase().trim() || "";
               const pEmail = data.participant.email.toLowerCase().trim() || "";
               const pPostalCode = data.participant.postalCode || "";
               const pEducationLevel = data.participant.educationLevel.toLowerCase().trim() || "";
               const pWorkStatus = data.participant.workStatus.toLowerCase().trim() || "";
 
               // Extract course properties
-              const location = data.course?.courseLocation?.toLowerCase().trim() || ""; 
-              const type = data.course?.courseType?.toLowerCase().trim() || "";
-              const courseEngName = data.course?.courseEngName?.toLowerCase().trim() || "";
-              const duration = data.course?.courseDuration || "";
-              const payment = data.course?.payment || "";
-              const agreement = data.agreement || "";
+              const location = data.course.courseLocation.toLowerCase().trim() || ""; 
+              const type = data.course.courseType.toLowerCase().trim() || "";
+              const courseEngName = data.course.courseEngName.toLowerCase().trim() || "";
+              const duration = data.course.courseDuration.toLowerCase().trim() || "";
+              const payment = data.course.payment.toLowerCase().trim() || "";
+              const agreement = data.agreement.toLowerCase().trim() || "";
+
+              //Extract official properties
+              const status = data.status.toLowerCase().trim() || ""; 
+              console.log("Status:", status)
+              const oName = data.official?.name?.toLowerCase().trim() || "";
+              const oDate = data.official?.date?.toLowerCase().trim() || "";
+              const oTime = data.official?.time?.toLowerCase().trim() || ""
   
               // Match 'All Languages' and 'All Locations'
               const matchesLocation = selectedLocation === "All Locations" || 
@@ -237,7 +245,11 @@
                      courseEngName.includes(normalizedSearchQuery) ||
                      duration.includes(normalizedSearchQuery) ||
                      payment.includes(normalizedSearchQuery)||
-                     agreement.includes(normalizedSearchQuery))
+                     agreement.includes(normalizedSearchQuery) ||
+                     status.includes(normalizedSearchQuery) ||
+                     oName.includes(normalizedSearchQuery) ||
+                     oDate.includes(normalizedSearchQuery) ||
+                     oTime.includes(normalizedSearchQuery))
                   : true;
   
               return matchesType && matchesLocation && matchesSearchQuery;
