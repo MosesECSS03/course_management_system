@@ -128,8 +128,8 @@
       const { language } = this.props;
       const data = await this.fetchCourseRegistrations(language);
       console.log('Data:', data);
-      var locations = this.getAllLocations(data);
-      var types = this.getAllType(data);
+      var locations = await this.getAllLocations(data);
+      var types = await this.getAllType(data);
       this.props.passDataToParent(locations, types);
 
       const statuses = data.map(item => item.status); // Extract statuses
@@ -427,14 +427,14 @@
     };
 
       // Method to get all locations
-      getAllLocations(datas) {
+      getAllLocations = async (datas) => {
         return [...new Set(datas.map(data => {
           return data.course.courseLocation;
         }))];
       }
   
       // Method to get all languages
-      getAllType(datas) {
+      getAllType = async (datas) => {
         return [...new Set(datas.map(data => {
           return data.course.courseType;
         }))];
@@ -595,74 +595,6 @@
         link.click(); // Trigger the download
       }
 
-     /*exportToLOP = async (paginatedDetails) => {
-        const fileInput = document.getElementById('fileInput');
-    
-        // Check if a file has been selected
-        if (!fileInput.files.length) {
-            alert("Please select an Excel file first!");
-            return;
-        }
-    
-        const file = fileInput.files[0];
-        const data = await file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: 'array' });
-    
-        // Access the "LOP" sheet
-        const sheetName = "LOP";
-        const worksheet = workbook.Sheets[sheetName];
-    
-        if (!worksheet) {
-            alert(`Sheet "${sheetName}" not found!`);
-            return;
-        }
-    
-        const startRow = 9; // Row number where you want to start filling data
-    
-        // Fill data in the specified row without altering existing styles
-        paginatedDetails.forEach((detail, index) => {
-            const rowIndex = startRow + index; // Calculate the row index
-            console.log(`Filling row: ${rowIndex}`, "Detail:", detail);
-    
-            // Fill the data while keeping the existing styles intact
-            worksheet[`A${rowIndex}`] = { v: (index+1), ...worksheet[`A${rowIndex}`] };
-            worksheet[`B${rowIndex}`] = { v: detail.participant.name, ...worksheet[`B${rowIndex}`] };
-            worksheet[`C${rowIndex}`] = { v: detail.participant.nric, ...worksheet[`C${rowIndex}`] };
-            worksheet[`D${rowIndex}`] = { v: detail.participant.residentialStatus, ...worksheet[`D${rowIndex}`] };
-            worksheet[`E${rowIndex}`] = { v: detail.participant.dateOfBirth.split("/")[0].trim(), ...worksheet[`E${rowIndex}`] };
-            worksheet[`F${rowIndex}`] = { v: detail.participant.dateOfBirth.split("/")[1].trim(), ...worksheet[`F${rowIndex}`] };
-            worksheet[`G${rowIndex}`] = { v: detail.participant.dateOfBirth.split("/")[2].trim(), ...worksheet[`G${rowIndex}`] };
-            worksheet[`H${rowIndex}`] = { v: detail.participant.gender, ...worksheet[`H${rowIndex}`] };
-            worksheet[`I${rowIndex}`] = { v: detail.participant.race.substring(0,1), ...worksheet[`I${rowIndex}`] };
-            worksheet[`J${rowIndex}`] = { v: detail.participant.contactNumber, ...worksheet[`J${rowIndex}`] };
-            worksheet[`K${rowIndex}`] = { v: detail.participant.email, ...worksheet[`K${rowIndex}`] };
-            worksheet[`L${rowIndex}`] = { v: detail.participant.postalCode, ...worksheet[`L${rowIndex}`] };
-            worksheet[`M${rowIndex}`] = { v: detail.participant.educationLevel, ...worksheet[`M${rowIndex}`] };
-            worksheet[`N${rowIndex}`] = { v: detail.participant.workStatus, ...worksheet[`B${rowIndex}`] };
-            worksheet[`O${rowIndex}`] = { v: detail.course.courseEngName, ...worksheet[`O${rowIndex}`] };
-            worksheet[`P${rowIndex}`] = { v: detail.course.courseDuration.split("-")[0].trim(), ...worksheet[`P${rowIndex}`] };
-            worksheet[`Q${rowIndex}`] = { v: detail.course.courseDuration.split("-")[1].trim(), ...worksheet[`Q${rowIndex}`] };
-            worksheet[`R${rowIndex}`] = { v: detail.course.coursePrice, ...worksheet[`R${rowIndex}`] };
-            const paymentValue = detail.course.payment === "Skills Future" ? "SFC" : detail.course.payment;
-            worksheet[`S${rowIndex}`] = { v: paymentValue, ...worksheet[`S${rowIndex}`] };
-        });
-    
-        // Use the original file name for saving
-        const originalFileName = file.name;
-    
-        // Export the updated workbook back to the original file
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        });
-    
-        // Create a link element for downloading the original file
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = originalFileName; // Use the original file name
-        link.click(); // Trigger the download
-    };*/
-
     convertDateFormat(dateString) {
       const months = {
         January: '01',
@@ -701,6 +633,8 @@
       }
   
       const file = fileInput.files[0];
+      console.log(file);
+
       const data = await file.arrayBuffer();
   
       const workbook = new ExcelJS.Workbook();
@@ -738,12 +672,26 @@
           sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
   
           const educationParts = detail.participant.educationLevel.split(" ");
-          sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0, 2).join(" ");
+          if(educationParts.length === 3)
+          {
+            sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0, 2).join(" ");
+          }
+          else if(educationParts.length === 2)
+          {
+            sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0];
+          }
   
           const workParts = detail.participant.workStatus.split(" ");
-          sourceSheet.getCell(`N${rowIndex}`).value = workParts.slice(0, 2).join(" ");
+          if(workParts.length === 3)
+          {
+            sourceSheet.getCell(`N${rowIndex}`).value = workParts.slice(0, 2).join(" ");
+          }
+          else if(educationParts.length === 2)
+          {
+            sourceSheet.getCell(`N${rowIndex}`).value = workParts[0];
+          }
   
-          sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
+          sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName.split("–")[0].trim();
   
           const [startDate, endDate] = detail.course.courseDuration.split(" - ");
           sourceSheet.getCell(`P${rowIndex}`).value = this.convertDateFormat(startDate);
