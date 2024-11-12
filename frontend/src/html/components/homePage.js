@@ -93,6 +93,7 @@
         item: '',
         isInactive: false,
         refreshKey: 0,
+        graphHtml: ''    
       };
   
       // Set the initial state
@@ -109,6 +110,7 @@
       this.createAccountPopupMessage = this.createAccountPopupMessage.bind(this);
       this.inactivityTimeout = null;
       this.editAccountPopupMessage = this.editAccountPopupMessage.bind(this);
+      this.graphContainerRef = React.createRef();
       //this.getTotalNumberofDetails = this.getTotalNumberofDetails.bind(this);
     }
 
@@ -268,7 +270,7 @@
       }
     };
 
-    componentDidMount() {
+    componentDidMount = async () => {
       // Start the inactivity detection timeout
       //sessionStorage.clear();
       this.resetInactivity();
@@ -278,6 +280,7 @@
       window.addEventListener('click', this.resetInactivity);
       window.addEventListener('scroll', this.resetInactivity);
       window.addEventListener('beforeunload', this.handleBeforeUnload);
+      await this.fetchCourses();
     }
 
     handleBeforeUnload = (event) => {
@@ -631,6 +634,66 @@
       }, 5000);
     } 
 
+    async fetchCourses() {
+      try {
+        let coursesName = [];
+        let coursesStock = [];
+    
+        // Fetching course data from the backend
+        const response = await axios.post('http://localhost:3002/woocommerce/products/', { "courseType": "None" });
+        // const response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courses`, { "courseType": courseType });
+        
+        const courses = JSON.parse(response.data.product);
+    
+        // Populate coursesName and coursesStock arrays
+        for (let i = 0; i < courses.length; i++) {
+          coursesName.push(this.courseNameAndDetails(courses[i].name).engName); // Assuming each product has a 'name' 
+          coursesStock.push(courses[i].stock_quantity);
+        }
+    
+        // Sending filtered data to another endpoint for generating a graph
+        const response1 = await axios.post('http://localhost:3002/woocommerce/api/filter-data/', { 
+          "category": coursesName, 
+          "values": coursesStock 
+        });
+    
+        this.setState({ graphHtml: response1.data }, () => {
+          // After state update, render the Plotly graph
+          this.renderGraph(response1.data);
+        });
+    
+    
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    }
+    
+
+    courseNameAndDetails(product_name) {
+      var regex = /<br\s*\/?>/gi;
+      var array = product_name.split(regex);
+      if (array.length === 3) {
+        array[2] = array[2].replace(/[()]/g, '');
+        return { "engName": array[1], "chiName": array[0], "location": array[2] };
+      }
+      if (array.length === 2) {
+        array[1] = array[1].replace(/[()]/g, '');
+        return { "engName": array[0], "chiName": array[0], "location": array[1] };
+      }
+    }
+
+    renderGraph() {
+      if (this.state.graphHtml && this.graphContainerRef.current) {
+        // Set the innerHTML of the container to the graph HTML
+        this.graphContainerRef.current.innerHTML = this.state.graphHtml;
+  
+        // Ensure Plotly.js is available, then render the graph
+        if (window.Plotly) {
+          window.Plotly.newPlot(this.graphContainerRef.current);
+        }
+      }
+    }
+
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
@@ -678,6 +741,7 @@
                 />
               </div>
               <div className="main-content">
+              <div ref={this.graphContainerRef}></div>
               {createAccount && (
                 <>
                    <div className="create-account-section">
