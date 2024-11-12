@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>AI Dashboard</h1>
+    
+    <!-- Dropdown for filtering -->
+    <select id="category-filter">
+        <option value="">Select Category</option>
+        <option value="A">Category A</option>
+        <option value="B">Category B</option>
+        <option value="C">Category C</option>
+        <option value="D">Category D</option>
+    </select>
+    
+    <div id="chart-container">
+        <!-- The plotly graph will be embedded here -->
+        {{ graph_html|safe }}
+    </div>
+    
+    <script>
+        // Handle category filter change
+        $('#category-filter').change(function() {
+            var category = $(this).val();
+            $.get('/api/filter-data/', { category: category }, function(data) {
+                $('#chart-container').html(data.graph_html);  // Update the chart
+            });
+        });
+    </script>
+</body>
+</html>

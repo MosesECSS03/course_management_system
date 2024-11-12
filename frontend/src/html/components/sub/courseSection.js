@@ -37,9 +37,11 @@
     async fetchCourses(courseType) {
       try {
         this.setState({ loading: true });
-        var response = await axios.post(`http://localhost:3001/courses`, { "courseType": courseType });
+       // var response = await axios.post(`http://localhost:3001/courses`, { "courseType": courseType });
+        var response =  await axios.post('http://localhost:3002/woocommerce/products/', { "courseType": courseType });
         //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courses`, { "courseType": courseType });
-        var courses = response.data;
+        var courses = JSON.parse(response.data.product);
+        console.log("Courses:", courses);
 
         // Extract locations and languages
         var locations = this.getAllLocations(courses);
@@ -71,6 +73,8 @@
         this.props.closePopup();
       }
     }
+
+    
 
     // Method to get all locations
     getAllLocations(courses) {
@@ -140,15 +144,51 @@
           this.setState({ filteredCourses });
         }
     }
-    
-    
-    
-    async componentDidMount() {
+
+    // Function to get CSRF token from cookies
+    getCsrfToken = async () => {
+      const name = 'csrftoken';
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(`${name}=`)) {
+          return cookie.substring(name.length + 1);
+        }
+      }
+      return null;
+    };
+
+    // Axios instance with CSRF token attached
+    axiosInstance = axios.create({
+      baseURL: 'http://localhost:3002',  // Your Django backend URL
+      withCredentials: true            // Ensure cookies are sent with requests
+    });
+
+    componentDidMount = async () => 
+    {
+      this.axiosInstance.interceptors.request.use(config => {
+        const csrfToken = this.getCsrfToken();
+        if (csrfToken) {
+          config.headers['X-CSRFToken'] = csrfToken;  // Attach CSRF token to headers
+        }
+        return config;
+      });
       var { courseType } = this.props;
       if (courseType && !this.state.dataFetched) {
         await this.fetchCourses(courseType);
       }
     }
+  
+
+    
+    
+    
+   /* async componentDidMount() {
+      var { courseType } = this.props;
+      if (courseType && !this.state.dataFetched) {
+        await this.fetchCourses(courseType);
+      }
+    }*/
 
       componentDidUpdate(prevProps)
        {
@@ -218,19 +258,20 @@
 
     convertTo24HourWithHrs(time12) {
       const [time, modifier] = time12.split(/(am|pm)/i); // Split by 'am' or 'pm'
-      let [hours, minutes] = time.split(":").map(Number);
+      let [hours, minutes] = time.split(/[:.]/).map(Number);
       if (modifier.toLowerCase() === "pm" && hours < 12) {
         hours += 12; // Convert PM hours
       } else if (modifier.toLowerCase() === "am" && hours === 12) {
         hours = 0; // Midnight case
       }
+      console.log("24 hr Format:", hours);
       // Return formatted time as "HHmm hrs"
       return { hours, minutes }; // Return hours and minutes as an object
     }
     
         
 
-    getSelectedDetails(short_description) {
+    getSelectedDetails(short_description, vacancy) {
       let array = short_description.split('<p>');
       if (array[0] === '') {
         array.shift(); // Remove the empty string at the start
@@ -269,7 +310,7 @@
       const { hours: startHours, minutes: startMinutes } = this.convertTo24HourWithHrs(startTime);
       startDateTime.setHours(startHours);
       startDateTime.setMinutes(startMinutes);
-      startDateTime.setSeconds(0);
+      //startDateTime.setSeconds(0);
       //console.log("Start Date Time:", startDateTime);
       
       const endDateTime = new Date(year1, month1, day1);
@@ -280,8 +321,13 @@
       //console.log("End Date Time:", endDateTime);
       
       //console.log("Today Date:", startDateTime < new Date());
+      console.log("Start Date:", startDate, year, month, day, startTime, startHours);
 
-      if (startDateTime > new Date()) 
+      if(vacancy === 0)
+      {
+        var status = "Full";
+      }
+      else if (startDateTime > new Date()) 
       {
         var status = "Available";
       } 
@@ -290,7 +336,7 @@
       } 
       else if (endDateTime < new Date()) {
         var status ="Ended";
-      }  
+      } 
 
       return { noOfLesson, language, vacancies: vacanciesMatch, startDate, endDate, startTime, endTime, status };
     }
@@ -395,7 +441,7 @@
                   <tbody>
                     {paginatedCourses.map((course, index) => {
                       var nameDetails = this.courseNameAndDetails(course.name);
-                      var courseDetails = this.getSelectedDetails(course.short_description);
+                      var courseDetails = this.getSelectedDetails(course.short_description, course.stock_quantity);
                       var coursePrice = parseFloat(course.regular_price);
     
                       return (
