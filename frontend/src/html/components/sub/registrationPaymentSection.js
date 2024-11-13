@@ -425,7 +425,7 @@
     };
 
       // Method to get all locations
-      getAllLocations = (datas) => {
+      getAllLocations = async (datas) => {
         return [...new Set(datas.map(data => {
           //console.log(data.course)
           return data.course.courseLocation;
@@ -433,7 +433,7 @@
       }
   
       // Method to get all languages
-      getAllType = (datas) => {
+      getAllType = async (datas) => {
         return [...new Set(datas.map(data => {
           return data.course.courseType;
         }))];
