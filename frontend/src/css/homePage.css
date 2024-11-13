@@ -127,6 +127,28 @@
       height: fit-content;
   }
 
+  .data-visualization-section
+  {
+    grid-row: 1; /* Botom section */
+    z-index: 0;
+    margin-left: -2rem;
+   -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+
+  .course-vacancy-graph {
+    width: 800px; 
+    height: 500px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow */
+    border-radius: 8px;  /* Optional: add rounded corners */
+    padding: 20px;  /* Optional: add padding around the plot */
+    background-color: #fff;  /* Optional: set background color */
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+  }
+
   .create-account-section
   {
     grid-row: 1; /* Botom section */

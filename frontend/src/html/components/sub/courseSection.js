@@ -38,7 +38,7 @@
       try {
         this.setState({ loading: true });
        // var response = await axios.post(`http://localhost:3001/courses`, { "courseType": courseType });
-        var response =  await axios.post('http://localhost:3002/woocommerce/products/', { "courseType": courseType });
+        var response =  await axios.post('http://localhost:3002/products/', { "courseType": courseType });
         //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courses`, { "courseType": courseType });
         var courses = JSON.parse(response.data.product);
         console.log("Courses:", courses);

@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('woocommerce/', include('woocommerce.urls'))
+    path('', include('woocommerce.urls'))
 ]

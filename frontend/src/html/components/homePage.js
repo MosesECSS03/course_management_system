@@ -13,6 +13,7 @@
   import SideBarContent from './sub/sideBarContent';
   import { withAuth } from '../../AuthContext';
   import axios from 'axios';  
+  import Plot from 'react-plotly.js';
 
   class HomePage extends Component {
     constructor(props) {
@@ -93,7 +94,9 @@
         item: '',
         isInactive: false,
         refreshKey: 0,
-        graphHtml: ''    
+        productData: [],
+        mostStockedProduct: '',
+        leastStockedProduct: '',  
       };
   
       // Set the initial state
@@ -280,7 +283,7 @@
       window.addEventListener('click', this.resetInactivity);
       window.addEventListener('scroll', this.resetInactivity);
       window.addEventListener('beforeunload', this.handleBeforeUnload);
-      await this.fetchCourses();
+      await this.fetchDataVisualization();
     }
 
     handleBeforeUnload = (event) => {
@@ -302,6 +305,31 @@
      window.removeEventListener('beforeunload', this.handleBeforeUnload);
      localStorage.removeItem('myComponentState');
     }
+
+    toggleHomeComponent = async () => 
+    {
+        try 
+        {
+          console.log("Home Page");
+            this.setState({ resetSearch: true, }, () => {
+              this.setState({ resetSearch: false });
+            });
+  
+           
+            this.setState({
+              courseType: null,
+              sidebarVisible: false,
+              isRegistrationPaymentVisible: false ,
+              section: "",
+              accountType: null,
+              createAccount: false
+            });
+        } 
+        catch (error) 
+        {
+          console.log(error);
+        }
+    };
 
     toggleAccountsComponent = async (accountType) => 
     {
@@ -634,39 +662,22 @@
       }, 5000);
     } 
 
-    async fetchCourses() {
-      try {
-        let coursesName = [];
-        let coursesStock = [];
-    
-        // Fetching course data from the backend
-        const response = await axios.post('http://localhost:3002/woocommerce/products/', { "courseType": "None" });
-        // const response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courses`, { "courseType": courseType });
-        
-        const courses = JSON.parse(response.data.product);
-    
-        // Populate coursesName and coursesStock arrays
-        for (let i = 0; i < courses.length; i++) {
-          coursesName.push(this.courseNameAndDetails(courses[i].name).engName); // Assuming each product has a 'name' 
-          coursesStock.push(courses[i].stock_quantity);
+      // Fetch product stock data when the component is mounted
+      async fetchDataVisualization() {
+        try {
+          const response = await axios.post('http://localhost:3002/dashboard_react/');
+          const data = response.data;
+
+          // Set the state with the fetched data
+          this.setState({
+            productData: data.product_data,
+            mostStockedProduct: data.most_stocked_product,
+            leastStockedProduct: data.least_stocked_product,
+          });
+        } catch (error) {
+          console.error('Error fetching product stock data:', error);
         }
-    
-        // Sending filtered data to another endpoint for generating a graph
-        const response1 = await axios.post('http://localhost:3002/woocommerce/api/filter-data/', { 
-          "category": coursesName, 
-          "values": coursesStock 
-        });
-    
-        this.setState({ graphHtml: response1.data }, () => {
-          // After state update, render the Plotly graph
-          this.renderGraph(response1.data);
-        });
-    
-    
-      } catch (error) {
-        console.error("Error fetching courses:", error);
       }
-    }
     
 
     courseNameAndDetails(product_name) {
@@ -682,22 +693,65 @@
       }
     }
 
-    renderGraph() {
-      if (this.state.graphHtml && this.graphContainerRef.current) {
-        // Set the innerHTML of the container to the graph HTML
-        this.graphContainerRef.current.innerHTML = this.state.graphHtml;
-  
-        // Ensure Plotly.js is available, then render the graph
-        if (window.Plotly) {
-          window.Plotly.newPlot(this.graphContainerRef.current);
-        }
-      }
-    }
-
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
-      const { item,isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
+      const { item,isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount, productData, mostStockedProduct, leastStockedProduct} = this.state;
+      var productNames = productData.map((product) => product.name);
+      var stockQuantities = productData.map((product) => product.stock);
+
+      
+      var maxStock = Math.max(...stockQuantities);
+      var minStock = Math.min(...stockQuantities);
+      var mostPopularProductIndex = stockQuantities.indexOf(maxStock);
+      var leastPopularProductIndex = stockQuantities.indexOf(minStock);
+
+
+      var colors = stockQuantities.map((stock, index) => {
+        if (index === mostPopularProductIndex) {
+            return 'green'; // Most popular product color
+        } else if (index === leastPopularProductIndex) {
+            return 'red'; // Least popular product color
+        } else {
+            return 'blue'; // Default color for others
+        }
+    });
+    
+    const chartData = {
+      data: [
+        {
+          x: productNames,
+          y: stockQuantities,
+          type: 'bar',
+          name: 'Stock Level',
+          marker: { color: colors }  // Apply colors to the bars
+        }
+      ],
+      layout: {
+        title: '',
+        xaxis: { 
+          title: 'Courses', 
+          tickangle: 55,  
+          tickfont: {
+            size: 7,  // Decrease font size to fit the labels
+          },
+          tickmode: 'array',
+          tickvals: productNames  // Ensure all labels are visible
+        },
+        yaxis: { 
+          title: 'Vacancies' 
+        },
+        barmode: 'group',
+        hovermode: 'closest',
+        margin: { t: 60, b: 250, l: 60, r: 100 },  // Adjust margins to fit axis titles
+      },
+      config: {
+        displayModeBar: false,  // Hide all graph buttons
+        displaylogo: false,     // Remove the Plotly logo
+        responsive: true,       // Make the graph responsive to window size
+      }
+    };
+
       return (
         <>
           <div className="dashboard">
@@ -734,6 +788,7 @@
               >
                 <SideBarContent
                   accountId = {this.props.location.state?.accountId}
+                  toggleHomeComponent = {this.toggleHomeComponent}
                   toggleAccountsComponent = {this.toggleAccountsComponent}
                   toggleCourseComponent = {this.toggleCourseComponent}
                   toggleRegistrationPaymentComponent = {this.toggleRegistrationPaymentComponent}
@@ -741,7 +796,18 @@
                 />
               </div>
               <div className="main-content">
-              <div ref={this.graphContainerRef}></div>
+              {
+                accountType === null && courseType === null && isRegistrationPaymentVisible === false && createAccount === false &&
+                (
+                  <>
+                    <div className="data-visualization-section">
+                      <div className="course-vacancy-graph">
+                        <Plot data={chartData.data} layout={chartData.layout} config={chartData.config} style={{ width: '800px', height: '500px' }}/>
+                      </div>
+                    </div>
+                  </>
+                )
+              }
               {createAccount && (
                 <>
                    <div className="create-account-section">

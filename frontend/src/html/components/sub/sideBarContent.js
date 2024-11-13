@@ -86,6 +86,11 @@ class SideBarContent extends Component {
             openKey: prevState.openKey === mainItem ? null : mainItem, // Toggle the active main key
         }));
     }
+    
+    toggleHome = () =>
+    {
+        this.props.toggleHomeComponent();
+    }
 
     handleSubKeyClick = (subKey) => {
         // Add any additional functionality you want to execute on sub-menu item click
@@ -131,6 +136,7 @@ class SideBarContent extends Component {
 
         // Map of icons for each main item
         const iconMap = {
+            "Home": 'fa-solid fa-house-user',
             "Account": 'fa-solid fa-users',
             "Courses": "fa-solid fa-chalkboard-user",
             "Registration And Payment": 'fa-brands fa-wpforms',
@@ -140,6 +146,12 @@ class SideBarContent extends Component {
         return (
             <div className="sidebar-content"  onMouseLeave={this.closeSubMenu}>
                 <ul>
+                    <div style={{marginBottom: "-20px"}}> 
+                        <li key={"Home"} onClick={() => this.toggleHome()}>
+                            <i className={iconMap["Home"]} aria-hidden="true"></i>
+                            <span style={{marginLeft: "5px"}}>Home</span>
+                        </li>
+                    </div>
                     {Object.keys(accessRights).map((key) => {
                         const value = accessRights[key];
 
