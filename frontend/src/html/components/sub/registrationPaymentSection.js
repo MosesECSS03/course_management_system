@@ -687,7 +687,7 @@
         return 'Invalid date format'; // Handle invalid month names
       }  
       // Return the date in the dd/mm/yyyy format
-      return `${day.toString().padStart(2, '0')}/${month.NumbertoString().padStart(2, '0')}/${year.toString().padStart(4, '0')}`;
+      return `${day.toString().padStart(2, '0')}/${monthNumber.NumbertoString().padStart(2, '0')}/${year.toString().padStart(4, '0')}`;
     }
 
     exportToLOP = async (paginatedDetails) => {
