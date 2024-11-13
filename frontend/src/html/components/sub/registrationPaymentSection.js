@@ -128,7 +128,7 @@
       const data = await this.fetchCourseRegistrations(language);
       console.log('Data:', data);
       var locations = await this.getAllLocations(data);
-      var types = this.getAllType(data);
+      var types = await this.getAllType(data);
       this.props.passDataToParent(locations, types);
 
       const statuses = data.map(item => item.status); // Extract statuses
@@ -150,8 +150,7 @@
         locations: locations, // Set locations in state
         types: types
       });
-    
-        
+      this.props.closePopup();
     }
     
     
@@ -426,7 +425,7 @@
     };
 
       // Method to get all locations
-      getAllLocations = async (datas)  =>{
+      getAllLocations = async (datas) => {
         return [...new Set(datas.map(data => {
           console.log(data.course)
           //return data.course.courseLocation;
@@ -434,7 +433,7 @@
       }
   
       // Method to get all languages
-      getAllType(datas) {
+      getAllType = async (datas) => {
         return [...new Set(datas.map(data => {
           return data.course.courseType;
         }))];
