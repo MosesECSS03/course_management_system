@@ -127,9 +127,9 @@
       const { language } = this.props;
       const data = await this.fetchCourseRegistrations(language);
       console.log('Data:', data);
-      var locations = this.getAllLocations(data);
-      var types = this.getAllType(data);
-      this.props.passDataToParent(locations, types);
+      var locations = await this.getAllLocations(data);
+      var types = await this.getAllType(data);
+      await this.props.passDataToParent(locations, types);
 
       const statuses = data.map(item => item.status); // Extract statuses
       console.log('Statuses:', statuses); // Log the array of statuses
@@ -425,7 +425,7 @@
     };
 
       // Method to get all locations
-      getAllLocations = (datas) => {
+      getAllLocations = async (datas) => {
         return [...new Set(datas.map(data => {
           //console.log(data.course)
           return data.course.courseLocation;
@@ -433,7 +433,7 @@
       }
   
       // Method to get all languages
-      getAllType = (datas) => {
+      getAllType = async (datas) => {
         return [...new Set(datas.map(data => {
           return data.course.courseType;
         }))];
