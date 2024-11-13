@@ -150,7 +150,7 @@
         locations: locations, // Set locations in state
         types: types
       });
-      //this.props.closePopup();
+      this.props.closePopup();
     }
     
     
