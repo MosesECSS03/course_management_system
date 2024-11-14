@@ -54,7 +54,9 @@ class AgreementDetailsSection extends Component {
             </label>
             <br/>
           {/* Show error message if the user has interacted but not selected the option */}
-          {errors.agreement && <span className="error-message1">{errors.agreement}</span>}
+          {!selectedChoice && isSelected && (
+            <span className="error-message1">Please select the declaration</span>
+          )}
           </div>
         </div>
       </div>
