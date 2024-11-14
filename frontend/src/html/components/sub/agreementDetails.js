@@ -53,7 +53,7 @@ class AgreementDetailsSection extends Component {
               Agree 我同意
             </label>
             <br/>
-          {/* Show error message if the user has interacted but not selected the option */}
+          {console.log(!selectedChoice && isSelected)}
           {!selectedChoice && isSelected && (
             <span className="error-message1">Please select the declaration</span>
           )}
