@@ -270,6 +270,7 @@
       startDateTime.setHours(startHours);
       startDateTime.setMinutes(startMinutes);
       startDateTime.setSeconds(0);
+      console.log(startTime);
       //console.log("Start Date Time:", startDateTime);
       
       const endDateTime = new Date(year1, month1, day1);
