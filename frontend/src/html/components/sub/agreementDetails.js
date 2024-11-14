@@ -26,7 +26,7 @@ class AgreementDetailsSection extends Component {
 
   render() {
     const { selectedChoice, isSelected } = this.state;
-    const { agreement } = this.props;
+    const { agreement, errors } = this.props;
 
     return (
       <div className="agreement-details-section">
@@ -53,9 +53,7 @@ class AgreementDetailsSection extends Component {
               Agree 我同意
             </label>
           {/* Show error message if the user has interacted but not selected the option */}
-          {isSelected && !selectedChoice && (
-            <span className="error-message1">Please select an option.</span>
-          )}
+          {errors.agreement && <span className="error-message1">{errors.agreement}</span>}
           </div>
         </div>
       </div>

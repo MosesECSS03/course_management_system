@@ -238,6 +238,11 @@ class FormPage extends Component {
         errors.wORKING = 'Work Status is required.';
       }
     }
+    else if (currentSection === 3) {
+      if (!formData.agreement) {
+        errors.agreement = 'Please choose the declaration';
+      }
+    }
 
     return errors;
   };
@@ -272,7 +277,7 @@ class FormPage extends Component {
                 onChange={this.handleDataChange}
               />
             }
-            {currentSection === 3 && <AgreementDetailsSection ref={(ref) => this.agreementDetailsRef = ref} agreement={formData.agreement} onChange={this.handleDataChange} />}
+            {currentSection === 3 && <AgreementDetailsSection ref={(ref) => this.agreementDetailsRef = ref} agreement={formData.agreement} onChange={this.handleDataChange} errors={validationErrors}/>}
             {currentSection === 4 && <SubmitDetailsSection />}
           </div>
   
