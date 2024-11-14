@@ -98,14 +98,6 @@ class FormPage extends Component {
       errors.selectedPayment = 'Please select a payment option.';
       this.courseDetailsRef.setState({ paymentTouched: true });
     }
-
-    if (currentSection === 3 && !this.agreementDetailsRef.state.selectedChoice) {
-      errors.selectedPayment = 'Please agree to move on for submitting this form.';
-      this.agreementDetailsRef.setState({ isSelcted: true });
-    }
-    if (currentSection === 3) {
-      this.handleSubmit(); 
-    }
     
     if (Object.keys(errors).length === 0) {
       if (this.state.currentSection < 4) {

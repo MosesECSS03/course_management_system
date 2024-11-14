@@ -52,6 +52,7 @@ class AgreementDetailsSection extends Component {
               />
               Agree 我同意
             </label>
+            <br/>
           {/* Show error message if the user has interacted but not selected the option */}
           {errors.agreement && <span className="error-message1">{errors.agreement}</span>}
           </div>
