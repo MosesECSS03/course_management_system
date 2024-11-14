@@ -218,7 +218,7 @@
 
     convertTo24HourWithHrs(time12) {
       const [time, modifier] = time12.split(/(am|pm)/i); // Split by 'am' or 'pm'
-      let [hours, minutes] = time.split(":").map(Number);
+      let [hours, minutes] = time.split(/[:.]/).map(Number);
       if (modifier.toLowerCase() === "pm" && hours < 12) {
         hours += 12; // Convert PM hours
       } else if (modifier.toLowerCase() === "am" && hours === 12) {
@@ -265,7 +265,6 @@
           [startTime, endTime] = timing.split("–").map(t => t.trim());
         }
       }
-      console.log(startTime);
       const startDateTime = new Date(year, month, day);
       const { hours: startHours, minutes: startMinutes } = this.convertTo24HourWithHrs(startTime);
       startDateTime.setHours(startHours);
