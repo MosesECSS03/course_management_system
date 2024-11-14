@@ -98,7 +98,13 @@ class FormPage extends Component {
       errors.selectedPayment = 'Please select a payment option.';
       this.courseDetailsRef.setState({ paymentTouched: true });
     }
-    
+
+    if (currentSection === 3 && !this.courseDetailsRef.state.selectedChoice) {
+      errors.agreement = 'Please choose the declaration';
+      this.courseDetailsRef.setState({ isSelected: true });
+    }
+
+
     if (Object.keys(errors).length === 0) {
       if (this.state.currentSection < 4) {
         this.setState({ currentSection: this.state.currentSection + 1 }, () => {
@@ -228,11 +234,6 @@ class FormPage extends Component {
       }
       if (!formData.wORKING) {
         errors.wORKING = 'Work Status is required.';
-      }
-    }
-    else if (currentSection === 3) {
-      if (!formData.agreement) {
-        errors.agreement = 'Please choose the declaration';
       }
     }
 
