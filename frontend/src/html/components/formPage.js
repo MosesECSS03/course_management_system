@@ -100,7 +100,7 @@ class FormPage extends Component {
     }
 
     if (currentSection === 3 && !this.agreementDetailsRef.state.selectedChoice) {
-      errors.agreement = 'Please choose the declaration';
+      errors.agreement = 'Please choose the declaration.';
       this.agreementDetailsRef.setState({ isSelected: true });
     }
 
@@ -197,45 +197,45 @@ class FormPage extends Component {
     const { currentSection, formData } = this.state;
     const errors = {};
 
-    // Validate fields for PersonalInfo section
     if (currentSection === 1) {
       if (!formData.pName) {
-        errors.pName = 'Name is required.';
+        errors.pName = 'Name is required. 姓名是必填项。';
       }
       if (!formData.location) {
-        errors.location = 'Location is required.';
+        errors.location = 'Location is required. 地点是必填项。';
       }
       if (!formData.nRIC) {
-        errors.nRIC = 'NRIC Number is required.';
+        errors.nRIC = 'NRIC Number is required. 身份证号码是必填项。';
       }
       if (!formData.rESIDENTIALSTATUS) {
-        errors.rESIDENTIALSTATUS = 'Residential Status is required.';
+        errors.rESIDENTIALSTATUS = 'Residential Status is required. 居民身份是必填项。';
       }
       if (!formData.rACE) {
-        errors.rACE = 'Race is required.';
+        errors.rACE = 'Race is required. 种族是必填项。';
       }
       if (!formData.gENDER) {
-        errors.gENDER = 'Gender is required.';
+        errors.gENDER = 'Gender is required. 性别是必填项。';
       }
       if (!formData.dOB) {
-        errors.dOB = 'Date of Birth is required.';
+        errors.dOB = 'Date of Birth is required. 出生日期是必填项。';
       }
       if (!formData.cNO) {
-        errors.cNO = 'Contact No. is required.';
+        errors.cNO = 'Contact No. is required. 联系号码是必填项。';
       }
       if (!formData.eMAIL) {
-        errors.eMAIL = 'Email is required.';
+        errors.eMAIL = 'Email is required. 电子邮件是必填项。';
       }
       if (!formData.postalCode) {
-        errors.postalCode = 'Postal Code is required.';
+        errors.postalCode = 'Postal Code is required. 邮政编码是必填项。';
       }
       if (!formData.eDUCATION) {
-        errors.eDUCATION = 'Education Level is required.';
+        errors.eDUCATION = 'Education Level is required. 教育水平是必填项。';
       }
       if (!formData.wORKING) {
-        errors.wORKING = 'Work Status is required.';
+        errors.wORKING = 'Work Status is required. 工作状态是必填项。';
       }
     }
+    
 
     return errors;
   };
@@ -277,9 +277,9 @@ class FormPage extends Component {
           {/* Conditionally render the button container */}
           {currentSection < 4 && (
             <div className="button-container">
-              <button onClick={this.handleBack} disabled={currentSection === 0}>Back</button>
+              <button onClick={this.handleBack} disabled={currentSection === 0}>Back 返回</button>
               <button onClick={this.handleNext}>
-                {currentSection === 4 ? 'Submit' : 'Next'} 
+                {currentSection === 4 ? 'Submit 提交' : 'Next 下一步'}
               </button>
             </div>
           )}

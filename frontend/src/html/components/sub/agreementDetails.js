@@ -57,7 +57,10 @@ class AgreementDetailsSection extends Component {
           </div>
           <br/>
           {!selectedChoice && isSelected && (
-            <span className="error-message1">Please select the declaration</span>
+            <>
+              <span className="error-message1">Please select the declaration</span>
+              <span className="error-message1">请选择声明</span>
+            </>
           )}
         </div>
       </div>
