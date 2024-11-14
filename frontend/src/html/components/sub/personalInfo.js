@@ -44,7 +44,7 @@ class PersonalInfo extends Component {
       { name: 'gENDER', placeholder: 'Gender 性别', isSelect: true, isRadio: true },
       { name: 'dOB', placeholder: 'Date of Birth 出生日期', isSelect: true, isDate: true },
       { name: 'cNO', placeholder: 'Contact No. 联络号码', isSelect: false },
-      { name: 'eMAIL', placeholder: 'Email 电子邮件', isSelect: false },
+      { name: 'eMAIL', placeholder: 'Email 电子邮件 Enter "N/A" if no email', isSelect: false },
       { name: 'postalCode', placeholder: 'Postal Code 邮区', isSelect: false },
       { name: 'eDUCATION', placeholder: 'Education Level 最高教育水平', isSelect: true, isRadio: true },
       { name: 'wORKING', placeholder: 'Work Status 工作状态', isSelect: true, isRadio: true }
@@ -87,16 +87,19 @@ class PersonalInfo extends Component {
             <label htmlFor={section.name}>{section.placeholder}</label>
             {section.isSelect ? (
               section.isDate ? (
-                <DatePicker
-                  selected={data.dOB ? new Date(data.dOB.formattedDate.split('/').reverse().join('-')) : null}
-                  onChange={this.handleDateChange}
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  customInput={<CustomInput />}
-                  placeholderText="DD/MM/YYYY"
-                />
+                <>
+                  <DatePicker
+                    selected={data.dOB ? new Date(data.dOB.formattedDate.split('/').reverse().join('-')) : null}
+                    onChange={this.handleDateChange}
+                    dateFormat="dd/MM/yyyy"
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    customInput={<CustomInput />}
+                    placeholderText="DD/MM/YYYY"
+                  />
+                  <br/>
+                </>
               ) : (
                 section.isRadio && (
                   <div className="radio-group1">
