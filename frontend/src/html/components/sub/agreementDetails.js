@@ -20,6 +20,7 @@ class AgreementDetailsSection extends Component {
 
     // Pass the selected payment option back to the parent
     this.props.onChange({
+      ...this.props.formData,
       agreement: selectedChoice 
     });
   };

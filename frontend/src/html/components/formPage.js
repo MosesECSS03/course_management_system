@@ -101,7 +101,7 @@ class FormPage extends Component {
 
     if (currentSection === 3 && !this.agreementDetailsRef.state.selectedChoice) {
       errors.agreement = 'Please choose the declaration';
-      this.courseDetailsRef.setState({ isSelected: true });
+      this.agreementDetailsRef.setState({ isSelected: true });
     }
 
 
