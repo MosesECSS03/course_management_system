@@ -265,12 +265,12 @@
           [startTime, endTime] = timing.split("–").map(t => t.trim());
         }
       }
+      console.log(startTime);
       const startDateTime = new Date(year, month, day);
       const { hours: startHours, minutes: startMinutes } = this.convertTo24HourWithHrs(startTime);
       startDateTime.setHours(startHours);
       startDateTime.setMinutes(startMinutes);
       startDateTime.setSeconds(0);
-      console.log(startTime);
       //console.log("Start Date Time:", startDateTime);
       
       const endDateTime = new Date(year1, month1, day1);
