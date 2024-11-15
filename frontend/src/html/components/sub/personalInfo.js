@@ -130,7 +130,7 @@ class PersonalInfo extends Component {
                 className="personal-info-input1"
               />
             )}
-            {errors[section.name] && <span className="error-message1">{errors[section.name]}</span>}
+            {errors[section.name] && <span className="error-message3">{errors[section.name]}</span>}
           </div>
         ))}
       </div>

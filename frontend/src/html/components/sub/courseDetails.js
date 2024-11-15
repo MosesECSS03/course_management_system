@@ -110,8 +110,8 @@ class CourseDetailsSection extends Component {
           </div>
           {!selectedPayment && paymentTouched && (
             <>
-              <span className="error-message1">Please select a payment option.</span>
-              <span className="error-message1">请选择付款方式。</span>
+              <span className="error-message3">Please select a payment option.</span>
+              <span className="error-message3">请选择付款方式。</span>
             </>
           )}
         </div>
