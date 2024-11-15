@@ -355,7 +355,7 @@ class DatabaseConnectivity {
         }
     }
 
-    async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+    /*async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
         const db = this.client.db(databaseName);
         const collection = db.collection(collectionName);
     
@@ -364,11 +364,11 @@ class DatabaseConnectivity {
             receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with courseLocation -
         }).toArray();
     
-        console.log("Current receipts:", existingReceipts);
+        console.log("Current:", existingReceipts);
     
-        // If there are no receipts for the specific courseLocation, start numbering from 1
+        // If there are no receipts for the specific courseLocation, return '001'
         if (existingReceipts.length === 0) {
-            return `${courseLocation} - 1`; // No existing receipts, start at '1'
+            return `${courseLocation} - 001`; // No existing receipts, start at '001'
         }
     
         // Extract the numeric part and find the latest number for the specific courseLocation
@@ -380,13 +380,68 @@ class DatabaseConnectivity {
         // Find the latest (maximum) existing number
         const latestNumber = Math.max(...receiptNumbers);
     
-        // Determine the next number without formatting constraints
+        // Determine the next number
         const nextNumber = latestNumber + 1;
     
+        // Calculate the length dynamically based on the maximum length of existing numbers
+        const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3); // Ensure at least 3 digits
+    
+        // Return the next receipt number with dynamic length
+        return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
+    }*/
+   async getNextReceiptNumber(databaseName, collectionName, courseLocation) 
+    {
+        const db = this.client.db(databaseName);
+        const collection = db.collection(collectionName);
+
+        // Retrieve all receipts matching the specified courseLocation
+        const existingReceipts = await collection.find({
+            receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with courseLocation -
+        }).toArray();
+
+        console.log("Current receipts:", existingReceipts);
+
+        // If there are no receipts for the specific courseLocation, start numbering from 1
+        if (existingReceipts.length === 0) {
+            return `${courseLocation} - 1`; // No existing receipts, start at '1'
+        }
+
+        // Extract the numeric part and find the latest number for the specific courseLocation
+        const receiptNumbers = existingReceipts.map(receipt => {
+            const numberPart = receipt.receiptNo.substring(courseLocation.length + 3); // Extract the numeric part
+            return parseInt(numberPart, 10); // Convert to integer
+        }).filter(num => !isNaN(num)); // Filter out NaN values in case of invalid formats
+
+        // Find the latest (maximum) existing number
+        const latestNumber = Math.max(...receiptNumbers);
+
+        // Determine the next number without formatting constraints
+        const nextNumber = latestNumber + 1;
+
         // Return the next receipt number without padding
         return `${courseLocation} - ${nextNumber}`;
     }
     
+    async deleteAccount(databaseName, collectionName, id) {
+        const db = this.client.db(databaseName);
+        const table = db.collection(collectionName);
+    
+        try {
+            const filter = { _id: new ObjectId(id) }; // Find document by ID
+            const result = await table.deleteOne(filter);
+    
+            if (result.deletedCount === 1) {
+                console.log("Successfully deleted the document.");
+                return { success: true, message: "Document deleted successfully." };
+            } else {
+                console.log("No document found with that ID.");
+                return { success: false, message: "No document found with that ID." };
+            }
+        } catch (error) {
+            console.log("Error deleting document:", error);
+            return { success: false, error };
+        }
+    }
 
     async deleteAccessRights(databaseName, collectionName, id) {
         const db = this.client.db(databaseName);
