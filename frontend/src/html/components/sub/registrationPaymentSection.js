@@ -34,14 +34,17 @@
 
     handleClick1 = (id) => {
       console.log("Textbox Toggle:", id);
-      this.setState((prevState) => {
+      /*this.setState((prevState) => {
         const updatedDisabledState = !prevState.isDisabled;
         return { isDisabled: updatedDisabledState };
       }, () => {
         if (this.state.isDisabled) {
           this.sendData(id, this.state.remarks); // Send data for the specific row
         }
-      });
+      });*/
+      this.setState((prevState) => ({
+        isDisabled: !prevState.isDisabled, // Toggle for each row or globally
+      }));
     };
 
       sendData = (id, value) => {
