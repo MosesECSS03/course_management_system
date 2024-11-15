@@ -363,21 +363,21 @@ class DatabaseConnectivity {
     
         // Retrieve all receipts matching the specified courseLocation
         const existingReceipts = await collection.find({
-            receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with courseLocation -
+            receiptNo: { $regex: `^${courseLocation} - \\d+$` } // Match receipt numbers with courseLocation and numeric part
         }).toArray();
     
-        console.log("Current:", existingReceipts);
+        console.log("Current receipts:", existingReceipts);
     
-        // If there are no receipts for the specific courseLocation, return '001'
+        // If there are no receipts for the specific courseLocation, return '1' as the starting number
         if (existingReceipts.length === 0) {
-            return `${courseLocation} - 00000001`; // No existing receipts, start at '001'
+            return `${courseLocation} - 1`; // Start from '1' for new courseLocation
         }
     
-        // Extract the numeric part and find the latest number for the specific courseLocation
+        // Extract the numeric part of receipt numbers
         const receiptNumbers = existingReceipts.map(receipt => {
-            const numberPart = receipt.receiptNo.substring(courseLocation.length + 3); // Extract the numeric part
-            return parseInt(numberPart, 10); // Convert to integer
-        }).filter(num => !isNaN(num)); // Filter out NaN values in case of invalid formats
+            const match = receipt.receiptNo.match(new RegExp(`^${courseLocation} - (\\d+)$`));
+            return match ? parseInt(match[1], 10) : null; // Extract and parse numeric part
+        }).filter(num => num !== null); // Remove invalid entries
     
         // Find the latest (maximum) existing number
         const latestNumber = Math.max(...receiptNumbers);
@@ -385,12 +385,13 @@ class DatabaseConnectivity {
         // Determine the next number
         const nextNumber = latestNumber + 1;
     
-        // Calculate the length dynamically based on the maximum length of existing numbers
-        const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3); // Ensure at least 3 digits
+        // Calculate the length dynamically based on the maximum numeric length in existing receipts
+        const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), String(nextNumber).length);
     
-        // Return the next receipt number with dynamic length
+        // Format the next number with leading zeros to match the dynamic length
         return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
     }
+    
         /*async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
             try {
                 const db = this.client.db(databaseName);
