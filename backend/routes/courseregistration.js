@@ -80,9 +80,8 @@ router.post('/', async function(req, res, next)
         var controller = new RegistrationController();
         var result = await controller.updateReceiptNumber(req.body.rowData[0]._id, req.body.receiptNo);
         console.log("updateReceiptNumber:", result); 
-        return res.json({"result": result}); 
-        //var pdf = new PdfGenerator();
-        //await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
+        var pdf = new PdfGenerator();
+        await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
     }
 });
 

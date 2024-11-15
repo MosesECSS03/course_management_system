@@ -482,7 +482,7 @@
                         }, { responseType: 'blob' });*/
     
                         // Extract filename from Content-Disposition header
-                       /* const contentDisposition = pdfResponse.headers['content-disposition'];
+                       const contentDisposition = pdfResponse.headers['content-disposition'];
                         const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
                         let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
     
@@ -503,7 +503,7 @@
                           registration_id: registration_id,
                           url: url,
                           staff: this.props.userName
-                      });*/
+                      });
                      /* const receiptCreationResponse = await axios.post('http://localhost:3001/receipt', {
                             purpose: 'createReceipt',
                             receiptNo: receiptNo,
@@ -512,7 +512,7 @@
                             staff: this.props.userName
                         });*/
     
-                       // console.log("Receipt Created:", receiptCreationResponse.data);
+                       console.log("Receipt Created:", receiptCreationResponse.data);
                         this.props.closePopup();
                     } else {
                         console.error("Failed to generate receipt number.");
