@@ -38,6 +38,7 @@
   
     // Handle the submit action for a specific row
     handleSubmit = async (id, index) => {
+      this.props.updateRemarksPopup();
       const remark = this.state.remarks[index];
       // Perform the submit action here, e.g., API call
       //console.log(`Submitting remark for item with id ${id}:`, remark);
@@ -46,8 +47,12 @@
         'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
         { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
       );
-      console.log(response);
-      this.props.refreshChild();
+      console.log("handleSubmit:", response.data);
+      if(response.data.result === true)
+      {
+        this.props.closePopup();
+        this.props.refreshChild();
+      }
     }
     
 

@@ -384,6 +384,15 @@
       });
     };
 
+      
+    updateRemarksPopup = () => {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Update Remarks...",
+        popupType: "loading"
+      });
+    };
+
     updatePaymentPopup = () => {
       this.setState({
         isPopupOpen: true,
@@ -817,6 +826,7 @@
                         refreshChild={this.refreshChild}
                         generateReceiptPopup = {this.generateReceiptPopup}
                         updatePaymentPopup = {this.updatePaymentPopup}
+                        updateRemarksPopup = {this.updateRemarksPopup}
                     />
                     </div>
                     <div className="pagination-section">
