@@ -52,8 +52,8 @@ class PersonalInfo extends Component {
     
 
     // Define additional options for radio buttons
-    const residentalStatusOptions = ['SC 新加坡公民', 'PR'];
-    const genderOptions = ['M', 'F'];
+    const residentalStatusOptions = ['SC 新加坡公民', 'PR 永久居民'];
+    const genderOptions = ['M 男', 'F 女'];
     const educationOptions = [
       'Primary 小学',
       'Secondary 中学',
