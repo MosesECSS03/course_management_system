@@ -28,21 +28,22 @@
     }
 
      // Method to handle click event and toggle the disabled state
-      handleClick1 = () => {
-        this.setState(prevState => {
-          const newDisabledState = !prevState.isDisabled; // Toggle the disabled state
-          if (newDisabledState) {
-            // If re-disabled, you can send the data here
-           // this.sendData(id, prevState.remarks); // Send the value when it is disabled again
-          }
-          return { isDisabled: newDisabledState }; // Update the state with the new disabled state
-        });
-      };
+     handleInputChange = (e, id) => {
+      const updatedInputValues = { ...this.state.inputValues }; // Copy current state
+      updatedInputValues[id] = e.target.value; // Update value for the specific _id
+      this.setState({ inputValues: updatedInputValues });
+    };
 
-      // Method to handle changes in the textbox
-      handleInputChange = (event) => {
-        this.setState({ remarks: event.target.value }); // Update the remarks value as user types
-      };
+    handleClick1 = (id) => {
+      this.setState((prevState) => {
+        const updatedDisabledState = !prevState.isDisabled;
+        return { isDisabled: updatedDisabledState };
+      }, () => {
+        if (this.state.isDisabled) {
+          this.sendData(this.state.inputValues[id]); // Send data for the specific row
+        }
+      });
+    };
 
       sendData = (id, value) => {
         console.log("Sending data:", id, value); // Log or send the data wherever necessary (e.g., API or parent component)
@@ -830,7 +831,7 @@
                 </thead>
                 <tbody>
                   {paginatedDetails.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={index, }>
                       <td>{item.participant.name}</td>
                       <td>{item.participant.nric}</td>
                       <td>{item.participant.residentialStatus}</td>
@@ -888,18 +889,18 @@
                       <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
                         <input
                           type="text"
-                          value={remarks}
+                          value={this.state.inputValues[item._id]} // Specific value for each row based on _id
                           maxLength={1000} // Limit to 1000 characters
-                          disabled={isDisabled} // Conditionally disable/enable based on state
-                          onClick={() => this.handleClick1()} // Trigger function to toggle disabled state
-                          onChange={this.handleInputChange} // Handle user input changes
+                          disabled={this.state.isDisabled} // Conditionally disable/enable based on state
+                          onClick={() => this.handleClick1(item._id)} // Toggle disabled state for specific row based on _id
+                          onChange={(e) => this.handleInputChange(e, item._id)} // Handle user input changes for specific row based on _id
                           style={{
                             width: '100%', // Make the textbox fill the parent container
                             padding: '0.5rem', // Optional padding for visual appearance
                             border: '1px solid #ccc', // Optional border styling
-                            backgroundColor: isDisabled ? '#f0f0f0' : '#fff', // Background color based on disabled state
+                            backgroundColor: this.state.isDisabled ? '#f0f0f0' : '#fff', // Change background when disabled
                             boxSizing: 'border-box', // Ensures padding is included in the width calculation
-                            whiteSpace: 'nowrap', // Prevent text wrapping inside the input (if needed)
+                            whiteSpace: 'nowrap', // Prevent text wrapping inside the input
                           }}
                         />
                       </td>
