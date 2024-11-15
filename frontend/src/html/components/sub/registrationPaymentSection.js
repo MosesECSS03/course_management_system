@@ -907,7 +907,7 @@
                             padding: '0.5rem',
                             color: '#fff',
                             border: 'none',
-                            marginBottom: '0.5em';
+                            marginBottom: '0.5em'
                           }}
                         >
                           Submit
