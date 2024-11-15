@@ -453,12 +453,10 @@
                 rowDataArray[i].status === "Paid" && 
                 rowDataArray[i].official.name !== null
             ) {
-                console.log("Generating Receipt for:", rowDataArray[i]._id);
-                console.log("Payment Method:", rowDataArray[i].course.payment);
-            }
-          }
-               /* const registration_id = rowDataArray[i]._id;
                 try {
+                    console.log("Generating Receipt for:", rowDataArray[i]._id);
+                    console.log("Payment Method:", rowDataArray[i].course.payment);
+                    const registration_id = rowDataArray[i]._id;
                     if (rowDataArray[i].course.payment !== "SkillsFuture") {
                         // First, get the receipt number
                         const response = await axios.post(
@@ -577,7 +575,7 @@
                     console.error('Error during receipt generation process:', error);
                 }
             }
-        }*/
+        }
     };
     
     async saveData(paginatedDetails) {
