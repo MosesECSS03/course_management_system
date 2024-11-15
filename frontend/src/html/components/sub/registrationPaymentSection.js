@@ -28,12 +28,12 @@
     }
 
      // Method to handle click event and toggle the disabled state
-      handleClick = () => {
+      handleClick1 = (id) => {
         this.setState(prevState => {
           const newDisabledState = !prevState.isDisabled; // Toggle the disabled state
           if (newDisabledState) {
             // If re-disabled, you can send the data here
-            this.sendData(prevState.remarks); // Send the value when it is disabled again
+            this.sendData(id, prevState.remarks); // Send the value when it is disabled again
           }
           return { isDisabled: newDisabledState }; // Update the state with the new disabled state
         });
@@ -44,8 +44,8 @@
         this.setState({ remarks: event.target.value }); // Update the remarks value as user types
       };
 
-      sendData = (value) => {
-        console.log("Sending data:", value); // Log or send the data wherever necessary (e.g., API or parent component)
+      sendData = (id, value) => {
+        console.log("Sending data:", id, value); // Log or send the data wherever necessary (e.g., API or parent component)
         // Example of sending data via API:
         // axios.post('/your-api-endpoint', { remarks: value });
       };
@@ -862,7 +862,7 @@
               <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
             </div>
             <div className="table-wrapper" ref={this.tableRef}>
-            <table style={{borderCollapse: 'collapse',tableLayout: 'fixed', width: '100%'}}>
+            <table style={{borderCollapse: 'collapse',tableLayout: 'fixed', width: '350%'}}>
                 <thead>
                   <tr>
                     <th colSpan="11">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
@@ -960,7 +960,7 @@
                           value={remarks}
                           maxLength={1000} // Limit to 1000 characters
                           disabled={isDisabled} // Conditionally disable/enable based on state
-                          onClick={this.handleClick} // Trigger function to toggle disabled state
+                          onClick={() => this.handleClick1(item._id)} // Trigger function to toggle disabled state
                           onChange={this.handleInputChange} // Handle user input changes
                           style={{
                             width: '100%', // Make the textbox fill the parent container
