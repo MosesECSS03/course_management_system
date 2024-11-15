@@ -36,7 +36,9 @@ router.post('/', async function(req, res, next)
         participantsParticulars.official = {
             name: "", // You can set a default or dynamic value
             date: "", // You can set this to the current date using new Date() or any format
-            time: ""  // Set the current time or any specific time value
+            time: "",  // Set the current time or any specific time value
+            receiptNo: "",
+            remarks: ""
           };
         var result = await controller.newParticipant(participantsParticulars);
         return res.json({"result": result});
