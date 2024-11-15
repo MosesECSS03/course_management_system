@@ -62,7 +62,7 @@ router.post('/', async function(req, res, next)
     else if(req.body.purpose === "updatePayment")
     {
         console.log("Official Use");
-        var id = req.body.registration_id;
+        var id = req.body.registration_id;  
         var name = req.body.staff;
         var status = req.body.status;
         const currentDateTime = getCurrentDateTime();
@@ -78,7 +78,7 @@ router.post('/', async function(req, res, next)
     {
         console.log("Receipt body:", req.body); 
         var controller = new RegistrationController();
-        var result = await controller.updateReceiptNumber(req.body.rowData._id, req.body.receiptNo);
+        var result = await controller.updateReceiptNumber(req.body.rowData[0]._id, req.body.receiptNo);
         console.log("updateReceiptNumber:", result); 
         return res.json({"result": result}); 
         //var pdf = new PdfGenerator();
