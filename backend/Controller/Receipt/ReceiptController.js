@@ -20,6 +20,7 @@ class ReceiptController {
                 const latestReceiptNumber = await this.databaseConnectivity.getNextReceiptNumber(databaseName, collectionName, courseLocation);
 
                 // Parse and increment the numeric part of the receipt number
+                let nextNumber = 1;
                 if (latestReceiptNumber) {
                     const parts = latestReceiptNumber.split(" - ");
                     nextNumber = parseInt(parts[1], 10);
