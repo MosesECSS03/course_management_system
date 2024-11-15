@@ -897,7 +897,20 @@
                       <td>{item.official?.date}</td>                      
                       <td>{item.official?.time}</td>
                       <td>{item.official?.receiptNo}</td>                      
-                      <td>{item.official?.remarks}</td>
+                      <td>
+                        <input
+                          type="text"
+                          value={item.official?.remarks || ''}
+                          maxLength={1000} // Limit to 1000 characters
+                          disabled
+                          style={{
+                            width: '100%', // Make the textbox fill its container
+                            padding: '0.5rem', // Optional padding for better visual appearance
+                            border: '1px solid #ccc', // Optional border styling
+                            backgroundColor: '#f0f0f0', // Make it visually different to indicate it is disabled
+                          }}
+                        />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
