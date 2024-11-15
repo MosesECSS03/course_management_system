@@ -128,13 +128,15 @@ class PdfGenerator {
         // Move down for spacing after the title
         doc.moveDown(2); // Adjust the space after the title
 
+        var receiptText = "";
+
         if(receiptNo.split("-")[0].trim() !== "SFC")
         {
-            const receiptText = `Receipt No   : ${receiptNo}`;
+            receiptText = `Receipt No   : ${receiptNo}`;
         }
         else
         {
-            const receiptText = `Invoice No   : ${receiptNo}`;
+            receiptText = `Invoice No   : ${receiptNo}`;
         }
 
         // Store the current y position
