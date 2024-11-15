@@ -399,7 +399,7 @@ class DatabaseConnectivity {
             receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with courseLocation -
         }).toArray();
 
-        console.log("Current receipts:", existingReceipts);
+        console.log("Current receipts1:", existingReceipts);
 
         // If there are no receipts for the specific courseLocation, start numbering from 1
         if (existingReceipts.length === 0) {
@@ -421,7 +421,7 @@ class DatabaseConnectivity {
         // Return the next receipt number without padding
         return `${courseLocation} - ${nextNumber}`;
     }
-    
+
     async deleteAccount(databaseName, collectionName, id) {
         const db = this.client.db(databaseName);
         const table = db.collection(collectionName);
