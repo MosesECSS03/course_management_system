@@ -887,28 +887,26 @@
                       <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
                       <input
                           type="text"
-                          value={this.state.remarks[item._id] || ''}
+                          value={this.state.remarks[index] || ''}
                           maxLength={1000}
                           onChange={(e) => this.handleInputChange1(e, item._id)}
                           style={{
                             width: '100%',
                             padding: '0.5rem',
                             border: '1px solid #ccc',
-                            backgroundColor: this.state.disabledRows[item._id] ? '#f0f0f0' : '#fff',
+                            backgroundColor: this.state.disabledRows[index] ? '#f0f0f0' : '#fff',
                             boxSizing: 'border-box',
                             whiteSpace: 'nowrap',
                           }}
                         />
                         <button
                           onClick={() => this.handleSubmit(item._id)}
-                          disabled={this.state.disabledRows[item._id]} // Disable button if row is disabled
+                          disabled={this.state.disabledRows[index]} // Disable button if row is disabled
                           style={{
                             marginTop: '0.5rem',
                             padding: '0.5rem',
-                            backgroundColor: this.state.disabledRows[item._id] ? '#ccc' : '#4CAF50',
                             color: '#fff',
-                            border: 'none',
-                            cursor: this.state.disabledRows[item._id] ? 'not-allowed' : 'pointer',
+                            border: 'none'
                           }}
                         >
                           Submit
