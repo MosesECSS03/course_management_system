@@ -18,7 +18,7 @@ function getCurrentDateTime() {
 
     // Format date and time
     const formattedDate = `${day}/${month}/${year}`;
-    const formattedTime = `${hours}:${minute    s}:${seconds}`;
+    const formattedTime = `${hours}:${minutes}:${seconds}`;
 
     return {
         date: formattedDate,
@@ -79,8 +79,8 @@ router.post('/', async function(req, res, next)
         console.log(req.body); 
         var controller = new RegistrationController();
         var result = await controller.updateReceiptNumber(id, req.body.receiptNo);
-        var pdf = new PdfGenerator();
-        await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
+        //var pdf = new PdfGenerator();
+        //await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
     }
 });
 
