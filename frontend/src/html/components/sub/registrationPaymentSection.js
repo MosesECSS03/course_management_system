@@ -756,21 +756,21 @@
           const educationParts = detail.participant.educationLevel.split(" ");
           if(educationParts.length === 3)
           {
-            sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0, 2).join(" ");
+            sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0] +" "+educationParts[1];
           }
-          else
+          else if(educationParts.length === 2)
           {
-            sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0).join(" ");
+            sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0];
           }
   
           const workParts = detail.participant.workStatus.split(" ");
           if(workParts.length === 3)
           {
-            sourceSheet.getCell(`M${rowIndex}`).value = workParts.slice(0, 2).join(" ");
+            sourceSheet.getCell(`N${rowIndex}`).value = workParts[0] +" "+workParts[1];
           }
-          else
+          else if(workParts.length === 2)
           {
-            sourceSheet.getCell(`M${rowIndex}`).value = workParts.slice(0).join(" ");
+            sourceSheet.getCell(`N${rowIndex}`).value = workParts[0];
           }
   
           sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
