@@ -845,8 +845,7 @@
   };
   
     render() {
-      const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
-      const { isDisabled } = this.state;
+      const { isDisabled, remarks, hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
         <>
