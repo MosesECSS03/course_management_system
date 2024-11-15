@@ -516,7 +516,7 @@
                         const response = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/receipt',
                             {
-                                purpose: 'getReceiptNo',
+                                purpose: 'receipt',
                                 courseLocation: 'SFC'
                             }
                         );
