@@ -33,6 +33,7 @@
     };
 
     handleClick1 = (id) => {
+      console.log("Textbox Toggle:", id);
       this.setState((prevState) => {
         const updatedDisabledState = !prevState.isDisabled;
         return { isDisabled: updatedDisabledState };
