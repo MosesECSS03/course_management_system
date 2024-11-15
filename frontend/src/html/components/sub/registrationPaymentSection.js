@@ -511,7 +511,10 @@
                             );
                             console.log("Receipt Created:", receiptCreationResponse.data);
                         }
-                    } else {
+                    } 
+                    else 
+                    {
+                      console.log("SFC Payment");
                         // Non-SkillsFuture receipt number
                         const response = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/receipt',
