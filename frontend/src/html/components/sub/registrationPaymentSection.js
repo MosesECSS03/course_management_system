@@ -40,8 +40,7 @@
       const remark = this.state.remarks[id];
       // Add the submit logic here, e.g., API call or form submission
       console.log(`Submitting remark for row ${id}:`, remark);
-      sendData(id, remarks);
-     
+      this.sendData(id, remark);
     };
 
       sendData = (id, value) => {
