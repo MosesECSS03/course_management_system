@@ -111,7 +111,7 @@ class FormPage extends Component {
           window.scrollTo(0, 0);
         });
       } 
-      if (this.state.currentSection === 4) {
+      if (this.state.currentSection === 3) {
         // Call handleSubmit if on the last section
         this.handleSubmit();
       } 
