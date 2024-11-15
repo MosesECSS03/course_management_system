@@ -287,6 +287,7 @@ class DatabaseConnectivity {
     }
 
     async updateReceiptNumberData(dbname, id, receiptNumber) {
+        console.log("Parameters:", dbname, id, receiptNumber);
         var db = this.client.db(dbname); // return the db object
         try {
             if (db) {
