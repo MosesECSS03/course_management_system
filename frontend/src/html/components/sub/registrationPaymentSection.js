@@ -457,18 +457,27 @@
                     console.log("Generating Receipt for:", rowDataArray[i]._id);
                     console.log("Payment Method:", rowDataArray[i].course.payment);
                     const registration_id = rowDataArray[i]._id;
-                    if (rowDataArray[i].course.payment !== "SkillsFuture") {
-                        // First, get the receipt number
-                        const response = await axios.post(
-                            'https://moses-ecss-backend.azurewebsites.net/receipt',
-                            {
-                                purpose: 'getReceiptNo',
-                                courseLocation: rowDataArray[i].course?.courseLocation
-                            }
-                        );
-                        console.log("Get receipt number:", response.data);
-    
-                        const receiptNo = response.data.result.receiptNumber;
+                    if (rowDataArray[i].course.payment !== "SkillsFuture") 
+                    {
+                      var receiptNo = "";
+                        if(rowDataArray[i].official.receiptNo === "")
+                        {
+                            // First, get the receipt number
+                            const response = await axios.post(
+                                'https://moses-ecss-backend.azurewebsites.net/receipt',
+                                {
+                                    purpose: 'getReceiptNo',
+                                    courseLocation: rowDataArray[i].course?.courseLocation
+                                }
+                            );
+                            console.log("Get receipt number:", response.data);
+                           receiptNo = response.data.result.receiptNumber;
+                        }
+                        else
+                        {
+                          receiptNo = rowDataArray[i].official.receiptNo;
+                        }
+
     
                         if (response.data.result.success === true) {
                             // Fetch the PDF
@@ -516,8 +525,10 @@
                     else 
                     {
                       console.log("SFC Payment");
-                        // Non-SkillsFuture receipt number
-                        const response = await axios.post(
+                      var receiptNo = "";
+                      if(rowDataArray[i].official.receiptNo === "")
+                      {
+                          const response = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/receipt',
                             { 
                                 purpose: 'getReceiptNo',
@@ -525,7 +536,13 @@
                             }
                         );
                         console.log("Get receipt number:", response.data);
-                        const receiptNo = response.data.result.receiptNumber;
+                        receiptNo = response.data.result.receiptNumber;
+                      }
+                      else
+                      {
+                        receiptNo = rowDataArray[i].official.receiptNo;
+                      }
+
     
                         if (response.data.result.success === true) {
                             // Fetch the PDF
