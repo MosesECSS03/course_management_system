@@ -56,6 +56,7 @@
       else
       {
         this.props.closePopup();
+        this.props.refreshChild()
       }
     }
     
