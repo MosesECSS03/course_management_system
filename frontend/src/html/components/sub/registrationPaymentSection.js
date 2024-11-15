@@ -28,12 +28,12 @@
     }
 
      // Method to handle click event and toggle the disabled state
-      handleClick1 = (id) => {
+      handleClick1 = () => {
         this.setState(prevState => {
           const newDisabledState = !prevState.isDisabled; // Toggle the disabled state
           if (newDisabledState) {
             // If re-disabled, you can send the data here
-            this.sendData(id, prevState.remarks); // Send the value when it is disabled again
+           // this.sendData(id, prevState.remarks); // Send the value when it is disabled again
           }
           return { isDisabled: newDisabledState }; // Update the state with the new disabled state
         });
@@ -891,7 +891,7 @@
                           value={remarks}
                           maxLength={1000} // Limit to 1000 characters
                           disabled={isDisabled} // Conditionally disable/enable based on state
-                          onClick={() => this.handleClick1(item._id)} // Trigger function to toggle disabled state
+                          onClick={() => this.handleClick1()} // Trigger function to toggle disabled state
                           onChange={this.handleInputChange} // Handle user input changes
                           style={{
                             width: '100%', // Make the textbox fill the parent container
