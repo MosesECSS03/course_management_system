@@ -300,11 +300,11 @@ class DatabaseConnectivity {
                 const update = {
                     $set: {
                         "official": {
-                            ...document.official,
                             receiptNo: receiptNumber
                         }
                     }
                 };
+
                 // Call updateOne
                 const result = await table.updateOne(filter, update);
                 console.log("updateReceiptNumberData:", result)
