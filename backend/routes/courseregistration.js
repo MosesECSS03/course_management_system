@@ -83,6 +83,12 @@ router.post('/', async function(req, res, next)
         var pdf = new PdfGenerator();
         await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
     }
+    else if(req.body.purpose === "updateRemarks")
+    {
+        var controller = new RegistrationController();
+        var result = await controller.updateRemarks(req.body.id, req.body.remarks);
+        return res.json({"result": message}); 
+    }
 });
 
 module.exports = router;

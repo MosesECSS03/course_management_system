@@ -342,7 +342,9 @@ class DatabaseConnectivity {
                         $set: {
                             "official.name": "",
                             "official.date": "",
-                            "official.time": ""
+                            "official.time": "",
+                            "official.receiptNo": "",
+                            "official.remarks": ""
                         }
                     };
                 }
@@ -356,6 +358,49 @@ class DatabaseConnectivity {
             console.log("Error updating database:", error);
         }
     }
+
+    async updatePaymentRemarks(dbname, id, remarks) {
+        var db = this.client.db(dbname); // return the db object
+        try {
+            if (db) {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+    
+                // Use updateOne to update a single document
+                const filter = { _id: new ObjectId(id) };
+    
+                // Define the update object conditionally based on status
+                let update = null;
+
+                //Remarks: Change Payment From What To What
+                if(remarks.includes("Change") || remarks.includes("Payment"))
+                {
+                    update = {
+                            $set: {
+                                "course.payment": remarks.split(" ")[6].trim(),
+                                "official.remarks": remarks,
+                            }
+                        };
+                }
+                else
+                {
+                    update = {
+                        $set: {
+                            "official.remarks": remarks,
+                        }
+                    };
+                }
+    
+                // Call updateOne
+                const result = await table.updateOne(filter, update);
+    
+                return result;
+            }
+        } catch (error) {
+            console.log("Error updating database:", error);
+        }
+    }
+
 
     async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
         const db = this.client.db(databaseName);
@@ -392,42 +437,6 @@ class DatabaseConnectivity {
         // Format the next number with leading zeros to match the dynamic length
         return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
     }
-    
-        /*async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
-            try {
-                const db = this.client.db(databaseName);
-                const collection = db.collection(collectionName);
-        
-                // Retrieve all receipts matching the specified courseLocation
-                const existingReceipts = await collection.find({
-                    receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with "courseLocation -"
-                }).toArray();
-        
-                console.log("Current receipts:", existingReceipts);
-        
-                // If there are no receipts for the specific courseLocation, start numbering from 1
-                if (existingReceipts.length === 0) {
-                    return `${courseLocation} - 0000001`; // Start at 1 for this courseLocation
-                }
-        
-                // Extract the numeric part and sort the receipt numbers
-                const receiptNumbers = existingReceipts.map(receipt => {
-                    const numberPart = receipt.receiptNo.split(" - ")[1]; // Extract numeric part after " - "
-                    return parseInt(numberPart, 10); // Convert to integer
-                }).filter(num => !isNaN(num)) // Filter out invalid numbers
-                  .sort((a, b) => a - b); // Sort in ascending order
-        
-                // The next number in the sequence is the last number + 1
-                const latestNumber = receiptNumbers[receiptNumbers.length - 1]; // Get the highest number
-                const nextNumber = latestNumber + 1;
-        
-                // Always ensure the numeric part is 7 digits, padded with leading zeros
-                return `${courseLocation} - ${String(nextNumber).padStart(7, '0')}`;
-            } catch (error) {
-                console.error("Error generating next receipt number:", error);
-                throw error; // Rethrow the error for handling upstream
-            }
-        }*/
         
 
     async deleteAccount(databaseName, collectionName, id) {

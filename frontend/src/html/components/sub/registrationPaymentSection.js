@@ -40,7 +40,13 @@
     handleSubmit = (id, index) => {
       const remark = this.state.remarks[index];
       // Perform the submit action here, e.g., API call
-      console.log(`Submitting remark for item with id ${id}:`, remark);
+      //console.log(`Submitting remark for item with id ${id}:`, remark);
+
+      const response = await axios.post(
+        'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
+        { purpose: 'updateRemarks', id: id, remarks: remark }
+      );
+      console.log(response);
     }
     
 
