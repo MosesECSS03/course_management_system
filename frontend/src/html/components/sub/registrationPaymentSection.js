@@ -22,39 +22,27 @@
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
         remarks: {}, // Remarks for each row
-        disabledRows: {}, // Store disabled state for each row
       };
       this.tableRef = React.createRef();
-
-      const disabledRows = {};
-      this.props.items.forEach(item => {
-        disabledRows[item._id] = true; // All rows are disabled initially
-      });
-  
-      // Set initial state for disabled rows
-      this.state.disabledRows = disabledRows;
     }
 
-    handleClick1 = (id) => {
-      // Toggle the disabled state for the specific row's input
-      this.setState((prevState) => ({
-        disabledRows: {
-          ...prevState.disabledRows,
-          [id]: !prevState.disabledRows[id], // Toggle between true/false
-        },
-      }));
-    };
-  
     handleInputChange = (e, id) => {
-      // Update remarks for the specific row
+      const { value } = e.target;
       this.setState((prevState) => ({
         remarks: {
           ...prevState.remarks,
-          [id]: e.target.value, // Update the value for this specific row
+          [id]: value,
         },
       }));
     };
-    
+  
+    handleSubmit = (id) => {
+      const remark = this.state.remarks[id];
+      // Add the submit logic here, e.g., API call or form submission
+      console.log(`Submitting remark for row ${id}:`, remark);
+      sendData(id, remarks);
+     
+    };
 
       sendData = (id, value) => {
         console.log("Sending data:", id, value); // Log or send the data wherever necessary (e.g., API or parent component)
@@ -899,21 +887,33 @@
                       <td>{item.official?.receiptNo}</td>                      
                       <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
                       <input
-                        type="text"
-                        value={this.state.remarks[item._id] || ''} // Bind value for the specific row
-                        maxLength={1000}
-                        disabled={this.state.disabledRows[item._id]} // Check if the row is disabled
-                        onClick={() => this.handleClick1(item._id)} // Toggle disabled state on click
-                        onChange={(e) => this.handleInputChange(e, item._id)} // Handle input changes
-                        style={{
-                          width: '100%',
-                          padding: '0.5rem',
-                          border: '1px solid #ccc',
-                          backgroundColor: this.state.disabledRows[item._id] ? '#f0f0f0' : '#fff', // Background changes when disabled
-                          boxSizing: 'border-box',
-                          whiteSpace: 'nowrap',
-                        }}
-                      />
+                          type="text"
+                          value={this.state.remarks[item._id] || ''}
+                          maxLength={1000}
+                          onChange={(e) => this.handleInputChange(e, item._id)}
+                          style={{
+                            width: '100%',
+                            padding: '0.5rem',
+                            border: '1px solid #ccc',
+                            backgroundColor: this.state.disabledRows[item._id] ? '#f0f0f0' : '#fff',
+                            boxSizing: 'border-box',
+                            whiteSpace: 'nowrap',
+                          }}
+                        />
+                        <button
+                          onClick={() => this.handleSubmit(item._id)}
+                          disabled={this.state.disabledRows[item._id]} // Disable button if row is disabled
+                          style={{
+                            marginTop: '0.5rem',
+                            padding: '0.5rem',
+                            backgroundColor: this.state.disabledRows[item._id] ? '#ccc' : '#4CAF50',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: this.state.disabledRows[item._id] ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          Submit
+                        </button>
                       </td>
                     </tr>
                   ))}
