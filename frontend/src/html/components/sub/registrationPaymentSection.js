@@ -21,9 +21,36 @@
         originalData: [],
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
+        isDisabled: true,
+        remarks: ""
       };
       this.tableRef = React.createRef();
     }
+
+     // Method to handle click event and toggle the disabled state
+      handleClick = () => {
+        this.setState(prevState => {
+          const newDisabledState = !prevState.isDisabled; // Toggle the disabled state
+          if (newDisabledState) {
+            // If re-disabled, you can send the data here
+            this.sendData(prevState.remarks); // Send the value when it is disabled again
+          }
+          return { isDisabled: newDisabledState }; // Update the state with the new disabled state
+        });
+      };
+
+      // Method to handle changes in the textbox
+      handleInputChange = (event) => {
+        this.setState({ remarks: event.target.value }); // Update the remarks value as user types
+      };
+
+      sendData = (value) => {
+        console.log("Sending data:", value); // Log or send the data wherever necessary (e.g., API or parent component)
+        // Example of sending data via API:
+        // axios.post('/your-api-endpoint', { remarks: value });
+      };
+    
+
 
     handleEntriesPerPageChange = (e) => {
       this.setState({
@@ -819,6 +846,7 @@
   
     render() {
       const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
+      const { isDisabled } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
         <>
@@ -834,7 +862,7 @@
               <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
             </div>
             <div className="table-wrapper" ref={this.tableRef}>
-              <table>
+            <table style={{borderCollapse: 'collapse',tableLayout: 'fixed', width: '100%'}}>
                 <thead>
                   <tr>
                     <th colSpan="11">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
@@ -929,14 +957,16 @@
                       <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
                         <input
                           type="text"
-                          value={item.official?.remarks || ''}
+                          value={remarks}
                           maxLength={1000} // Limit to 1000 characters
-                          disabled
+                          disabled={isDisabled} // Conditionally disable/enable based on state
+                          onClick={this.handleClick} // Trigger function to toggle disabled state
+                          onChange={this.handleInputChange} // Handle user input changes
                           style={{
                             width: '100%', // Make the textbox fill the parent container
                             padding: '0.5rem', // Optional padding for visual appearance
                             border: '1px solid #ccc', // Optional border styling
-                            backgroundColor: '#f0f0f0', // Background color to indicate the textbox is disabled
+                            backgroundColor: isDisabled ? '#f0f0f0' : '#fff', // Background color based on disabled state
                             boxSizing: 'border-box', // Ensures padding is included in the width calculation
                             whiteSpace: 'nowrap', // Prevent text wrapping inside the input (if needed)
                           }}
