@@ -887,9 +887,9 @@
                       <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
                         <input
                           type="text"
-                          value={this.state.inputValues[item._id]} // Specific value for each row based on _id
+                          value={remarks} // Specific value for each row based on _id
                           maxLength={1000} // Limit to 1000 characters
-                          disabled={this.state.isDisabled} // Conditionally disable/enable based on state
+                          disabled={isDisabled} // Conditionally disable/enable based on state
                           onClick={() => this.handleClick1(item._id)} // Toggle disabled state for specific row based on _id
                           onChange={(e) => this.handleInputChange(e, item._id)} // Handle user input changes for specific row based on _id
                           style={{
