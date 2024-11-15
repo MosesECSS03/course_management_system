@@ -444,86 +444,136 @@
         this.props.generateReceiptPopup();
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
-        
+    
         for (var i = 0; i < rowDataArray.length; i++) {
-            if ((rowDataArray[i].course.payment === "Cash" || rowDataArray[i].course.payment === "PayNow" || rowDataArray[i].course.payment === "SkillsFuture") && rowDataArray[i].status === "Paid"  && rowDataArray[i].official.name !== null) {
+            if (
+                (rowDataArray[i].course.payment === "Cash" || 
+                 rowDataArray[i].course.payment === "PayNow" || 
+                 rowDataArray[i].course.payment === "SkillsFuture") && 
+                rowDataArray[i].status === "Paid" && 
+                rowDataArray[i].official.name !== null
+            ) {
                 console.log("Generating Receipt for:", rowDataArray[i]._id);
                 const registration_id = rowDataArray[i]._id;
-                
                 try {
-                    // First, get the receipt number
-                    const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/receipt', {
-                      purpose: 'getReceiptNo',
-                      courseLocation: rowDataArray[i].course?.courseLocation
-                  });
-                  /*const response = await axios.post('http://localhost:3001/receipt', {
-                        purpose: 'getReceiptNo',
-                        courseLocation: rowDataArray[i].course?.courseLocation
-                    });*/
-                    console.log("Get receipt number:", repsonse.data);
-                    
-                    const receiptNo = response.data.result.receiptNumber;
-                    
-                    if (response.data.result.success === true) 
-                    {
-                        // Now, fetch the PDF
-                       const pdfResponse = await axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {
-                          purpose: 'receipt',
-                            rowData: rowDataArray,
-                            staff: this.props.userName,
-                            receiptNo: receiptNo
-                        }, { responseType: 'blob' });
-                        console.log("pdfResponse:", pdfResponse);
-                        /*const pdfResponse = await axios.post('http://localhost:3001/courseregistration', {
-                            purpose: 'receipt',
-                            rowData: rowDataArray,
-                            staff: this.props.userName,
-                            receiptNo: receiptNo
-                        }, { responseType: 'blob' });*/
+                    if (rowDataArray[i].course.payment !== "SkillsFuture") {
+                        // First, get the receipt number
+                        const response = await axios.post(
+                            'https://moses-ecss-backend.azurewebsites.net/receipt',
+                            {
+                                purpose: 'getReceiptNo',
+                                courseLocation: rowDataArray[i].course?.courseLocation
+                            }
+                        );
+                        console.log("Get receipt number:", response.data);
     
-                        // Extract filename from Content-Disposition header
-                       const contentDisposition = pdfResponse.headers['content-disposition'];
-                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                        let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+                        const receiptNo = response.data.result.receiptNumber;
     
-                        console.log(`Filename: ${filename}`);
+                        if (response.data.result.success === true) {
+                            // Fetch the PDF
+                            const pdfResponse = await axios.post(
+                                'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+                                {
+                                    purpose: 'receipt',
+                                    rowData: rowDataArray,
+                                    staff: this.props.userName,
+                                    receiptNo: receiptNo
+                                },
+                                { responseType: 'blob' }
+                            );
+                            console.log("pdfResponse:", pdfResponse);
     
-                        // Create a Blob for the PDF
-                        const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
-                        const url = window.URL.createObjectURL(blob);
+                            // Extract filename from Content-Disposition header
+                            const contentDisposition = pdfResponse.headers['content-disposition'];
+                            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                            let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
     
-                        // Open PDF in a new tab
-                        const pdfWindow = window.open();
-                        pdfWindow.location.href = url;
+                            console.log(`Filename: ${filename}`);
     
-                        // Now, create the receipt in the database
-                        const receiptCreationResponse = await axios.post('https://moses-ecss-backend.azurewebsites.net/receipt', {
-                          purpose: 'createReceipt',
-                          receiptNo: receiptNo,
-                          registration_id: registration_id,
-                          url: url,
-                          staff: this.props.userName
-                      });
-                     /* const receiptCreationResponse = await axios.post('http://localhost:3001/receipt', {
-                            purpose: 'createReceipt',
-                            receiptNo: receiptNo,
-                            registration_id: registration_id,
-                            url: url,
-                            staff: this.props.userName
-                        });*/
+                            // Create a Blob for the PDF
+                            const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+                            const url = window.URL.createObjectURL(blob);
     
-                       console.log("Receipt Created:", receiptCreationResponse.data);
-                        this.props.closePopup();
+                            // Open PDF in a new tab
+                            const pdfWindow = window.open();
+                            pdfWindow.location.href = url;
+    
+                            // Create the receipt in the database
+                            const receiptCreationResponse = await axios.post(
+                                'https://moses-ecss-backend.azurewebsites.net/receipt',
+                                {
+                                    purpose: 'createReceipt',
+                                    receiptNo: receiptNo,
+                                    registration_id: registration_id,
+                                    url: url,
+                                    staff: this.props.userName
+                                }
+                            );
+                            console.log("Receipt Created:", receiptCreationResponse.data);
+                        }
                     } else {
-                        console.error("Failed to generate receipt number.");
+                        // Non-SkillsFuture receipt number
+                        const response = await axios.post(
+                            'https://moses-ecss-backend.azurewebsites.net/receipt',
+                            {
+                                purpose: 'getReceiptNo',
+                                courseLocation: 'SFC'
+                            }
+                        );
+                        console.log("Get receipt number:", response.data);
+                        const receiptNo = response.data.result.receiptNumber;
+    
+                        if (response.data.result.success === true) {
+                            // Fetch the PDF
+                            const pdfResponse = await axios.post(
+                                'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+                                {
+                                    purpose: 'receipt',
+                                    rowData: rowDataArray,
+                                    staff: this.props.userName,
+                                    receiptNo: receiptNo
+                                },
+                                { responseType: 'blob' }
+                            );
+                            console.log("pdfResponse:", pdfResponse);
+    
+                            // Extract filename from Content-Disposition header
+                            const contentDisposition = pdfResponse.headers['content-disposition'];
+                            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                            let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+    
+                            console.log(`Filename: ${filename}`);
+    
+                            // Create a Blob for the PDF
+                            const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+                            const url = window.URL.createObjectURL(blob);
+    
+                            // Open PDF in a new tab
+                            const pdfWindow = window.open();
+                            pdfWindow.location.href = url;
+    
+                            // Create the receipt in the database
+                            const receiptCreationResponse = await axios.post(
+                                'https://moses-ecss-backend.azurewebsites.net/receipt',
+                                {
+                                    purpose: 'createReceipt',
+                                    receiptNo: receiptNo,
+                                    registration_id: registration_id,
+                                    url: url,
+                                    staff: this.props.userName
+                                }
+                            );
+                            console.log("Receipt Created:", receiptCreationResponse.data);
+                        }
                     }
+                    this.props.closePopup();
                 } catch (error) {
                     console.error('Error during receipt generation process:', error);
                 }
             }
         }
-    }
-
+    };
+    
     async saveData(paginatedDetails) {
         console.log("Save Data:", paginatedDetails);
     
