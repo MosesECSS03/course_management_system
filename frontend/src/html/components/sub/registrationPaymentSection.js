@@ -48,10 +48,14 @@
         { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
       );
       console.log("handleSubmit:", response.data);
-      if(response.data.result === true)
+      if(response.data.result.success === true)
       {
         this.props.closePopup();
         this.props.refreshChild();
+      }
+      else
+      {
+        this.props.closePopup();
       }
     }
     
