@@ -98,6 +98,7 @@ class PersonalInfo extends Component {
                     dropdownMode="select"
                     customInput={<CustomInput />}
                     placeholderText="DD/MM/YYYY"
+                    style={{ fontSize: '2em' }}
                   />
                   <br/>
                 </>
