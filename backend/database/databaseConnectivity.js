@@ -273,8 +273,6 @@ class DatabaseConnectivity {
                 const update = {
                     $set: {
                         status: newStatus, // Add new key "confirmation"
-                        receiptNo: "",
-                        remarks: ""
                     }
                 };
     
@@ -298,13 +296,10 @@ class DatabaseConnectivity {
                 // Use updateOne to update a single document
                 const filter = { _id: new ObjectId(id) };
     
-                // Corrected update object
+                // Update only the `receiptNo` field inside the `official` object
                 const update = {
                     $set: {
-                        official: {
-                            receiptNo: receiptNumber,
-                            remarks: ""
-                        }
+                        "official.receiptNo": receiptNumber
                     }
                 };
     
@@ -318,50 +313,39 @@ class DatabaseConnectivity {
         }
     }
     
-    async updatePaymentOfficialUse(dbname,  id, name, date, time, status) {
+    
+    async updatePaymentOfficialUse(dbname, id, name, date, time, status) {
         var db = this.client.db(dbname); // return the db object
         try {
             if (db) {
                 var tableName = "Registration Forms";
                 var table = db.collection(tableName);
-                var update = null;
     
                 // Use updateOne to update a single document
                 const filter = { _id: new ObjectId(id) };
-
-                // Add the new key "confirmation" to the update data
-                if(status === "Paid")
-                {                
-                     update = {
+    
+                // Define the update object conditionally based on status
+                let update = null;
+    
+                if (status === "Paid") {
+                    update = {
                         $set: {
-                            official:
-                            {
-                                name: name,
-                                date: date,
-                                time: time,
-                                receiptNo: "",
-                                remarks: ""
-                            }
+                            "official.name": name,
+                            "official.date": date,
+                            "official.time": time
+                        }
+                    };
+                } else {
+                    update = {
+                        $set: {
+                            "official.name": "",
+                            "official.date": "",
+                            "official.time": ""
                         }
                     };
                 }
-                else
-                {                
-                     update = {
-                            $set: {
-                                official:
-                                {
-                                    name: "",
-                                    date: "",
-                                    time: "",
-                                    receiptNo: "",
-                                    remarks: ""
-                                }
-                            }   
-                        };
-                }
     
-               // Call updateOne
+                // Call updateOne
                 const result = await table.updateOne(filter, update);
     
                 return result;
@@ -380,11 +364,11 @@ class DatabaseConnectivity {
             receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with courseLocation -
         }).toArray();
     
-        console.log("Current:", existingReceipts);
+        console.log("Current receipts:", existingReceipts);
     
-        // If there are no receipts for the specific courseLocation, return '001'
+        // If there are no receipts for the specific courseLocation, start numbering from 1
         if (existingReceipts.length === 0) {
-            return `${courseLocation} - 001`; // No existing receipts, start at '001'
+            return `${courseLocation} - 1`; // No existing receipts, start at '1'
         }
     
         // Extract the numeric part and find the latest number for the specific courseLocation
@@ -396,36 +380,13 @@ class DatabaseConnectivity {
         // Find the latest (maximum) existing number
         const latestNumber = Math.max(...receiptNumbers);
     
-        // Determine the next number
+        // Determine the next number without formatting constraints
         const nextNumber = latestNumber + 1;
     
-        // Calculate the length dynamically based on the maximum length of existing numbers
-        const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3); // Ensure at least 3 digits
-    
-        // Return the next receipt number with dynamic length
-        return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
+        // Return the next receipt number without padding
+        return `${courseLocation} - ${nextNumber}`;
     }
-
-    async deleteAccount(databaseName, collectionName, id) {
-        const db = this.client.db(databaseName);
-        const table = db.collection(collectionName);
     
-        try {
-            const filter = { _id: new ObjectId(id) }; // Find document by ID
-            const result = await table.deleteOne(filter);
-    
-            if (result.deletedCount === 1) {
-                console.log("Successfully deleted the document.");
-                return { success: true, message: "Document deleted successfully." };
-            } else {
-                console.log("No document found with that ID.");
-                return { success: false, message: "No document found with that ID." };
-            }
-        } catch (error) {
-            console.log("Error deleting document:", error);
-            return { success: false, error };
-        }
-    }
 
     async deleteAccessRights(databaseName, collectionName, id) {
         const db = this.client.db(databaseName);
