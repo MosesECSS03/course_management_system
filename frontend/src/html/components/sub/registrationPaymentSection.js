@@ -26,7 +26,7 @@
       this.tableRef = React.createRef();
     }
 
-    handleInputChange = (e, id) => {
+    handleInputChange1 = (e, id) => {
       const { value } = e.target;
       this.setState((prevState) => ({
         remarks: {
@@ -889,7 +889,7 @@
                           type="text"
                           value={this.state.remarks[item._id] || ''}
                           maxLength={1000}
-                          onChange={(e) => this.handleInputChange(e, item._id)}
+                          onChange={(e) => this.handleInputChange1(e, item._id)}
                           style={{
                             width: '100%',
                             padding: '0.5rem',
