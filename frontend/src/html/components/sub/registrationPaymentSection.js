@@ -576,7 +576,7 @@
             "Participant Contact Number", "Participant Email", "Participant Postal Code", "Participant Education Level", "Participant Work Status",
             "Course Type", "Course English Name", "Course Chinese Name", "Course Location",
             "Course Price", "Course Duration", "Payment", "Agreement", "Payment Status",
-            "Staff Name", "Received Date", "Received Time", 
+            "Staff Name", "Received Date", "Received Time", "Receipt/Inovice Number", "Remarks"
         ];
     
         preparedData.push(headers);
@@ -606,7 +606,9 @@
                 detail.status,
                 detail.official?.name,
                 detail.official?.date,
-                detail.official?.time
+                detail.official?.time,
+                detail.official?.receiptNo,
+                detail.official?.remarks
             ];
             preparedData.push(row);
         });
@@ -931,7 +933,7 @@
                           maxLength={1000} // Limit to 1000 characters
                           disabled
                           style={{
-                            width: '100%', // Make the textbox fill its container
+                            width: '1000%', // Make the textbox fill its container
                             padding: '0.5rem', // Optional padding for better visual appearance
                             border: '1px solid #ccc', // Optional border styling
                             backgroundColor: '#f0f0f0', // Make it visually different to indicate it is disabled
