@@ -405,7 +405,7 @@ class DatabaseConnectivity {
         
                 // If there are no receipts for the specific courseLocation, start numbering from 1
                 if (existingReceipts.length === 0) {
-                    return `${courseLocation} - 00000000`; // Start at 1 for this courseLocation
+                    return `${courseLocation} - 00000001`; // Start at 1 for this courseLocation
                 }
         
                 // Extract the numeric part and sort the receipt numbers
@@ -419,8 +419,11 @@ class DatabaseConnectivity {
                 const latestNumber = receiptNumbers[receiptNumbers.length - 1]; // Get the highest number
                 const nextNumber = latestNumber + 1;
         
-                // Return the next receipt number
-                return `${courseLocation} - ${nextNumber}`;
+                // Calculate the length dynamically based on the maximum length of existing numbers
+                const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3); // Ensure at least 3 digits
+            
+                // Return the next receipt number with dynamic length
+                return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
             } catch (error) {
                 console.error("Error generating next receipt number:", error);
                 throw error; // Rethrow the error for handling upstream
