@@ -15,7 +15,7 @@
         inputValues: {},
         dropdownVisible: {}, // Store input values for each row
         cashPaynowSuggestions: ["Pending", "Paid", "Cancelled"], // General suggestions
-        skillsFutureOptions: ["Pending", "Approved", "Not Approved", "Refunded", "Cancelled"], // SkillsFuture specific options
+        skillsFutureOptions: ["Pending", "Paid", "Cancelled"], // SkillsFuture specific options
         filteredSuggestions: [],
         focusedInputIndex: null,
         originalData: [],
@@ -446,7 +446,7 @@
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
         
         for (var i = 0; i < rowDataArray.length; i++) {
-            if ((rowDataArray[i].course.payment === "Cash" || rowDataArray[i].course.payment === "PayNow") && rowDataArray[i].status === "Paid") {
+            if ((rowDataArray[i].course.payment === "Cash" || rowDataArray[i].course.payment === "PayNow" || rowDataArray[i].course.payment === "SkillsFuture") && rowDataArray[i].status === "Paid"  && rowDataArray[i].official.name !== null) {
                 console.log("Generating Receipt for:", rowDataArray[i]._id);
                 const registration_id = rowDataArray[i]._id;
                 
@@ -797,7 +797,7 @@
                     <th colSpan="5">{this.props.language === 'zh' ? '课程' : 'Courses'}</th>
                     <th>{this.props.language === 'zh' ? '其他' : 'Others'}</th>
                     <th>{this.props.language === 'zh' ? '确认状态' : 'Confirmation Status'}</th>
-                    <th colSpan="3">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
+                    <th colSpan="5">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
                   </tr>
                   <tr>
                     <th>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
@@ -821,6 +821,8 @@
                     <th>{this.props.language === 'zh' ? '' : 'Staff Name'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Date Received'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
                   </tr>
                 </thead>
                 <tbody>
