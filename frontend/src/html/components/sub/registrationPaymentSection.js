@@ -732,6 +732,8 @@
       const startRow = 9;
   
       paginatedDetails.forEach((detail, index) => {
+        if(detail.course.courseType === "NSA")
+        {
           const rowIndex = startRow + index;
           const newDataRow = sourceSheet.getRow(rowIndex);
           newDataRow.height = originalRow.height;
@@ -787,6 +789,7 @@
               const newCell = newDataRow.getCell(colNumber);
               newCell.style = cell.style;
           });
+        }
       });
   
       const originalFileName = file.name.replace('.xlsx', '_new.xlsx');
