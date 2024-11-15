@@ -460,6 +460,7 @@
                         purpose: 'getReceiptNo',
                         courseLocation: rowDataArray[i].course?.courseLocation
                     });*/
+                    console.log("Get receipt number:", repsonse.data);
                     
                     const receiptNo = response.data.result.receiptNumber;
                     
