@@ -286,6 +286,35 @@ class DatabaseConnectivity {
         }
     }
 
+    async updateReceiptNumberData(dbname, id, receiptNumber) {
+        var db = this.client.db(dbname); // return the db object
+        try {
+            if (db) {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+    
+                // Use updateOne to update a single document
+                const filter = { _id: new ObjectId(id) };
+    
+                // Corrected update object
+                const update = {
+                    $set: {
+                        official: {
+                            receiptNo: receiptNumber
+                        }
+                    }
+                };
+    
+                // Call updateOne
+                const result = await table.updateOne(filter, update);
+    
+                return result;
+            }
+        } catch (error) {
+            console.log("Error updating database:", error);
+        }
+    }
+    
     async updatePaymentOfficialUse(dbname,  id, name, date, time, status) {
         var db = this.client.db(dbname); // return the db object
         try {

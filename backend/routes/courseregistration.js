@@ -78,6 +78,8 @@ router.post('/', async function(req, res, next)
     {
         var pdf = new PdfGenerator();
         console.log(req.body); 
+        var controller = new RegistrationController();
+        var result = await controller.updateReceiptNumber(id, req.body.receiptNo);
         await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
     }
 });
