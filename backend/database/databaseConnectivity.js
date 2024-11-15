@@ -379,6 +379,7 @@ class DatabaseConnectivity {
                             $set: {
                                 "course.payment": remarks.split(" ")[6].trim(),
                                 "official.remarks": remarks,
+                                "official.receiptNo": ""
                             }
                         };
                 }

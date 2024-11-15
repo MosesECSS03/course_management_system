@@ -37,7 +37,7 @@
     };
   
     // Handle the submit action for a specific row
-    handleSubmit = (id, index) => {
+    handleSubmit = async (id, index) => {
       const remark = this.state.remarks[index];
       // Perform the submit action here, e.g., API call
       //console.log(`Submitting remark for item with id ${id}:`, remark);
