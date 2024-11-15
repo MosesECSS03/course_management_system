@@ -31,6 +31,8 @@ class ReceiptController {
                 const formattedNumber = nextNumber.toString().padStart(6, '0');
                 const newReceiptNumber = `${courseLocation} - ${formattedNumber}`;
 
+                console.log("New Receipt Number:", newReceiptNumber);
+
                 // Return the newly generated receipt number
                 return {
                     success: true,
