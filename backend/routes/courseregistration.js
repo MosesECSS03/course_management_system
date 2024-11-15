@@ -76,9 +76,10 @@ router.post('/', async function(req, res, next)
     }
     else if(req.body.purpose === "receipt")
     {
-        console.log(req.body); 
+        console.log("Receipt body:", req.body); 
         var controller = new RegistrationController();
         var result = await controller.updateReceiptNumber(id, req.body.receiptNo);
+        console.log("updateReceiptNumber:", result); 
         //var pdf = new PdfGenerator();
         //await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
     }
