@@ -47,6 +47,7 @@
         { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
       );
       console.log(response);
+      this.props.refreshChild();
     }
     
 
@@ -887,7 +888,7 @@
                       <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
                       <input
                           type="text"
-                          value={this.state.remarks[index] || ''}
+                          value={this.state.remarks[index]}
                           maxLength={1000}
                           onChange={(e) => this.handleInputChange1(e, index)}
                           style={{
