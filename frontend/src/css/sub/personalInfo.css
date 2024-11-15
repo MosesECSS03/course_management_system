@@ -23,6 +23,9 @@
   outline: none; /* Remove default outline */
 }
 
+.custom-date-input {
+  font-size: 2rem;
+}
 
 /* personalInfo.css */
 .input-group1 {
