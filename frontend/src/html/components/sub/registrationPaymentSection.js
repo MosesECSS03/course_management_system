@@ -5,7 +5,7 @@
   import ExcelJS from 'exceljs';
   import Popup from '../popup/popupMessage';
 
-  class RegistrationPaymentSection extends Component {
+ class RegistrationPaymentSection extends Component {
     constructor(props) {
       super(props);
       this.state = {
@@ -522,8 +522,35 @@
                             }
                         );
                         console.log("Receipt Created:", receiptCreationResponse.data);
-                    } else {
-                        console.error("Failed to fetch receipt number.");
+                    } 
+                    else 
+                    {
+                      const pdfResponse = await axios.post(
+                            'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+                            {
+                                purpose: 'receipt',
+                                rowData: rowDataArray,
+                                staff: this.props.userName,
+                                receiptNo: receiptNo
+                            },
+                            { responseType: 'blob' }
+                        );
+                        console.log("pdfResponse:", pdfResponse);
+
+                        // Extract filename from Content-Disposition header
+                        const contentDisposition = pdfResponse.headers['content-disposition'];
+                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+
+                        console.log(`Filename: ${filename}`);
+
+                        // Create a Blob for the PDF
+                        const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+                        const url = window.URL.createObjectURL(blob);
+
+                        // Open PDF in a new tab
+                        const pdfWindow = window.open();
+                        pdfWindow.location.href = url;
                     }
     
                     // Close the popup and refresh
