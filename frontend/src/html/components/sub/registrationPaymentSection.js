@@ -892,6 +892,7 @@
                             whiteSpace: 'nowrap',
                           }}
                         />
+                        <br/>
                         <button
                           onClick={() => this.handleSubmit(item._id)}
                           style={{
