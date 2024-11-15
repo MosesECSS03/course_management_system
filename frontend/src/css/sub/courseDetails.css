@@ -20,7 +20,7 @@
   padding: 0.5rem; /* Padding inside input */
   border: 1px solid #ccc; /* Light gray border */
   border-radius: 4px; /* Slightly rounded corners */
-  font-size: 1rem; /* Font size */
+  font-size: 2em; /* Font size */
 }
 
 .course-detail-input:focus {
