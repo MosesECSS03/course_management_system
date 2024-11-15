@@ -299,10 +299,12 @@ class DatabaseConnectivity {
                 // Update only the `receiptNo` field inside the `official` object
                 const update = {
                     $set: {
-                        "official.receiptNo": receiptNumber
+                        "official": {
+                            ...document.official,
+                            receiptNo: receiptNumber
+                        }
                     }
                 };
-    
                 // Call updateOne
                 const result = await table.updateOne(filter, update);
                 console.log("updateReceiptNumberData:", result)
