@@ -829,7 +829,7 @@
                 </thead>
                 <tbody>
                   {paginatedDetails.map((item, index) => (
-                    <tr key={index, }>
+                    <tr key={index}>
                       <td>{item.participant.name}</td>
                       <td>{item.participant.nric}</td>
                       <td>{item.participant.residentialStatus}</td>
