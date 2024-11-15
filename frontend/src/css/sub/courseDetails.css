@@ -28,6 +28,11 @@
   outline: none; /* Remove default outline */
 }
 
+.course-detail-text
+{
+  font-size: 2em;
+}
+
 .error-message {
   color: red; /* Red color for error messages */
   font-size: 0.875rem; /* Slightly smaller font for errors */
