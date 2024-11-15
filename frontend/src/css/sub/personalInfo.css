@@ -8,14 +8,14 @@
   display: block; /* Make label a block element */
   margin-bottom: 5px; /* Space between label and input */
   font-weight: bold; /* Optional: make label text bold */
-  font-size: 3em;
+  font-size: 2em;
 }
 
 .personal-info-input1 {
   width: 100%; /* Full width */
   padding: 10px; /* Padding for better spacing */
   border-radius: 5px; /* Rounded corners */
-  font-size: 3em; /* Font size */
+  font-size: 2em; /* Font size */
 }
 
 .personal-info-input1:focus {
