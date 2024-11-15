@@ -890,6 +890,7 @@
                             border: '1px solid #ccc',
                             boxSizing: 'border-box',
                             whiteSpace: 'nowrap',
+                            marginTop: '0.5em'
                           }}
                         />
                         <br/>
@@ -899,7 +900,8 @@
                             marginTop: '0.5rem',
                             padding: '0.5rem',
                             color: '#fff',
-                            border: 'none'
+                            border: 'none',
+                            marginBottom: '0.5em';
                           }}
                         >
                           Submit
