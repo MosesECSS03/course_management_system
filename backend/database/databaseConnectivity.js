@@ -305,6 +305,7 @@ class DatabaseConnectivity {
     
                 // Call updateOne
                 const result = await table.updateOne(filter, update);
+                console.log("updateReceiptNumberData:", result)
     
                 return result;
             }

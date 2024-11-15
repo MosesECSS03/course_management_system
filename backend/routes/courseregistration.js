@@ -18,7 +18,7 @@ function getCurrentDateTime() {
 
     // Format date and time
     const formattedDate = `${day}/${month}/${year}`;
-    const formattedTime = `${hours}:${minutes}:${seconds}`;
+    const formattedTime = `${hours}:${minute    s}:${seconds}`;
 
     return {
         date: formattedDate,

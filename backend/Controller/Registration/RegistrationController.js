@@ -100,7 +100,7 @@ class RegistrationController {
         }    
     }
 
-    async updateReceiptNumber(id, newStatus) 
+    async updateReceiptNumber(id, receiptNo) 
     {
         try {
             // Connect to the database
@@ -110,7 +110,7 @@ class RegistrationController {
             if(result === "Connected to MongoDB Atlas!")
             {
                 var databaseName = "Courses-Management-System";
-                var connectedDatabase = await this.databaseConnectivity.updateReceiptNumberData(databaseName, id, newStatus);  
+                var connectedDatabase = await this.databaseConnectivity.updateReceiptNumberData(databaseName, id, receiptNo);  
                 return connectedDatabase.acknowledged;
                 //console.log(connectedDatabase);
             }
