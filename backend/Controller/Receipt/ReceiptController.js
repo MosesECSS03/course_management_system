@@ -19,18 +19,6 @@ class ReceiptController {
                 // Find the highest existing receipt number for the given course location
                 const latestReceiptNumber = await this.databaseConnectivity.getNextReceiptNumber(databaseName, collectionName, courseLocation);
 
-                // Parse and increment the numeric part of the receipt number
-                let nextNumber = 1;
-                if (latestReceiptNumber) {
-                    const parts = latestReceiptNumber.split(" - ");
-                    nextNumber = parseInt(parts[1], 10);
-                }
-
-                // Format the new receipt number with leading zeros (up to 6 digits)
-                const formattedNumber = nextNumber.toString().padStart(6, '0');
-                const newReceiptNumber = `${courseLocation} - ${formattedNumber}`;
-
-                console.log("New Receipt Number:", newReceiptNumber);
 
                 // Return the newly generated receipt number
                 return {
