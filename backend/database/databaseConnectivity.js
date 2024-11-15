@@ -272,7 +272,9 @@ class DatabaseConnectivity {
                 // Add the new key "confirmation" to the update data
                 const update = {
                     $set: {
-                        status: newStatus // Add new key "confirmation"
+                        status: newStatus, // Add new key "confirmation"
+                        receiptNo: "",
+                        remarks: ""
                     }
                 };
     
@@ -300,7 +302,8 @@ class DatabaseConnectivity {
                 const update = {
                     $set: {
                         official: {
-                            receiptNo: receiptNumber
+                            receiptNo: receiptNumber,
+                            remarks: ""
                         }
                     }
                 };
@@ -335,7 +338,9 @@ class DatabaseConnectivity {
                             {
                                 name: name,
                                 date: date,
-                                time: time
+                                time: time,
+                                receiptNo: "",
+                                remarks: ""
                             }
                         }
                     };
@@ -348,7 +353,9 @@ class DatabaseConnectivity {
                                 {
                                     name: "",
                                     date: "",
-                                    time: ""
+                                    time: "",
+                                    receiptNo: "",
+                                    remarks: ""
                                 }
                             }   
                         };
