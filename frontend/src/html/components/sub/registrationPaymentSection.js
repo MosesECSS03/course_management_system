@@ -37,8 +37,8 @@
     };
   
     // Handle the submit action for a specific row
-    handleSubmit = (id) => {
-      const remark = this.state.remarks[id];
+    handleSubmit = (id, index) => {
+      const remark = this.state.remarks[index];
       // Perform the submit action here, e.g., API call
       console.log(`Submitting remark for item with id ${id}:`, remark);
     }
@@ -894,7 +894,7 @@
                         />
                         <br/>
                         <button
-                          onClick={() => this.handleSubmit(item._id)}
+                          onClick={() => this.handleSubmit(item._id, index)}
                           style={{
                             marginTop: '0.5rem',
                             padding: '0.5rem',
