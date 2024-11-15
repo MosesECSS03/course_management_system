@@ -750,10 +750,24 @@
           sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
   
           const educationParts = detail.participant.educationLevel.split(" ");
-          sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0, 2).join(" ");
+          if(educationParts.length === 3)
+          {
+            sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0, 2).join(" ");
+          }
+          else
+          {
+            sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0).join(" ");
+          }
   
           const workParts = detail.participant.workStatus.split(" ");
-          sourceSheet.getCell(`N${rowIndex}`).value = workParts.slice(0, 2).join(" ");
+          if(workParts.length === 3)
+          {
+            sourceSheet.getCell(`M${rowIndex}`).value = workParts.slice(0, 2).join(" ");
+          }
+          else
+          {
+            sourceSheet.getCell(`M${rowIndex}`).value = workParts.slice(0).join(" ");
+          }
   
           sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName;
   
