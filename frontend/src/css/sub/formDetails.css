@@ -8,6 +8,7 @@
     background-color: #fff; /* Background color for visibility */
     border-radius: 5px; /* Rounded corners */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Box shadow for the text container */
+    font-size: 3em;
   }
   
   .image-container {

@@ -38,10 +38,8 @@
       try {
         this.setState({ loading: true });
        // var response = await axios.post(`http://localhost:3001/courses`, { "courseType": courseType });
-        var response =  await axios.post('http://localhost:3002/products/', { "courseType": courseType });
-        //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courses`, { "courseType": courseType });
-        var courses = JSON.parse(response.data.product);
-        console.log("Courses:", courses);
+        var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/courses`, { "courseType": courseType });
+        var courses = response.data;
 
         // Extract locations and languages
         var locations = this.getAllLocations(courses);
@@ -258,7 +256,7 @@
 
     convertTo24HourWithHrs(time12) {
       const [time, modifier] = time12.split(/(am|pm)/i); // Split by 'am' or 'pm'
-      let [hours, minutes] = time.split(/[:.]/).map(Number);
+      let [hours, minutes] = time.split(":").map(Number);
       if (modifier.toLowerCase() === "pm" && hours < 12) {
         hours += 12; // Convert PM hours
       } else if (modifier.toLowerCase() === "am" && hours === 12) {
@@ -310,7 +308,7 @@
       const { hours: startHours, minutes: startMinutes } = this.convertTo24HourWithHrs(startTime);
       startDateTime.setHours(startHours);
       startDateTime.setMinutes(startMinutes);
-      //startDateTime.setSeconds(0);
+      startDateTime.setSeconds(0);
       //console.log("Start Date Time:", startDateTime);
       
       const endDateTime = new Date(year1, month1, day1);
@@ -318,7 +316,7 @@
       endDateTime.setHours(endHours);
       endDateTime.setMinutes(endMinutes);
       endDateTime.setSeconds(0);
-      //console.log("End Date Time:", endDateTime);
+      console.log("End Date Time:", endDateTime);
       
       //console.log("Today Date:", startDateTime < new Date());
       console.log("Start Date:", startDate, year, month, day, startTime, startHours);

@@ -146,14 +146,14 @@ class LoginPage extends Component {
 
     try {
       // Replace with your API endpoint and payload
-      const response = await axios.post('http://localhost:3001/login', {
-        email,
-        password
-      });
-      /*const response = await axios.post('https://moses-ecss-course.azurewebsites.net/login', {
+     /* const response = await axios.post('http://localhost:3001/login', {
         email,
         password
       });*/
+      const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/login', {
+        email,
+        password
+      });
       console.log(response.data.message)
 
       if (response.data?.message?.message === "Login successful") {

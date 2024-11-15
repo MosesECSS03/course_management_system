@@ -6,6 +6,7 @@ async function initialize(api) {
   try {
     // Test the connection by fetching basic store info
     const response = await api.get(""); // Await the API call
+    console.log("OK");
     return { "status": "Success", "message": "Connection Successfully" };
   } catch (error) {
     // Handle errors during the API request

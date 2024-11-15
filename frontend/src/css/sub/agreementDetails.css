@@ -29,6 +29,11 @@
     gap: 1rem; /* Space between radio options */
     margin-top: 0.5rem; /* Space between the label and options */
   }
+
+  .agreement-detail-text
+  {
+    font-size: 2em;
+  }
   
   .agreement-options label {
     display: flex; /* Keep label as flex for alignment */

@@ -5,7 +5,7 @@
   import ExcelJS from 'exceljs';
   import Popup from '../popup/popupMessage';
 
-  class RegistrationPaymentSection extends Component {
+ class RegistrationPaymentSection extends Component {
     constructor(props) {
       super(props);
       this.state = {
@@ -15,15 +15,52 @@
         inputValues: {},
         dropdownVisible: {}, // Store input values for each row
         cashPaynowSuggestions: ["Pending", "Paid", "Cancelled"], // General suggestions
-        skillsFutureOptions: ["Pending", "Approved", "Not Approved", "Refunded", "Cancelled"], // SkillsFuture specific options
+        skillsFutureOptions: ["Pending", "Paid", "Cancelled"], // SkillsFuture specific options
         filteredSuggestions: [],
         focusedInputIndex: null,
         originalData: [],
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
+        remarks: {}, // Remarks for each row
       };
       this.tableRef = React.createRef();
     }
+
+    handleInputChange1 = (e, id) => {
+      const { value } = e.target;
+      this.setState((prevState) => ({
+        remarks: {
+          ...prevState.remarks,
+          [id]: value, // Use item._id as key
+        },
+      }));
+    };
+  
+    // Handle the submit action for a specific row
+    handleSubmit = async (id, index) => {
+      this.props.updateRemarksPopup();
+      const remark = this.state.remarks[index];
+      // Perform the submit action here, e.g., API call
+      //console.log(`Submitting remark for item with id ${id}:`, remark);
+
+      const response = await axios.post(
+        'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
+        { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
+      );
+      console.log("handleSubmit:", response.data);
+      if(response.data.result.success === true)
+      {
+        this.props.closePopup();
+        this.props.refreshChild();
+      }
+      else
+      {
+        this.props.closePopup();
+        this.props.refreshChild()
+      }
+    }
+    
+
 
     handleEntriesPerPageChange = (e) => {
       this.setState({
@@ -54,24 +91,23 @@
       return `${year}年${monthNumber}月${parseInt(day)}日`;
     }
 
-    fetchCourseRegistrations(language) {
-     /* return axios
-        .post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'retrieve' })
-        .then(response => {
-          const array = this.languageDatabase(response.data.result, language);
-          return array;
-        })*/
-      return axios
-        .post('http://localhost:3001/courseregistration', { purpose: 'retrieve' })
-        .then(response => {
-          const array = this.languageDatabase(response.data.result, language);
-          return array;
-        })
-        .catch(error => {
-          console.error('Error fetching course registrations:', error);
-          return []; // Return an empty array in case of error
-        });
-    }
+    fetchCourseRegistrations = async (language) => {
+      try {
+        const response = await axios.post(
+          'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
+          { purpose: 'retrieve' }
+        );
+
+        console.log("Course Registration:", response);
+    
+        const array = this.languageDatabase(response.data.result, language);
+        return array;
+    
+      } catch (error) {
+        console.error('Error fetching course registrations:', error);
+        return []; // Return an empty array in case of error
+      }
+    };
 
     languageDatabase(array, language) {
       for (let i = 0; i < array.length; i++) {
@@ -128,8 +164,8 @@
       const { language } = this.props;
       const data = await this.fetchCourseRegistrations(language);
       console.log('Data:', data);
-      var locations = await this.getAllLocations(data);
-      var types = await this.getAllType(data);
+      var locations = this.getAllLocations(data);
+      var types = this.getAllType(data);
       this.props.passDataToParent(locations, types);
 
       const statuses = data.map(item => item.status); // Extract statuses
@@ -143,15 +179,20 @@
         inputValues[index] = item.status || "Pending"; // Use item.status or default to "Pending"
       });
 
+      const inputValues1 = {};
+      data.forEach((item, index) => {
+        inputValues1[index] = item.official.remarks; // Use item.status or default to "Pending"
+      });
+
       this.setState({
         originalData: data,
         registerationDetails: data, // Update with fetched dat
         isLoading: false, // Set loading to false after data is fetche
         inputValues: inputValues,  // Show dropdown for the focused input
+        remarks: inputValues1,  // Show dropdown for the focused input
         locations: locations, // Set locations in state
         types: types
       });
-    
       this.props.closePopup();
     }
     
@@ -348,22 +389,22 @@
 
     updateDatabaseForRegistrationPayment = async (value, id, page) => {
       console.log(value, id);
-     /* return axios
-        .post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
-        .then(response => {
-          if(response.data.result ===  true)
-          {
-            this.updateWooCommerceForRegistrationPayment(value, id, page)
-          }
-        })*/
-      return axios
-        .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
+     return axios
+        .post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
             this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
         })
+      /*return axios
+        .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
+        .then(response => {
+          if(response.data.result ===  true)
+          {
+            this.updateWooCommerceForRegistrationPayment(value, id, page)
+          }
+        })*/
         .catch(error => {
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
@@ -385,14 +426,14 @@
     updateWooCommerceForRegistrationPayment = async (value, id, page) =>
     {
       console.log("WooCommerce");
-      axios.post('https://moses-ecss-course.azurewebsites.net/courses', { type: 'update', page: page, status: value })
-      //axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
+      axios.post('https://moses-ecss-backend.azurewebsites.net/courses', { type: 'update', page: page, status: value })
+     // axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
           console.log("Update Woo Commerce", response.data);
           if(response.data.result ===  true)
           {
             console.log(this.props);
-            axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
             //axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
               if(response.data.result ===  true)
               {
@@ -441,6 +482,7 @@
       // Method to get all locations
       getAllLocations = async (datas) => {
         return [...new Set(datas.map(data => {
+          //console.log(data.course)
           return data.course.courseLocation;
         }))];
       }
@@ -457,40 +499,56 @@
         this.props.generateReceiptPopup();
     
         const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
-        
+    
         for (var i = 0; i < rowDataArray.length; i++) {
-            if ((rowDataArray[i].course.payment === "Cash" || rowDataArray[i].course.payment === "PayNow") && rowDataArray[i].status === "Paid") {
-                console.log("Generating Receipt for:", rowDataArray[i]._id);
-                const registration_id = rowDataArray[i]._id;
-                
+            if (
+                (rowDataArray[i].course.payment === "Cash" || 
+                 rowDataArray[i].course.payment === "PayNow" || 
+                 rowDataArray[i].course.payment === "SkillsFuture") && 
+                rowDataArray[i].status === "Paid" && 
+                rowDataArray[i].official.name !== null
+            ) {
                 try {
-                    // First, get the receipt number
-                    /*const response = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
-                      purpose: 'getReceiptNo',
-                      courseLocation: rowDataArray[i].course?.courseLocation
-                  });*/
-                    const response = await axios.post('http://localhost:3001/receipt', {
-                        purpose: 'getReceiptNo',
-                        courseLocation: rowDataArray[i].course?.courseLocation
-                    });
-                    
-                    const receiptNo = response.data.result.receiptNumber;
-                    
-                    if (response.data.result.success === true) 
-                    {
-                        // Now, fetch the PDF
-                        /*const pdfResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/courseregistration', {
-                          purpose: 'receipt',
-                            rowData: rowDataArray,
-                            staff: this.props.userName,
-                            receiptNo: receiptNo
-                        }, { responseType: 'blob' });*/
-                        const pdfResponse = await axios.post('http://localhost:3001/courseregistration', {
-                            purpose: 'receipt',
-                            rowData: rowDataArray,
-                            staff: this.props.userName,
-                            receiptNo: receiptNo
-                        }, { responseType: 'blob' });
+                    console.log("Generating Receipt for:", rowDataArray[i]._id);
+                    console.log("Payment Method:", rowDataArray[i].course.payment);
+                    const registration_id = rowDataArray[i]._id;
+                    let receiptNo = "";
+                    let response;
+    
+                    // Check if there's an existing receipt number
+                    if (rowDataArray[i].official.receiptNo === "") {
+                        // Get a new receipt number if not available
+                        const courseLocation = (rowDataArray[i].course.payment !== "SkillsFuture") 
+                            ? rowDataArray[i].course?.courseLocation 
+                            : 'SFC'; // Use 'SFC' for SkillsFuture payments
+    
+                        response = await axios.post(
+                            'https://moses-ecss-backend.azurewebsites.net/receipt',
+                            {
+                                purpose: 'getReceiptNo',
+                                courseLocation: courseLocation
+                            }
+                        );
+                        console.log("Get receipt number:", response.data);
+                        receiptNo = response.data.result.receiptNumber;
+                    } else {
+                        // Use the existing receipt number
+                        receiptNo = rowDataArray[i].official.receiptNo;
+                    }
+    
+                    if (response?.data?.result?.success) {
+                        // Fetch the PDF receipt
+                        const pdfResponse = await axios.post(
+                            'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+                            {
+                                purpose: 'receipt',
+                                rowData: rowDataArray,
+                                staff: this.props.userName,
+                                receiptNo: receiptNo
+                            },
+                            { responseType: 'blob' }
+                        );
+                        console.log("pdfResponse:", pdfResponse);
     
                         // Extract filename from Content-Disposition header
                         const contentDisposition = pdfResponse.headers['content-disposition'];
@@ -507,34 +565,60 @@
                         const pdfWindow = window.open();
                         pdfWindow.location.href = url;
     
-                        // Now, create the receipt in the database
-                       /* const receiptCreationResponse = await axios.post('https://moses-ecss-course.azurewebsites.net/receipt', {
-                          purpose: 'createReceipt',
-                          receiptNo: receiptNo,
-                          registration_id: registration_id,
-                          url: url,
-                          staff: this.props.userName
-                      });*/
-                      const receiptCreationResponse = await axios.post('http://localhost:3001/receipt', {
-                            purpose: 'createReceipt',
-                            receiptNo: receiptNo,
-                            registration_id: registration_id,
-                            url: url,
-                            staff: this.props.userName
-                        });
-    
+                        // Create the receipt in the database
+                        const receiptCreationResponse = await axios.post(
+                            'https://moses-ecss-backend.azurewebsites.net/receipt',
+                            {
+                                purpose: 'createReceipt',
+                                receiptNo: receiptNo,
+                                registration_id: registration_id,
+                                url: url,
+                                staff: this.props.userName
+                            }
+                        );
                         console.log("Receipt Created:", receiptCreationResponse.data);
-                        this.props.closePopup();
-                    } else {
-                        console.error("Failed to generate receipt number.");
+                    } 
+                    else 
+                    {
+                      const pdfResponse = await axios.post(
+                            'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+                            {
+                                purpose: 'receipt',
+                                rowData: rowDataArray,
+                                staff: this.props.userName,
+                                receiptNo: receiptNo
+                            },
+                            { responseType: 'blob' }
+                        );
+                        console.log("pdfResponse:", pdfResponse);
+
+                        // Extract filename from Content-Disposition header
+                        const contentDisposition = pdfResponse.headers['content-disposition'];
+                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+
+                        console.log(`Filename: ${filename}`);
+
+                        // Create a Blob for the PDF
+                        const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+                        const url = window.URL.createObjectURL(blob);
+
+                        // Open PDF in a new tab
+                        const pdfWindow = window.open();
+                        pdfWindow.location.href = url;
                     }
+    
+                    // Close the popup and refresh
+                    this.props.closePopup();
+                    this.props.refreshChild();
                 } catch (error) {
                     console.error('Error during receipt generation process:', error);
                 }
             }
         }
-    }
-
+    };
+    
+    
     async saveData(paginatedDetails) {
         console.log("Save Data:", paginatedDetails);
     
@@ -547,7 +631,7 @@
             "Participant Contact Number", "Participant Email", "Participant Postal Code", "Participant Education Level", "Participant Work Status",
             "Course Type", "Course English Name", "Course Chinese Name", "Course Location",
             "Course Price", "Course Duration", "Payment", "Agreement", "Payment Status",
-            "Staff Name", "Received Date", "Received Time"
+            "Staff Name", "Received Date", "Received Time", "Receipt/Inovice Number", "Remarks"
         ];
     
         preparedData.push(headers);
@@ -577,7 +661,9 @@
                 detail.status,
                 detail.official?.name,
                 detail.official?.date,
-                detail.official?.time
+                detail.official?.time,
+                detail.official?.receiptNo,
+                detail.official?.remarks
             ];
             preparedData.push(row);
         });
@@ -632,10 +718,9 @@
     
       if (!monthNumber) {
         return 'Invalid date format'; // Handle invalid month names
-      }
-    
+      }  
       // Return the date in the dd/mm/yyyy format
-      return `${day}/${monthNumber}/${year}`;
+      return `${day.toString().padStart(2, '0')}/${monthNumber.toString().padStart(2, '0')}/${year.toString().padStart(4, '0')}`;
     }
 
     convertDateFormat(dateString) {
@@ -671,6 +756,8 @@
       const startRow = 9;
   
       paginatedDetails.forEach((detail, index) => {
+        if(detail.course.courseType === "NSA")
+        {
           const rowIndex = startRow + index;
           const newDataRow = sourceSheet.getRow(rowIndex);
           newDataRow.height = originalRow.height;
@@ -693,24 +780,10 @@
           sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
   
           const educationParts = detail.participant.educationLevel.split(" ");
-          if(educationParts.length === 3)
-          {
-            sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0, 2).join(" ");
-          }
-          else if(educationParts.length === 2)
-          {
-            sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0];
-          }
+          sourceSheet.getCell(`M${rowIndex}`).value = educationParts.slice(0, 2).join(" ");
   
           const workParts = detail.participant.workStatus.split(" ");
-          if(workParts.length === 3)
-          {
-            sourceSheet.getCell(`N${rowIndex}`).value = workParts.slice(0, 2).join(" ");
-          }
-          else if(educationParts.length === 2)
-          {
-            sourceSheet.getCell(`N${rowIndex}`).value = workParts[0];
-          }
+          sourceSheet.getCell(`N${rowIndex}`).value = workParts.slice(0, 2).join(" ");
   
           sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName.split("–")[0].trim();
   
@@ -726,6 +799,7 @@
               const newCell = newDataRow.getCell(colNumber);
               newCell.style = cell.style;
           });
+        }
       });
   
       const originalFileName = file.name.replace('.xlsx', '_new.xlsx');
@@ -742,10 +816,11 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      this.props.refreshChild();
   };
   
     render() {
-      const { hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
+      const { isDisabled, remarks, hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
         <>
@@ -761,14 +836,14 @@
               <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
             </div>
             <div className="table-wrapper" ref={this.tableRef}>
-              <table>
+            <table style={{borderCollapse: 'collapse',tableLayout: 'fixed', width: '600%'}}>
                 <thead>
                   <tr>
                     <th colSpan="11">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
                     <th colSpan="5">{this.props.language === 'zh' ? '课程' : 'Courses'}</th>
                     <th>{this.props.language === 'zh' ? '其他' : 'Others'}</th>
                     <th>{this.props.language === 'zh' ? '确认状态' : 'Confirmation Status'}</th>
-                    <th colSpan="3">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
+                    <th colSpan="5">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
                   </tr>
                   <tr>
                     <th>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
@@ -792,6 +867,8 @@
                     <th>{this.props.language === 'zh' ? '' : 'Staff Name'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Date Received'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -850,6 +927,36 @@
                       <td onClick={(event) => this.receiptGenerator(event, item)}>{item.official?.name}</td>
                       <td>{item.official?.date}</td>                      
                       <td>{item.official?.time}</td>
+                      <td>{item.official?.receiptNo}</td>                      
+                      <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
+                      <input
+                          type="text"
+                          value={this.state.remarks[index]}
+                          maxLength={1000}
+                          onChange={(e) => this.handleInputChange1(e, index)}
+                          style={{
+                            width: '100%',
+                            padding: '0.5rem',
+                            border: '1px solid #ccc',
+                            boxSizing: 'border-box',
+                            whiteSpace: 'nowrap',
+                            marginTop: '0.5em'
+                          }}
+                        />
+                        <br/>
+                        <button
+                          onClick={() => this.handleSubmit(item._id, index)}
+                          style={{
+                            marginTop: '0.5rem',
+                            padding: '0.5rem',
+                            color: '#fff',
+                            border: 'none',
+                            marginBottom: '0.5em'
+                          }}
+                        >
+                          Submit
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

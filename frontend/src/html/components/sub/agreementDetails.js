@@ -20,13 +20,14 @@ class AgreementDetailsSection extends Component {
 
     // Pass the selected payment option back to the parent
     this.props.onChange({
+      ...this.props.formData,
       agreement: selectedChoice 
     });
   };
 
   render() {
     const { selectedChoice, isSelected } = this.state;
-    const { agreement } = this.props;
+    const { agreement, errors } = this.props;
 
     return (
       <div className="agreement-details-section">
@@ -52,11 +53,15 @@ class AgreementDetailsSection extends Component {
               />
               Agree 我同意
             </label>
-          {/* Show error message if the user has interacted but not selected the option */}
-          {isSelected && !selectedChoice && (
-            <span className="error-message1">Please select an option.</span>
-          )}
+          {console.log(!selectedChoice && isSelected)}
           </div>
+          <br/>
+          {!selectedChoice && isSelected && (
+            <>
+              <span className="error-message3">Please select the declaration</span>
+              <span className="error-message3">请选择声明</span>
+            </>
+          )}
         </div>
       </div>
     );

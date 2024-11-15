@@ -15,17 +15,18 @@ class AccountsSection extends Component {
       dataFetched: false,
       clearTable: false,
       currentPage: 1, // Add this
-      entriesPerPage: 10 // Add this
+      entriesPerPage: 10// Add this
     };
     this.tableRef = React.createRef();
   }
+
 
   async fetchAccounts() 
   {
     try {
       this.setState({ loading: true });
-      //var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/accountDetails`, { "purpose": "retrieve"});
-      var response = await axios.post(`http://localhost:3001/accountDetails`, { "purpose": "retrieve"});
+      var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accountDetails`, { "purpose": "retrieve"});
+      //var response = await axios.post(`http://localhost:3001/accountDetails`, { "purpose": "retrieve"});
       console.log(response.data.result);
       var roles = this.getAllRoles(response.data.result);
 
@@ -54,9 +55,9 @@ class AccountsSection extends Component {
   {
     try {
       this.setState({ loading: true });
-      var response = await axios.post(`http://localhost:3001/accessRights`, { "purpose": "retrieve"});
-      //var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/accessRights`, { "purpose": "retrieve"});
-      console.log(response.data.result);
+      var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accessRights`, { "purpose": "retrieve"});
+      //var response = await axios.post(`https://localhost:3001/accessRights`, { "purpose": "retrieve"});
+      console.log("Fetch Access Rights:",response.data.result);
       var roles = this.getAllRolesAccessRight(response.data.result);
 
       await this.props.getTotalNumberofAccounts(response.data.result.length);
@@ -297,7 +298,6 @@ accessRightInfo = async(accessRight) =>
                   <tr>
                     <th>{this.props.language === 'zh' ? '' : 'Name'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Email'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Password'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Account Type'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Date Created'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Time Created'}</th>
@@ -314,7 +314,6 @@ accessRightInfo = async(accessRight) =>
                         <tr key={index} onClick={() => this.accountInfo(account)}>
                           <td>{account.name}</td>
                           <td>{account.email}</td>
-                          <td>{account.password}</td>
                           <td>{account.role}</td>
                           <td>{account.date_created}</td>
                           <td>{account.time_created}</td>

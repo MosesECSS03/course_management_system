@@ -56,7 +56,7 @@ class Popup extends Component {
         });
     } else {
         clearInterval(this.countdownInterval);
-        this.setState({ countdown: 10 });
+       // this.setState({ countdown: 10 });
         // If the type changed to something else, clear the countdown
       }
     }
@@ -74,7 +74,7 @@ class Popup extends Component {
           //console.log(prevState.countdown);
          clearInterval(this.countdownInterval);
           this.props.goBackLoginPage();
-            return { countdown: 10 };
+            return { countdown: 0 };
         }
         console.log(prevState.countdown);
         return { countdown: prevState.countdown - 1 };
@@ -121,8 +121,8 @@ class Popup extends Component {
     }
     else if(valid)
     {
-      var response = await axios.post(`http://localhost:3001/login`, {"purpose": "changePassword", "accountId": accountId, "newPassword": newPassword});
-      //var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/login`, {"purpose": "changePassword", "accountId": accountId, "newPassword": newPassword});
+      //var response = await axios.post(`http://localhost:3001/login`, {"purpose": "changePassword", "accountId": accountId, "newPassword": newPassword});
+      var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, {"purpose": "changePassword", "accountId": accountId, "newPassword": newPassword});
       if(response.data.success === true)
       {
         this.props.passPopupMessage(response.data.success, response.data.message);
@@ -231,8 +231,8 @@ class Popup extends Component {
   
     if(valid === true)
     {
-      var response = await axios.post(`http://localhost:3001/login`, {"purpose": "resetPassword",  "username": username, "password": newPassword1});
-      //var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/login`, {"purpose": "resetPassword",  "username": username, "password": newPassword1});
+      //var response = await axios.post(`http://localhost:3001/login`, {"purpose": "resetPassword",  "username": username, "password": newPassword1});
+      var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, {"purpose": "resetPassword",  "username": username, "password": newPassword1});
       console.log(response)
       if(response.data.success === true)
       {
@@ -260,8 +260,8 @@ class Popup extends Component {
       console.log("Delete Account");
       //console.log("Delete Account", this.props);
       var accountId = this.props.message;
-      //var response = await axios.post(`http://moses-ecss-course.azurewebsites.net/accountDetails`, {"purpose": "deleteAccount",  "accountId": accountId});
-      var response = await axios.post(`http://localhost:3001/accountDetails`, {"purpose": "deleteAccount",  "accountId": accountId});
+      var response = await axios.post(`http://moses-ecss-backend.azurewebsites.net/accountDetails`, {"purpose": "deleteAccount",  "accountId": accountId});
+      //var response = await axios.post(`http://localhost:3001/accountDetails`, {"purpose": "deleteAccount",  "accountId": accountId});
       if(response.data.success === true)
       {
           //console.log("Change Password Successfully");
@@ -302,8 +302,8 @@ class Popup extends Component {
   {
     var accessRight = this.state.message4;
     var accessRightId = this.props.message._id;
-    //var response = await axios.post(`https://moses-ecss-course.azurewebsites.net/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
-    var response = await axios.post(`http://localhost:3001/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
+    var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
+    //var response = await axios.post(`http://localhost:3001/accessRights`, {"purpose": "updateAccessRight",  "accessRight": accessRight, "accessRightId": accessRightId});
     if(response.data.success === true)
       {
           //console.log("Change Password Successfully");

@@ -110,19 +110,39 @@ class PdfGenerator {
         const fontPathTimesRegular = path.join(__dirname, '../../fonts/timesNewRoman.ttf'); // Path to your Times New Roman font file
 
         // Set the font to Arial Bold and add the title "RECEIPT"
-        doc.font(fontPathBold).fontSize(16).text('RECEIPT', {
-            align: 'center' // Center the text
-        });
+        if(receiptNo.split("-")[0].trim() !== "SFC")
+        {
+            doc.font(fontPathBold).fontSize(16).text('RECEIPT', {
+                align: 'center' // Center the text
+            });
+        }
+        else
+        {
+            doc.font(fontPathBold).fontSize(16).text('INVOICE', {
+                align: 'center' // Center the text
+            });
+        }
+
+        
 
         // Move down for spacing after the title
         doc.moveDown(2); // Adjust the space after the title
 
+        var receiptText = "";
 
-        var receiptNumber = "Unknown";
-        const receiptText = `Receipt No   : ${receiptNo}`;
+        if(receiptNo.split("-")[0].trim() !== "SFC")
+        {
+            receiptText = `Receipt No   : ${receiptNo}`;
+        }
+        else
+        {
+            receiptText = `Invoice No   : ${receiptNo}`;
+        }
 
         // Store the current y position
         let currentY = doc.y;
+
+        console.log("Receipt Text:", receiptText);
 
         // Add the receipt number on the left side and keep the cursor position
         doc.font(fontPathTimesRegular).fontSize(12).text(receiptText, leftMargin, currentY, {
@@ -354,7 +374,7 @@ class PdfGenerator {
         console.log("Add Content:", name);
         
         // Initial header addition for the first page
-        await this.addHeader(doc); // Add header to the first page
+        await this.addHeader(doc, receiptNo); // Add header to the first page
     
         let currentPage = 1; // Initialize current page
         let totalPages = 1; // Initialize total pages

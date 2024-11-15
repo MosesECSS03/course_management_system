@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var RegistrationController = require('../Controller/Registration/RegistrationController');
-var ReceiptGenerator = require('../Controller/Receipt/ReceiptController');
+var ReceiptController = require('../Controller/Receipt/ReceiptController');
 var PdfGenerator = require('../Others/Pdf/PdfGenerator');
 
 function getCurrentDateTime() {
@@ -12,7 +12,7 @@ function getCurrentDateTime() {
     const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
     const year = now.getFullYear();
 
-    const hours = String(now.getHours()).padStart(2, '0'); // 24-hour format
+    const hours = String(now.getHours()+8).padStart(2, '0'); // 24-hour format
     const minutes = String(now.getMinutes()).padStart(2, '0'); // Ensure two digits
     const seconds = String(now.getSeconds()).padStart(2, '0'); // Ensure two digits
 
@@ -36,7 +36,9 @@ router.post('/', async function(req, res, next)
         participantsParticulars.official = {
             name: "", // You can set a default or dynamic value
             date: "", // You can set this to the current date using new Date() or any format
-            time: ""  // Set the current time or any specific time value
+            time: "",  // Set the current time or any specific time value
+            receiptNo: "",
+            remarks: ""
           };
         var result = await controller.newParticipant(participantsParticulars);
         return res.json({"result": result});
@@ -46,6 +48,7 @@ router.post('/', async function(req, res, next)
         //console.log("Retrieve From Database")
         var controller = new RegistrationController();
         var result = await controller.allParticipants();
+        console.log("Retrieve Payment:", result)
         return res.json({"result": result}); 
     }
     else if(req.body.purpose === "update")
@@ -59,7 +62,7 @@ router.post('/', async function(req, res, next)
     else if(req.body.purpose === "updatePayment")
     {
         console.log("Official Use");
-        var id = req.body.registration_id;
+        var id = req.body.registration_id;  
         var name = req.body.staff;
         var status = req.body.status;
         const currentDateTime = getCurrentDateTime();
@@ -73,9 +76,23 @@ router.post('/', async function(req, res, next)
     }
     else if(req.body.purpose === "receipt")
     {
+        console.log("Receipt body:", req.body); 
+        var controller = new RegistrationController();
+        var result = await controller.updateReceiptNumber(req.body.rowData[0]._id, req.body.receiptNo);
+        console.log("updateReceiptNumber:", result); 
         var pdf = new PdfGenerator();
-        console.log(req.body); 
         await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
+    }
+    else if(req.body.purpose === "updateRemarks")
+    {
+        var controller = new RegistrationController();
+        const currentDateTime = getCurrentDateTime();
+        var date = currentDateTime.date;
+        var time = currentDateTime.time;
+        var result = await controller.updateRemarks(req.body.id, req.body.remarks, req.body.staff, date, time);
+        var controller1 = new ReceiptController();
+        var result1 = await controller1.deleteReceipt(req.body.id);
+        return res.json({"result": result1}); 
     }
 });
 

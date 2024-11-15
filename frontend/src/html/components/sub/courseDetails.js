@@ -40,35 +40,35 @@ class CourseDetailsSection extends Component {
     return (
       <div className="course-details-section">
         <div className="input-group1">
-          <label htmlFor="courseType">Course Type</label>
+          <label htmlFor="courseType">Course Type 课程类型</label>
           <span className="course-detail-text" id="courseType">
             {this.props.courseType}
           </span>
         </div>
         <div className="input-group1">
-          <label htmlFor="courseName">Course Name</label>
+          <label htmlFor="courseName">Course Name 课程名称</label>
           <span className="course-detail-text" id="courseName">
             English Name: {this.props.courseEnglishName}
           </span>
           <br />
           <span className="course-detail-text" id="courseName">
-            Chinese Name: {this.props.courseChineseName}
+            中文名: {this.props.courseChineseName}
           </span>
         </div>
         <div className="input-group1">
-          <label htmlFor="courseLocation">Course Location</label>
+          <label htmlFor="courseLocation">Course Location 课程地点</label>
           <span className="course-detail-text" id="courseLocation">
             {this.props.courseLocation}
           </span>
         </div>
         <div className="input-group1">
-          <label htmlFor="coursePrice">Course Price</label>
+          <label htmlFor="coursePrice">Course Price 价格</label>
           <span className="course-detail-text" id="coursePrice">
             {this.props.coursePrice}
           </span>
         </div>
         <div className="input-group1">
-          <label htmlFor="courseDuration">Course Duration</label>
+          <label htmlFor="courseDuration">Course Duration 课程时长</label>
           <span className="course-detail-text" id="courseDuration">
             {this.props.courseDuration}
           </span>
@@ -77,7 +77,8 @@ class CourseDetailsSection extends Component {
         
         {/* Payment Options Section */}
         <div className="input-group1">
-          <label>Payment Options</label>
+          <label>I wish to pay by:</label>
+          <label>我希望通过以下方式付款：</label>
           <div className="payment-options">
             <label>
               <input
@@ -108,7 +109,10 @@ class CourseDetailsSection extends Component {
             </label>
           </div>
           {!selectedPayment && paymentTouched && (
-            <span className="error-message1">Please select a payment option.</span>
+            <>
+              <span className="error-message3">Please select a payment option.</span>
+              <span className="error-message3">请选择付款方式。</span>
+            </>
           )}
         </div>
       </div>
