@@ -20,11 +20,9 @@ class ReceiptController {
                 const latestReceiptNumber = await this.databaseConnectivity.getNextReceiptNumber(databaseName, collectionName, courseLocation);
 
                 // Parse and increment the numeric part of the receipt number
-                let nextNumber = 1;
                 if (latestReceiptNumber) {
                     const parts = latestReceiptNumber.split(" - ");
-                    const currentNumber = parseInt(parts[1], 10);
-                    nextNumber = currentNumber + 1;
+                    nextNumber = parseInt(parts[1], 10);
                 }
 
                 // Format the new receipt number with leading zeros (up to 6 digits)
