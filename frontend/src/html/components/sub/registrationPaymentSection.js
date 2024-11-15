@@ -38,7 +38,7 @@
         return { isDisabled: updatedDisabledState };
       }, () => {
         if (this.state.isDisabled) {
-          this.sendData(id, remarks); // Send data for the specific row
+          this.sendData(id, this.state.remarks); // Send data for the specific row
         }
       });
     };
@@ -792,7 +792,7 @@
               <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
             </div>
             <div className="table-wrapper" ref={this.tableRef}>
-            <table style={{borderCollapse: 'collapse',tableLayout: 'fixed', width: '450%'}}>
+            <table style={{borderCollapse: 'collapse',tableLayout: 'fixed', width: '600%'}}>
                 <thead>
                   <tr>
                     <th colSpan="11">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
