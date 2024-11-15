@@ -78,7 +78,7 @@ router.post('/', async function(req, res, next)
     {
         console.log("Receipt body:", req.body); 
         var controller = new RegistrationController();
-        var result = await controller.updateReceiptNumber(id, req.body.receiptNo);
+        var result = await controller.updateReceiptNumber(req.body.rowData._id, req.body.receiptNo);
         console.log("updateReceiptNumber:", result); 
         return res.json({"result": result}); 
         //var pdf = new PdfGenerator();

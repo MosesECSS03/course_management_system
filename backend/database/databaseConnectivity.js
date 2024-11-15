@@ -300,9 +300,7 @@ class DatabaseConnectivity {
                 // Update only the `receiptNo` field inside the `official` object
                 const update = {
                     $set: {
-                        "official": {
-                            receiptNo: receiptNumber
-                        }
+                        "official.receiptNo": receiptNumber
                     }
                 };
 
