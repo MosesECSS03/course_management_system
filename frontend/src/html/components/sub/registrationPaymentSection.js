@@ -25,22 +25,32 @@
         disabledRows: {}, // Store disabled state for each row
       };
       this.tableRef = React.createRef();
+
+      const disabledRows = {};
+      this.props.items.forEach(item => {
+        disabledRows[item._id] = true; // All rows are disabled initially
+      });
+  
+      // Set initial state for disabled rows
+      this.state.disabledRows = disabledRows;
     }
 
-    handleInputChange = (e, id) => {
-      this.setState((prevState) => ({
-        remarks: {
-          ...prevState.remarks,
-          [id]: e.target.value, // Update remarks for the specific row
-        },
-      }));
-    };
-
     handleClick1 = (id) => {
+      // Toggle the disabled state for the specific row's input
       this.setState((prevState) => ({
         disabledRows: {
           ...prevState.disabledRows,
-          [id]: !prevState.disabledRows[id], // Toggle disabled state for this row
+          [id]: !prevState.disabledRows[id], // Toggle between true/false
+        },
+      }));
+    };
+  
+    handleInputChange = (e, id) => {
+      // Update remarks for the specific row
+      this.setState((prevState) => ({
+        remarks: {
+          ...prevState.remarks,
+          [id]: e.target.value, // Update the value for this specific row
         },
       }));
     };
@@ -180,10 +190,6 @@
         types: types
       });
       this.props.closePopup();
-      this.state.disabledRows = this.props.items.reduce((acc, item) => {
-        acc[item._id] = true; // Set every row to be disabled by default
-        return acc;
-      }, {});
     }
     
     
@@ -894,16 +900,16 @@
                       <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
                       <input
                         type="text"
-                        value={this.state.remarks[item._id] || ''}
+                        value={this.state.remarks[item._id] || ''} // Bind value for the specific row
                         maxLength={1000}
-                        disabled={this.state.disabledRows[item._id]} // Specific disabled state per row
-                        onClick={() => this.handleClick1(item._id)} 
-                        onChange={(e) => this.handleInputChange(e, item._id)}
+                        disabled={this.state.disabledRows[item._id]} // Check if the row is disabled
+                        onClick={() => this.handleClick1(item._id)} // Toggle disabled state on click
+                        onChange={(e) => this.handleInputChange(e, item._id)} // Handle input changes
                         style={{
                           width: '100%',
                           padding: '0.5rem',
                           border: '1px solid #ccc',
-                          backgroundColor: this.state.disabledRows[item._id] ? '#f0f0f0' : '#fff',
+                          backgroundColor: this.state.disabledRows[item._id] ? '#f0f0f0' : '#fff', // Background changes when disabled
                           boxSizing: 'border-box',
                           whiteSpace: 'nowrap',
                         }}
