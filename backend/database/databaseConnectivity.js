@@ -403,7 +403,7 @@ class DatabaseConnectivity {
 
         // If there are no receipts for the specific courseLocation, start numbering from 1
         if (existingReceipts.length === 0) {
-            return `${courseLocation} - 001`; // No existing receipts, start at '1'
+            return `${courseLocation} - 0001`; // No existing receipts, start at '1'
         }
 
         // Extract the numeric part and find the latest number for the specific courseLocation
