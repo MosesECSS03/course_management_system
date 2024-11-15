@@ -357,7 +357,7 @@ class DatabaseConnectivity {
         }
     }
 
-    /*async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+    async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
         const db = this.client.db(databaseName);
         const collection = db.collection(collectionName);
     
@@ -370,7 +370,7 @@ class DatabaseConnectivity {
     
         // If there are no receipts for the specific courseLocation, return '001'
         if (existingReceipts.length === 0) {
-            return `${courseLocation} - 000001`; // No existing receipts, start at '001'
+            return `${courseLocation} - 00000001`; // No existing receipts, start at '001'
         }
     
         // Extract the numeric part and find the latest number for the specific courseLocation
@@ -390,8 +390,8 @@ class DatabaseConnectivity {
     
         // Return the next receipt number with dynamic length
         return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
-    }*/
-        async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+    }
+        /*async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
             try {
                 const db = this.client.db(databaseName);
                 const collection = db.collection(collectionName);
@@ -425,7 +425,7 @@ class DatabaseConnectivity {
                 console.error("Error generating next receipt number:", error);
                 throw error; // Rethrow the error for handling upstream
             }
-        }
+        }*/
         
 
     async deleteAccount(databaseName, collectionName, id) {
