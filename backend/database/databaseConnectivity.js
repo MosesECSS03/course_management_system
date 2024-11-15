@@ -405,12 +405,12 @@ class DatabaseConnectivity {
         
                 // If there are no receipts for the specific courseLocation, start numbering from 1
                 if (existingReceipts.length === 0) {
-                    return `${courseLocation} - 00000001`; // Start at 1 for this courseLocation
+                    return `${courseLocation} - 0000001`; // Start at 1 for this courseLocation
                 }
         
                 // Extract the numeric part and sort the receipt numbers
                 const receiptNumbers = existingReceipts.map(receipt => {
-                    const numberPart = receipt.receiptNo.substring(courseLocation.length + 3); // Extract the numeric part
+                    const numberPart = receipt.receiptNo.split(" - ")[1]; // Extract numeric part after " - "
                     return parseInt(numberPart, 10); // Convert to integer
                 }).filter(num => !isNaN(num)) // Filter out invalid numbers
                   .sort((a, b) => a - b); // Sort in ascending order
@@ -419,17 +419,14 @@ class DatabaseConnectivity {
                 const latestNumber = receiptNumbers[receiptNumbers.length - 1]; // Get the highest number
                 const nextNumber = latestNumber + 1;
         
-                // Calculate the length dynamically based on the maximum length of existing numbers
-                const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3); // Ensure at least 3 digits
-            
-                // Return the next receipt number with dynamic length
-                return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
+                // Always ensure the numeric part is 7 digits, padded with leading zeros
+                return `${courseLocation} - ${String(nextNumber).padStart(7, '0')}`;
             } catch (error) {
                 console.error("Error generating next receipt number:", error);
                 throw error; // Rethrow the error for handling upstream
             }
         }
-
+        
 
     async deleteAccount(databaseName, collectionName, id) {
         const db = this.client.db(databaseName);
