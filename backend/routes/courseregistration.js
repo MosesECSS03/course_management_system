@@ -86,8 +86,11 @@ router.post('/', async function(req, res, next)
     else if(req.body.purpose === "updateRemarks")
     {
         var controller = new RegistrationController();
-        var result = await controller.updateRemarks(req.body.id, req.body.remarks);
-        return res.json({"result": message}); 
+        const currentDateTime = getCurrentDateTime();
+        var date = currentDateTime.date;
+        var time = currentDateTime.time;
+        var result = await controller.updateRemarks(req.body.id, req.body.remarks, req.body.staff, date, time);
+        return res.json({"result": result}); 
     }
 });
 

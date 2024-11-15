@@ -359,7 +359,7 @@ class DatabaseConnectivity {
         }
     }
 
-    async updatePaymentRemarks(dbname, id, remarks) {
+    async updatePaymentRemarks(dbname, id, remarks, staff, date, time) {
         var db = this.client.db(dbname); // return the db object
         try {
             if (db) {
@@ -371,15 +371,19 @@ class DatabaseConnectivity {
     
                 // Define the update object conditionally based on status
                 let update = null;
+                var newPaymentMethod = remarks.split(" ")[5].trim();
 
                 //Remarks: Change Payment From What To What
                 if(remarks.includes("Change") || remarks.includes("Payment"))
                 {
                     update = {
                             $set: {
-                                "course.payment": remarks.split(" ")[6].trim(),
+                                "course.payment": newPaymentMethod,
                                 "official.remarks": remarks,
-                                "official.receiptNo": ""
+                                "official.receiptNo": "",
+                                "official.name": staff,
+                                "official.date": date,
+                                "official.time": time,
                             }
                         };
                 }

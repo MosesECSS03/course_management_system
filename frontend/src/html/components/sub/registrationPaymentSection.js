@@ -44,7 +44,7 @@
 
       const response = await axios.post(
         'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
-        { purpose: 'updateRemarks', id: id, remarks: remark }
+        { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
       );
       console.log(response);
     }
