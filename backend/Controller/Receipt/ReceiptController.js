@@ -114,6 +114,35 @@ class ReceiptController {
             await this.databaseConnectivity.close(); // Ensure the connection is closed
         }    
     }  
+
+    async deleteReceipt(id) 
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System";
+                var collectionName = "Receipts";
+                var connectedDatabase = await this.databaseConnectivity.deleteFromDatabase(databaseName, collectionName, id);   
+                return connectedDatabase;
+                //console.log(connectedDatabase);
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error retrieving all user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }  
     
 }
 

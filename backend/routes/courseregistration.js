@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var RegistrationController = require('../Controller/Registration/RegistrationController');
+var RecieptController = require('../Controller/Registration/RecieptController');
 var ReceiptGenerator = require('../Controller/Receipt/ReceiptController');
 var PdfGenerator = require('../Others/Pdf/PdfGenerator');
 
@@ -90,7 +91,9 @@ router.post('/', async function(req, res, next)
         var date = currentDateTime.date;
         var time = currentDateTime.time;
         var result = await controller.updateRemarks(req.body.id, req.body.remarks, req.body.staff, date, time);
-        return res.json({"result": result}); 
+        var controller1 = new RecieptController();
+        var result1 = await controller1.deleteReceipt(req.body.id);
+        return res.json({"result": result1}); 
     }
 });
 
