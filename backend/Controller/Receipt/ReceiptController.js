@@ -18,6 +18,7 @@ class ReceiptController {
 
                 // Find the highest existing receipt number for the given course location
                 const newReceiptNumber = await this.databaseConnectivity.getNextReceiptNumber(databaseName, collectionName, courseLocation);
+                console.log("New Receipt Number:", newReceiptNumber);
 
 
                 // Return the newly generated receipt number
