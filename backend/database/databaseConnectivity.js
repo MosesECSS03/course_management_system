@@ -370,7 +370,7 @@ class DatabaseConnectivity {
     
         // If there are no receipts for the specific courseLocation, return '1' as the starting number
         if (existingReceipts.length === 0) {
-            return `${courseLocation} - 1`; // Start from '1' for new courseLocation
+            return `${courseLocation} - 0001`; // Start from '1' for new courseLocation
         }
     
         // Extract the numeric part of receipt numbers
@@ -386,7 +386,8 @@ class DatabaseConnectivity {
         const nextNumber = latestNumber + 1;
     
         // Calculate the length dynamically based on the maximum numeric length in existing receipts
-        const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), String(nextNumber).length);
+       // const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), String(nextNumber).length);
+       const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 4);
     
         // Format the next number with leading zeros to match the dynamic length
         return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;

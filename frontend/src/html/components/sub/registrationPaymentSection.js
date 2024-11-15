@@ -571,7 +571,7 @@
                         }
                     }
                     this.props.closePopup();
-                    //this.props.refreshChild();
+                    this.props.refreshChild();
                 } catch (error) {
                     console.error('Error during receipt generation process:', error);
                 }
