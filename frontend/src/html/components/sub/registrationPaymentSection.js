@@ -31,23 +31,17 @@
       this.setState((prevState) => ({
         remarks: {
           ...prevState.remarks,
-          [id]: value,
+          [id]: value, // Use item._id as key
         },
       }));
     };
   
+    // Handle the submit action for a specific row
     handleSubmit = (id) => {
       const remark = this.state.remarks[id];
-      // Add the submit logic here, e.g., API call or form submission
-      console.log(`Submitting remark for row ${id}:`, remark);
-      this.sendData(id, remark);
-    };
-
-      sendData = (id, value) => {
-        console.log("Sending data:", id, value); // Log or send the data wherever necessary (e.g., API or parent component)
-        // Example of sending data via API:
-        // axios.post('/your-api-endpoint', { remarks: value });
-      };
+      // Perform the submit action here, e.g., API call
+      console.log(`Submitting remark for item with id ${id}:`, remark);
+    }
     
 
 
@@ -889,12 +883,11 @@
                           type="text"
                           value={this.state.remarks[index] || ''}
                           maxLength={1000}
-                          onChange={(e) => this.handleInputChange1(e, item._id)}
+                          onChange={(e) => this.handleInputChange1(e, index)}
                           style={{
                             width: '100%',
                             padding: '0.5rem',
                             border: '1px solid #ccc',
-                            backgroundColor: this.state.disabledRows[index] ? '#f0f0f0' : '#fff',
                             boxSizing: 'border-box',
                             whiteSpace: 'nowrap',
                           }}
