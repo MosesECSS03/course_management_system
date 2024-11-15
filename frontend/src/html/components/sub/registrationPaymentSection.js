@@ -515,8 +515,8 @@
                         // Non-SkillsFuture receipt number
                         const response = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/receipt',
-                            {
-                                purpose: 'receipt',
+                            { 
+                                purpose: 'getReceiptNo',
                                 courseLocation: 'SFC'
                             }
                         );
