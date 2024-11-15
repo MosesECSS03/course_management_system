@@ -28,10 +28,8 @@
     }
 
      // Method to handle click event and toggle the disabled state
-     handleInputChange = (e, id) => {
-      const updatedInputValues = { ...this.state.inputValues }; // Copy current state
-      updatedInputValues[id] = e.target.value; // Update value for the specific _id
-      this.setState({ inputValues: updatedInputValues });
+     handleInputChange = (e) => {
+      this.setState({ remarks: e.target.value });
     };
 
     handleClick1 = (id) => {
@@ -40,7 +38,7 @@
         return { isDisabled: updatedDisabledState };
       }, () => {
         if (this.state.isDisabled) {
-          this.sendData(this.state.inputValues[id]); // Send data for the specific row
+          this.sendData(id, remarks); // Send data for the specific row
         }
       });
     };
