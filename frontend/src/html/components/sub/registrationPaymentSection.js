@@ -534,7 +534,7 @@
             "Participant Contact Number", "Participant Email", "Participant Postal Code", "Participant Education Level", "Participant Work Status",
             "Course Type", "Course English Name", "Course Chinese Name", "Course Location",
             "Course Price", "Course Duration", "Payment", "Agreement", "Payment Status",
-            "Staff Name", "Received Date", "Received Time"
+            "Staff Name", "Received Date", "Received Time", 
         ];
     
         preparedData.push(headers);
