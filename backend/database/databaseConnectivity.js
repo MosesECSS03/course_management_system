@@ -391,38 +391,42 @@ class DatabaseConnectivity {
         // Return the next receipt number with dynamic length
         return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
     }*/
-   async getNextReceiptNumber(databaseName, collectionName, courseLocation) 
-    {
-        const db = this.client.db(databaseName);
-        const collection = db.collection(collectionName);
-
-        // Retrieve all receipts matching the specified courseLocation
-        const existingReceipts = await collection.find({
-            receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with courseLocation -
-        }).toArray();
-
-        console.log("Current receipts:", existingReceipts);
-
-        // If there are no receipts for the specific courseLocation, start numbering from 1
-        if (existingReceipts.length === 0) {
-            return `${courseLocation} - 000000`; // No existing receipts, start at '1'
+        async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+            try {
+                const db = this.client.db(databaseName);
+                const collection = db.collection(collectionName);
+        
+                // Retrieve all receipts matching the specified courseLocation
+                const existingReceipts = await collection.find({
+                    receiptNo: { $regex: `^${courseLocation} - ` } // Match receipt numbers starting with "courseLocation -"
+                }).toArray();
+        
+                console.log("Current receipts:", existingReceipts);
+        
+                // If there are no receipts for the specific courseLocation, start numbering from 1
+                if (existingReceipts.length === 0) {
+                    return `${courseLocation} - 0000000`; // Start at 1 for this courseLocation
+                }
+        
+                // Extract the numeric part and sort the receipt numbers
+                const receiptNumbers = existingReceipts.map(receipt => {
+                    const numberPart = receipt.receiptNo.substring(courseLocation.length + 3); // Extract the numeric part
+                    return parseInt(numberPart, 10); // Convert to integer
+                }).filter(num => !isNaN(num)) // Filter out invalid numbers
+                  .sort((a, b) => a - b); // Sort in ascending order
+        
+                // The next number in the sequence is the last number + 1
+                const latestNumber = receiptNumbers[receiptNumbers.length - 1]; // Get the highest number
+                const nextNumber = latestNumber + 1;
+        
+                // Return the next receipt number
+                return `${courseLocation} - ${nextNumber}`;
+            } catch (error) {
+                console.error("Error generating next receipt number:", error);
+                throw error; // Rethrow the error for handling upstream
+            }
         }
 
-        // Extract the numeric part and find the latest number for the specific courseLocation
-        const receiptNumbers = existingReceipts.map(receipt => {
-            const numberPart = receipt.receiptNo.substring(courseLocation.length + 3); // Extract the numeric part
-            return parseInt(numberPart, 10); // Convert to integer
-        }).filter(num => !isNaN(num)); // Filter out NaN values in case of invalid formats
-
-        // Find the latest (maximum) existing number
-        const latestNumber = Math.max(...receiptNumbers);
-
-        // Determine the next number without formatting constraints
-        const nextNumber = latestNumber + 1;
-
-        // Return the next receipt number without padding
-        return `${courseLocation} - ${nextNumber}`;
-    }
 
     async deleteAccount(databaseName, collectionName, id) {
         const db = this.client.db(databaseName);
