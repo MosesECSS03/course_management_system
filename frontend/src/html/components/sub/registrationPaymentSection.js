@@ -460,10 +460,11 @@
                     if (rowDataArray[i].course.payment !== "SkillsFuture") 
                     {
                       var receiptNo = "";
+                      var response;
                         if(rowDataArray[i].official.receiptNo === "")
                         {
                             // First, get the receipt number
-                            const response = await axios.post(
+                             response = await axios.post(
                                 'https://moses-ecss-backend.azurewebsites.net/receipt',
                                 {
                                     purpose: 'getReceiptNo',
@@ -526,6 +527,7 @@
                     {
                       console.log("SFC Payment");
                       var receiptNo = "";
+                      var response;
                       if(rowDataArray[i].official.receiptNo === "")
                       {
                           const response = await axios.post(
