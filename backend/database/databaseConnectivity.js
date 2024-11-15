@@ -465,12 +465,14 @@ class DatabaseConnectivity {
         }
     }
 
-    async deleteFromDatabase(databaseName, collectionName, id) {
+    async deleteFromDatabase(databaseName, collectionName, id)
+     {
         const db = this.client.db(databaseName);
         const table = db.collection(collectionName);
     
         try {
-            const filter = { _id: new ObjectId(id) }; // Find document by ID
+            const filter = { 
+                registration_id: new ObjectId(id) }; // Find document by ID
             const result = await table.deleteOne(filter);
     
             if (result.deletedCount === 1) {
