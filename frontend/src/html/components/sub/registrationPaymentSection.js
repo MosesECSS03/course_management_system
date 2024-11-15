@@ -180,6 +180,10 @@
         types: types
       });
       this.props.closePopup();
+      this.state.disabledRows = this.props.items.reduce((acc, item) => {
+        acc[item._id] = true; // Set every row to be disabled by default
+        return acc;
+      }, {});
     }
     
     
