@@ -7,8 +7,6 @@ class ReceiptController {
 
     // Method to handle generating a new receipt number
     async newReceiptNo(courseLocation) { // Accept courseLocation as a parameter
-        let newReceiptNumber = `${courseLocation} - 001`; // Default receipt number
-
         try {
             // Connect to the database
             const result = await this.databaseConnectivity.initialize();
@@ -18,8 +16,20 @@ class ReceiptController {
                 const databaseName = "Courses-Management-System";
                 const collectionName = "Receipts";
 
-                // Aggregate to find the maximum receipt number for the given course location
-                const newReceiptNumber = await this.databaseConnectivity.getNextReceiptNumber(databaseName, collectionName, courseLocation);
+                // Find the highest existing receipt number for the given course location
+                const latestReceiptNumber = await this.databaseConnectivity.getNextReceiptNumber(databaseName, collectionName, courseLocation);
+
+                // Parse and increment the numeric part of the receipt number
+                let nextNumber = 1;
+                if (latestReceiptNumber) {
+                    const parts = latestReceiptNumber.split(" - ");
+                    const currentNumber = parseInt(parts[1], 10);
+                    nextNumber = currentNumber + 1;
+                }
+
+                // Format the new receipt number with leading zeros (up to 6 digits)
+                const formattedNumber = nextNumber.toString().padStart(6, '0');
+                const newReceiptNumber = `${courseLocation} - ${formattedNumber}`;
 
                 // Return the newly generated receipt number
                 return {
@@ -38,8 +48,9 @@ class ReceiptController {
         } 
         finally {
             await this.databaseConnectivity.close(); // Ensure the connection is closed
-        }    
+        }
     }
+
 
     async createReceipt(receiptNo, registration_id, url, staff, date, time) {
         try {
