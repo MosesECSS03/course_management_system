@@ -169,11 +169,17 @@
         inputValues[index] = item.status || "Pending"; // Use item.status or default to "Pending"
       });
 
+      const inputValues1 = {};
+      data.forEach((item, index) => {
+        inputValues1[index] = item.official.remarks; // Use item.status or default to "Pending"
+      });
+
       this.setState({
         originalData: data,
         registerationDetails: data, // Update with fetched dat
         isLoading: false, // Set loading to false after data is fetche
         inputValues: inputValues,  // Show dropdown for the focused input
+        remarks: inputValues1,  // Show dropdown for the focused input
         locations: locations, // Set locations in state
         types: types
       });
