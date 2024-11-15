@@ -142,6 +142,8 @@ class PdfGenerator {
         // Store the current y position
         let currentY = doc.y;
 
+        console.log("Receipt Text:", receiptText);
+
         // Add the receipt number on the left side and keep the cursor position
         doc.font(fontPathTimesRegular).fontSize(12).text(receiptText, leftMargin, currentY, {
             continued: true // Keep the position to allow text on the same line
