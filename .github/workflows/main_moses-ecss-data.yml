@@ -26,15 +26,17 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-      
+
       - name: Install dependencies
         run:  pip install -r djangoPython/djangoPython/requirements.txt
-      
+        
       - name: Install corsheader
         run:  pip install django-cors-headers
-
+  
       - name: Run collectstatic
         run: python djangoPython/manage.py collectstatic --noinput
+          
+  
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -71,9 +73,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_52077B7BF463479FB2D8DA77FAE06D06 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7EDEC4BAA0104BE0BC1578DA79150EE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_174B2E34FE8E46F7B4E31D2E97025333 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_051E17E589364024BFB97CF759C7F345 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A27BD6CA3AA040CFB4E84DF1206A87AA }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A604BDBE12B74590AC43060CB32C5190 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -81,14 +83,14 @@ jobs:
         with:
           app-name: 'moses-ecss-data'
           slot-name: 'Production'
-
+      
       - name: Install dependencies
         run: pip install -r djangoPython/djangoPython/requirements.txt
-        
+          
       - name: Install corsheader
         run:  pip install django-cors-headers
-
+  
       - name: Run collectstatic
         run: python djangoPython/manage.py collectstatic --noinput
-          
+  
           
