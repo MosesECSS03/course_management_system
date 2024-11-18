@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-u=^cvw++1jd=0wwq6e2j*zo!i8f8z8o)o87v@c0ik^@ml8-6%b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'moses-ecss-data.azurewebsites.net']
 
 WOOCOMMERCE_API_URL = 'https://ecss.org.sg/wp-json/wc/v3/'
 WOOCOMMERCE_CONSUMER_KEY= 'ck_64b4cd6275b5d67bb30cf6b8a004974061ca7c12'
@@ -48,13 +48,15 @@ INSTALLED_APPS = [
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000', 
     'http://localhost:3001', 
-    'http://localhost:3002'
+    'http://localhost:3002',
+    'moses-ecss-data.azurewebsites.net'
 ]
 
 CORS_ALLOWED_ORIGINS = [
      'http://localhost:3000', 
     'http://localhost:3001', 
-    'http://localhost:3002'
+    'http://localhost:3002',
+    'moses-ecss-data.azurewebsites.net'
 ]
 
 MIDDLEWARE = [
@@ -66,7 +68,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
+
 
 ROOT_URLCONF = 'djangoPython.urls'
 
@@ -141,6 +145,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
