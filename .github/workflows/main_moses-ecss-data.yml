@@ -83,9 +83,12 @@ jobs:
           slot-name: 'Production'
 
       - name: Install dependencies
-        run: pip install -r djangoPython/djangoPython/requirements.txt
+        run: pip install -r djangoPython/djangoPython/requirements.
+        
+      - name: Install corsheader
+        run:  pip install django-cors-headers
 
       - name: Run collectstatic
-        run: python manage.py collectstatic
+        run: python djangoPython/manage.py collectstatic
           
           
