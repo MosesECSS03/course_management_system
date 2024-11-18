@@ -83,7 +83,7 @@ jobs:
           slot-name: 'Production'
 
       - name: Install dependencies
-        run: pip install -r djangoPython/djangoPython/requirements.
+        run: pip install -r djangoPython/djangoPython/requirements.txt
         
       - name: Install corsheader
         run:  pip install django-cors-headers
