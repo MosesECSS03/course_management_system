@@ -28,7 +28,7 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run:  pip install -r djangoPython/djangoPy/requirements.txt
+        run:  pip install -r djangoPython/djangoPython/requirements.txt
 
       - name: Run collectstatic
         run: python manage.py collectstatic
@@ -80,7 +80,7 @@ jobs:
           slot-name: 'Production'
 
       - name: Install dependencies
-        run: pip install -r djangoPython/djangoPy/requirements.txt
+        run: pip install -r djangoPython/djangoPython/requirements.txt
 
       - name: Run collectstatic
         run: python manage.py collectstatic
