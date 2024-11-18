@@ -34,7 +34,7 @@ jobs:
         run:  pip install django-cors-headers
 
       - name: Run collectstatic
-        run: python djangoPython/manage.py collectstatic
+        run: python djangoPython/manage.py collectstatic --noinput
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -89,6 +89,6 @@ jobs:
         run:  pip install django-cors-headers
 
       - name: Run collectstatic
-        run: python djangoPython/manage.py collectstatic
+        run: python djangoPython/manage.py collectstatic --noinput
           
           
