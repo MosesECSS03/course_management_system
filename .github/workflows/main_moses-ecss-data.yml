@@ -31,7 +31,7 @@ jobs:
         run:  pip install -r djangoPython/djangoPython/requirements.txt
 
       - name: Run collectstatic
-        run: python manage.py collectstatic
+        run: python djangoPython/manage.py collectstatic
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
