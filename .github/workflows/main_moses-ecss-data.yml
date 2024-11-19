@@ -28,7 +28,7 @@ jobs:
           source venv/bin/activate
 
       - name: Install dependencies
-        run:  pip install -r crequirements.txt
+        run:  pip install -r djangoPython/djangoPython/requirements.txt
         
       - name: Install corsheader
         run:  pip install django-cors-headers
