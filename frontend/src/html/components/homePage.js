@@ -674,7 +674,8 @@
       // Fetch product stock data when the component is mounted
       async fetchDataVisualization() {
         try {
-          const response = await axios.post('http://localhost:3002/dashboard_react/');
+          //const response = await axios.post('http://localhost:3002/dashboard_react/');
+          const response = await axios.post('https://moses-ecss-data.azurewebsites.net/dashboard_react/');
           const data = response.data;
 
           // Set the state with the fetched data

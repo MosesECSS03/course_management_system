@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-u=^cvw++1jd=0wwq6e2j*zo!i8f8z8o)o87v@c0ik^@ml8-6%b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'moses-ecss-data.azurewebsites.net', '169.254.129.2']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'moses-ecss-data.azurewebsites.net', '169.254.129.2', 'thankful-water-08ce4bd10.5.azurestaticapps.net']
 
 WOOCOMMERCE_API_URL = 'https://ecss.org.sg/wp-json/wc/v3/'
 WOOCOMMERCE_CONSUMER_KEY= 'ck_64b4cd6275b5d67bb30cf6b8a004974061ca7c12'
@@ -51,7 +51,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3001', 
     'http://localhost:3002',
     'https://moses-ecss-data.azurewebsites.net',
-    '169.254.129.2'
+    '169.254.129.2:3002',
+    'https://thankful-water-08ce4bd10.5.azurestaticapps.net/'
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -59,7 +60,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3001', 
     'http://localhost:3002',
     'https://moses-ecss-data.azurewebsites.net',
-    '169.254.129.2'
+    '169.254.129.2:3002',
+    'https://thankful-water-08ce4bd10.5.azurestaticapps.net/'
 ]
 
 MIDDLEWARE = [
