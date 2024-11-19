@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-u=^cvw++1jd=0wwq6e2j*zo!i8f8z8o)o87v@c0ik^@ml8-6%b
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'moses-ecss-data.azurewebsites.net', '169.254.129.2']
-.
+
 WOOCOMMERCE_API_URL = 'https://ecss.org.sg/wp-json/wc/v3/'
 WOOCOMMERCE_CONSUMER_KEY= 'ck_64b4cd6275b5d67bb30cf6b8a004974061ca7c12'
 WOOCOMMERCE_CONSUMER_SECRET = 'cs_f8b4434b612ee8825ce3778b45b430980cf4ca3d'
