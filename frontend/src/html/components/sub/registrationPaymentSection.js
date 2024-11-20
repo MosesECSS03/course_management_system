@@ -729,7 +729,7 @@
         link.click(); // Trigger the download
       }
 
-    convertDateFormat(dateString) {
+    convertDateFormat1(dateString) {
       const months = {
         January: '01',
         February: '02',

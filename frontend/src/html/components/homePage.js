@@ -970,6 +970,7 @@
                         refreshChild={this.refreshChild}
                         generateReceiptPopup = {this.generateReceiptPopup}
                         updatePaymentPopup = {this.updatePaymentPopup}
+                        updateRemarksPopup = {this.updateRemarksPopup}
                     />
                     </div>
                     <div className="pagination-section">
