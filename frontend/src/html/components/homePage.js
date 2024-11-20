@@ -591,8 +591,8 @@
   goBackHome = async() =>
   {
     console.log("Logout");
-    var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
-    //var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+   // var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
     if(response.data.message.message === "Logout successful")
     {
       this.props.auth.logout();
@@ -674,8 +674,8 @@
       // Fetch product stock data when the component is mounted
       async fetchDataVisualization() {
         try {
-          //const response = await axios.post('http://localhost:3002/dashboard_react/');
-          const response = await axios.post('https://moses-ecss-data.azurewebsites.net/dashboard_react/');
+          const response = await axios.post('http://localhost:3002/dashboard_react/');
+          //const response = await axios.post('https://moses-ecss-data.azurewebsites.net/dashboard_react/');
           const data = response.data;
 
           // Set the state with the fetched data
