@@ -585,7 +585,7 @@
 
     // Restart the inactivity timeout
     //this.inactivityTimeout = setTimeout(this.noActivityDetected, 10000); // 1 minute*/
-    this.inactivityTimeout = setTimeout(this.noActivityDetected, 1.5*60*1000); // 1 minute*/
+    this.inactivityTimeout = setTimeout(this.noActivityDetected, 5*60*1000); // 1 minute*/
   };
 
   goBackHome = async() =>
@@ -970,6 +970,8 @@
                         refreshChild={this.refreshChild}
                         generateReceiptPopup = {this.generateReceiptPopup}
                         updatePaymentPopup = {this.updatePaymentPopup}
+                        updateRemarksPopup = {this.updateRemarksPopup}
+                        warningPopUpMessage = {this.warningPopUpMessage}
                     />
                     </div>
                     <div className="pagination-section">
