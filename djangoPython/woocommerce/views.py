@@ -118,3 +118,33 @@ def product_stock_dashboard_react(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+'''Working with Database'''
+from pymongo import MongoClient
+from django.http import JsonResponse
+from pymongo import MongoClient
+from django.shortcuts import render
+
+def sales_report_view(request):
+    # MongoDB connection
+    client = MongoClient("mongodb+srv://moseslee:Mlxy6695@ecss-course.hejib.mongodb.net/?retryWrites=true&w=majority&appName=ECSS-Course")
+    db = client["Courses-Management-System"]
+    collection = db["Registration Forms"]
+    
+    # Retrieve documents where courseType is 'NSA'
+    documents = list(collection.find({"course.courseType": "NSA"}))
+
+    # Clean up the coursePrice and convert it to a number
+    for doc in documents:
+        # Convert the course price to a float and remove any '$' symbol
+        course_price = doc['course']['coursePrice']
+        # Remove the '$' symbol and convert to float
+        if course_price and course_price.startswith('$'):
+            doc['course']['coursePrice'] = float(course_price.replace('$', '').strip())
+
+    # Serialize MongoDB data (convert ObjectId to string for JSON compatibility)
+    for doc in documents:
+        doc["_id"] = str(doc["_id"])
+
+    # Return the filtered documents to the template
+    return render(request, 'woocommerce/salesReport.html', {'documents': documents})
