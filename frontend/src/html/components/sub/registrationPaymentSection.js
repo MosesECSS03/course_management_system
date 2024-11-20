@@ -820,7 +820,7 @@
           }
           else
           {
-            sourceSheet.getCell(`M${rowIndex}`).value = workParts[0];
+            sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0];
           }
 
           const workParts = detail.participant.workStatus.split(" ");
