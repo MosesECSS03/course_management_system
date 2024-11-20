@@ -52,7 +52,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3001', 
     'http://localhost:3002',
     'https://moses-ecss-data.azurewebsites.net',
-    '169.254.129.3:8000',
+    '169.254.129.3:3002',
     'https://thankful-water-08ce4bd10.5.azurestaticapps.net/'
 ]
 
@@ -61,7 +61,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3001', 
     'http://localhost:3002',
     'https://moses-ecss-data.azurewebsites.net',
-    '169.254.129.3:8000',
+    '169.254.129.3:3002',
     'https://thankful-water-08ce4bd10.5.azurestaticapps.net/'
 ]
 
