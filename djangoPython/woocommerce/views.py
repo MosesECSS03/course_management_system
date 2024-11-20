@@ -8,7 +8,7 @@ from django.shortcuts import render
 
 @csrf_exempt  # Temporarily disable CSRF validation for this view
 def product_list(request):
-    """Fetches and returns a list of products from WooCommerce based on the courseType.1"""
+    """Fetches and returns a list of products from WooCommerce based on the courseType."""
     data = json.loads(request.body)
     courseType = data.get('courseType')  # Get the courseType from the request body
 
