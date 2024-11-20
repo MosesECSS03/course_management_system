@@ -23,7 +23,7 @@ def product_list(request):
     
     # Convert the response data to a JSON string and return it
     response_data = json.dumps(products)
-    return JsonResponse({"product": response_data})
+    return JsonResponse({"courses": response_data})
 
 import re
 import json
