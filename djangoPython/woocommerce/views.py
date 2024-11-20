@@ -120,8 +120,7 @@ def product_stock_dashboard_react(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 '''Working with Database'''
-from pymongo import MongoClient
-from django.http import JsonResponse
+from collections import defaultdict
 from pymongo import MongoClient
 from django.shortcuts import render
 
@@ -130,21 +129,41 @@ def sales_report_view(request):
     client = MongoClient("mongodb+srv://moseslee:Mlxy6695@ecss-course.hejib.mongodb.net/?retryWrites=true&w=majority&appName=ECSS-Course")
     db = client["Courses-Management-System"]
     collection = db["Registration Forms"]
+
+    # Retrieve documents where courseType is 'NSA' and status is not 'Cancelled'
+    #documents = list(collection.find({"course.courseType": "NSA", "status": {"$ne": "Cancelled"}}))
+
+    # Retrieve documents where courseType is 'NSA' and status is neither 'Cancelled' nor 'Pending'
+    documents = list(collection.find({"course.courseType": "NSA", "status": "Paid"}))
+
     
-    # Retrieve documents where courseType is 'NSA'
-    documents = list(collection.find({"course.courseType": "NSA"}))
+    # Prepare an aggregation dictionary
+    course_totals = defaultdict(lambda: defaultdict(float))  # Nested dictionary for totals by duration
 
-    # Clean up the coursePrice and convert it to a number
+    # Process each document
     for doc in documents:
-        # Convert the course price to a float and remove any '$' symbol
-        course_price = doc['course']['coursePrice']
-        # Remove the '$' symbol and convert to float
-        if course_price and course_price.startswith('$'):
-            doc['course']['coursePrice'] = float(course_price.replace('$', '').strip())
+        # Clean up and convert coursePrice to a float
+        course_price = doc['course'].get('coursePrice', None)
+        if course_price and isinstance(course_price, str) and course_price.startswith('$'):
+            course_price = float(course_price.replace('$', '').strip())
+        else:
+            course_price = 0.0
+        
+        # Ensure fields are included
+        course_duration = doc['course'].get('courseDuration', 'N/A')  # Default to 'N/A' if missing
+        course_eng_name = doc['course'].get('courseEngName', 'N/A')  # Default to 'N/A' if missing
 
-    # Serialize MongoDB data (convert ObjectId to string for JSON compatibility)
-    for doc in documents:
+        # Add to aggregation
+        course_totals[course_eng_name][course_duration] += course_price
+
+        # Serialize MongoDB ObjectId to a string for JSON compatibility
         doc["_id"] = str(doc["_id"])
 
-    # Return the filtered documents to the template
-    return render(request, 'woocommerce/salesReport.html', {'documents': documents})
+    # Convert the nested dictionary to a list of results for the template
+    aggregated_data = [
+        {"courseEngName": course_name, "durations": [{"courseDuration": duration, "totalPrice": total} for duration, total in durations.items()]}
+        for course_name, durations in course_totals.items()
+    ]
+
+    # Pass both raw documents and aggregated data to the template
+    return render(request, 'woocommerce/salesReport.html', {'documents': documents, 'aggregated_data': aggregated_data})

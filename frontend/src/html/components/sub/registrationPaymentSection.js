@@ -172,8 +172,8 @@
       const { language } = this.props;
       const data = await this.fetchCourseRegistrations(language);
       console.log('Data:', data);
-      var locations = this.getAllLocations(data);
-      var types = this.getAllType(data);
+      var locations = await this.getAllLocations(data);
+      var types = await this.getAllType(data);
       this.props.passDataToParent(locations, types);
 
       const statuses = data.map(item => item.status); // Extract statuses
