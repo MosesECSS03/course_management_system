@@ -39,7 +39,7 @@
         this.setState({ loading: true });
         //var response = await axios.post(`http://localhost:3002/courses`, { "courseType": courseType });
         var response = await axios.post(`https://moses-ecss-data.azurewebsites.net/courses/`, { "courseType": courseType });
-        var courses = response.data.courses;
+        var courses = JSON.parse(response.data.courses);
         console.log("From Django:", response);
 
         // Extract locations and languages
