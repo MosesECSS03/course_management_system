@@ -14,7 +14,7 @@ def product_list(request):
 
     woo_api = WooCommerceAPI()  # Create an instance of WooCommerceAPI
 
-    if courseType == "NSA":
+    if courseType == "NSA": 
         products = woo_api.get_nsa_products()  # Call the method on the instance
     elif courseType == "ILP":
         products = woo_api.get_ilp_products()  # Call the method on the instance
