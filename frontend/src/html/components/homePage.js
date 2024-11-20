@@ -971,6 +971,7 @@
                         generateReceiptPopup = {this.generateReceiptPopup}
                         updatePaymentPopup = {this.updatePaymentPopup}
                         updateRemarksPopup = {this.updateRemarksPopup}
+                        warningPopUpMessage = {this.warningPopUpMessage}
                     />
                     </div>
                     <div className="pagination-section">
