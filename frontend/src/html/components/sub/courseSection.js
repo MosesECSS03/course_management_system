@@ -42,8 +42,8 @@
         var courses = response.data;
 
         // Extract locations and languages
-        var locations = this.getAllLocations(courses);
-        var languages = this.getAllLanguages(courses);
+        var locations = await this.getAllLocations(courses);
+        var languages = await this.getAllLanguages(courses);
 
         this.props.passDataToParent(locations, languages);
 
@@ -75,7 +75,7 @@
     
 
     // Method to get all locations
-    getAllLocations(courses) {
+    getAllLocations = async(courses)  => {
       return [...new Set(courses.map(course => {
         var nameDetails = this.courseNameAndDetails(course.name);
         return nameDetails.location;
@@ -83,7 +83,7 @@
     }
 
     // Method to get all languages
-    getAllLanguages(courses) {
+    getAllLanguages= async(courses)  =>  {
       return [...new Set(courses.map(course => {
         var courseDetails = this.getSelectedDetails(course.short_description);
         return courseDetails.language;
