@@ -30,7 +30,8 @@ class DashboardSection extends Component {
     // Fetch product stock data when the component is mounted
     fetchCourseReportVisualization = async () => {
         try {
-            const response = await axios.post('http://localhost:3002/course_report/');
+            //const response = await axios.post('http://localhost:3002/course_report/');
+            const response = await axios.post('http://moses-ecss-data.azurewebsites.net/course_report/');
             const data = response.data;
 
             // Set the state with the fetched data
@@ -46,7 +47,8 @@ class DashboardSection extends Component {
      fetchSalesReportVisualization = async () => {
         try 
         {
-            const response = await axios.post('http://localhost:3002/sales_report/');
+            //const response = await axios.post('http://localhost:3002/sales_report/');
+            const response = await axios.post('http://moses-ecss-data.azurewebsites.net/sales_report/');
             const data = response.data;
             console.log(data.aggregated_data)
 
