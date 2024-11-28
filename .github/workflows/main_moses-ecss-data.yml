@@ -35,7 +35,10 @@ jobs:
 
       - name: Install inflect
         run: pip install inflect
-  
+      
+      - name: Install pymongo
+        run: pip install pymongo
+            
       - name: Run collectstatic
         run: python djangoPython/manage.py collectstatic --noinput
           
@@ -92,6 +95,9 @@ jobs:
 
       - name: Install inflect
         run: pip install inflect
+
+      - name: Install pymongo
+        run: pip install pymongo
             
       - name: Install corsheader
         run:  pip install django-cors-headers
