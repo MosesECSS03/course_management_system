@@ -11,9 +11,10 @@
   import CreateAccountsSection from './sub/createAccountsSection';
   import ReceiptSection from './sub/receiptSection';
   import SideBarContent from './sub/sideBarContent';
+  import DashboardSection from './sub/dashboardSection';
   import { withAuth } from '../../AuthContext';
   import axios from 'axios';  
-  import Plot from 'react-plotly.js';
+
 
   class HomePage extends Component {
     constructor(props) {
@@ -93,10 +94,7 @@
         isReceiptVisible: false,
         item: '',
         isInactive: false,
-        refreshKey: 0,
-        productData: [],
-        mostStockedProduct: '',
-        leastStockedProduct: '',  
+        refreshKey: 0
       };
   
       // Set the initial state
@@ -113,7 +111,6 @@
       this.createAccountPopupMessage = this.createAccountPopupMessage.bind(this);
       this.inactivityTimeout = null;
       this.editAccountPopupMessage = this.editAccountPopupMessage.bind(this);
-      this.graphContainerRef = React.createRef();
       //this.getTotalNumberofDetails = this.getTotalNumberofDetails.bind(this);
     }
 
@@ -283,7 +280,6 @@
       window.addEventListener('click', this.resetInactivity);
       window.addEventListener('scroll', this.resetInactivity);
       window.addEventListener('beforeunload', this.handleBeforeUnload);
-      await this.fetchDataVisualization();
     }
 
     handleBeforeUnload = (event) => {
@@ -591,8 +587,8 @@
   goBackHome = async() =>
   {
     console.log("Logout");
-    var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
-    //var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+   // var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
     if(response.data.message.message === "Logout successful")
     {
       this.props.auth.logout();
@@ -671,23 +667,6 @@
       }, 5000);
     } 
 
-      // Fetch product stock data when the component is mounted
-      async fetchDataVisualization() {
-        try {
-          //const response = await axios.post('http://localhost:3002/dashboard_react/');
-          const response = await axios.post('https://moses-ecss-data.azurewebsites.net/dashboard_react/');
-          const data = response.data;
-
-          // Set the state with the fetched data
-          this.setState({
-            productData: data.product_data,
-            mostStockedProduct: data.most_stocked_product,
-            leastStockedProduct: data.least_stocked_product,
-          });
-        } catch (error) {
-          console.error('Error fetching product stock data:', error);
-        }
-      }
     
 
     courseNameAndDetails(product_name) {
@@ -706,61 +685,7 @@
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
-      const { item,isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount, productData, mostStockedProduct, leastStockedProduct} = this.state;
-      var productNames = productData.map((product) => product.name);
-      var stockQuantities = productData.map((product) => product.stock);
-
-      
-      var maxStock = Math.max(...stockQuantities);
-      var minStock = Math.min(...stockQuantities);
-      var mostPopularProductIndex = stockQuantities.indexOf(maxStock);
-      var leastPopularProductIndex = stockQuantities.indexOf(minStock);
-
-
-      var colors = stockQuantities.map((stock, index) => {
-        if (index === mostPopularProductIndex) {
-            return 'green'; // Most popular product color
-        } else if (index === leastPopularProductIndex) {
-            return 'red'; // Least popular product color
-        } else {
-            return 'blue'; // Default color for others
-        }
-    });
-    
-    const chartData = {
-      data: [
-        {
-          x: productNames,
-          y: stockQuantities,
-          type: 'bar',
-          name: 'Stock Level',
-          marker: { color: colors }  // Apply colors to the bars
-        }
-      ],
-      layout: {
-        title: '',
-        xaxis: { 
-          title: 'Courses', 
-          tickangle: 55,  
-          tickfont: {
-            size: 7,  // Decrease font size to fit the labels
-          },
-          tickmode: 'array',
-          tickvals: productNames  // Ensure all labels are visible
-        },
-        yaxis: { 
-          title: 'Vacancies' 
-        },
-        barmode: 'group',
-        hovermode: 'closest',
-        margin: { t: 60, b: 250, l: 60, r: 100 },  // Adjust margins to fit axis titles
-      },
-      config: {
-        displayModeBar: false,  // Hide all graph buttons
-        displaylogo: false,     // Remove the Plotly logo
-        responsive: true,       // Make the graph responsive to window size
-      }
-    };
+      const { item,isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
 
       return (
         <>
@@ -810,11 +735,7 @@
                 accountType === null && courseType === null && isRegistrationPaymentVisible === false && createAccount === false &&
                 (
                   <>
-                    <div className="data-visualization-section">
-                      <div className="course-vacancy-graph">
-                        <Plot data={chartData.data} layout={chartData.layout} config={chartData.config} style={{ width: '800px', height: '500px' }}/>
-                      </div>
-                    </div>
+                  {<DashboardSection/>}
                   </>
                 )
               }

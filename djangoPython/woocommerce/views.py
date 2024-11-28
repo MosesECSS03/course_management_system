@@ -35,7 +35,7 @@ def product_stock_dashboard(request):
     try:
         # Fetch products from WooCommerce API
         woo_api = WooCommerceAPI()
-        products = woo_api.get_nsa_products() + woo_api.get_ilp_products()  # Adjust as needed
+        products = woo_api.get_nsa_products() # Adjust as needed
 
         # Extract product names and stock quantities with custom logic for name splitting
         product_data = []
@@ -83,7 +83,7 @@ def product_stock_dashboard_react(request):
     try:
         # Fetch products from WooCommerce API
         woo_api = WooCommerceAPI()
-        products = woo_api.get_nsa_products() + woo_api.get_ilp_products()  # Adjust as needed
+        products = woo_api.get_nsa_products()  # Adjust as needed
 
         # Extract product names and stock quantities with custom logic for name splitting
         product_data = []
@@ -93,11 +93,14 @@ def product_stock_dashboard_react(request):
 
             # Determine how to process the name based on the split length
             if len(split_name) == 3:
-                processed_name = f"{split_name[1]} {split_name[2][1:-1]}"  # Correct slicing syntax
+                processed_name = f"{split_name[1]} | {split_name[2][1:-1]}"  # Correct slicing syntax
             elif len(split_name) == 2:
-                processed_name = f"{split_name[0]} {split_name[1][1:-1]}"  # Correct slicing syntax
+                processed_name = f"{split_name[0]} | {split_name[1][1:-1]}"  # Correct slicing syntax
             else:
                 processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
+
+            print(processed_name)
+        
 
             # Append processed product data
             product_data.append({
@@ -113,8 +116,372 @@ def product_stock_dashboard_react(request):
         return JsonResponse({
             'product_data': product_data,  # Return the processed product data
             'most_stocked_product': most_stocked_product,
-            'least_stocked_product': least_stocked_product,
+            'least_stocked_product': least_stocked_product
         })
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+'''Working with Database'''
+from collections import defaultdict
+from pymongo import MongoClient
+from django.shortcuts import render
+
+@csrf_exempt
+def sales_report_view(request):
+    # MongoDB connection
+    client = MongoClient("mongodb+srv://moseslee:Mlxy6695@ecss-course.hejib.mongodb.net/?retryWrites=true&w=majority&appName=ECSS-Course")
+    db = client["Courses-Management-System"]
+    collection = db["Registration Forms"]
+
+    # Retrieve documents where courseType is 'NSA' and status is 'Paid'
+    documents = list(collection.find({"course.courseType": "NSA", "status": "Paid"}))
+
+    # Prepare an aggregation dictionary
+    course_totals = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))  # Nested dictionary for totals by location and quarter
+
+    # Helper function for quarter formatting
+    def format_quarter_for_price(course_duration):
+        try:
+            # Parse the duration to extract the month and determine the quarter
+            duration = course_duration.split("-")[0].strip() # Assuming the quarter format logic is pre-defined
+            duration1 = duration.split(" ")[1].strip()
+            return format_quarter(duration1)  + " " + duration.split(" ")[2].strip()
+        except:
+            return "Unknown Quarter"
+
+    # Process each document
+    for doc in documents:
+        # Clean up and convert coursePrice to a float
+        course_price = doc['course'].get('coursePrice', None)
+        if course_price and isinstance(course_price, str) and course_price.startswith('$'):
+            course_price = float(course_price.replace('$', '').strip())
+        else:
+            course_price = 0.0
+
+        # Ensure fields are included
+        course_duration = doc['course'].get('courseDuration', 'N/A')  # Default to 'N/A' if missing
+        course_quarter = format_quarter_for_price(course_duration)
+        course_eng_name = doc['course'].get('courseEngName', 'N/A')  # Default to 'N/A' if missing
+        course_location = doc['course'].get('courseLocation', 'N/A')  # Default to 'N/A' if missing
+
+        # Add to aggregation based on location and quarter
+        course_totals[course_eng_name][course_location][course_quarter] += course_price
+
+        # Serialize MongoDB ObjectId to a string for JSON compatibility
+        doc["_id"] = str(doc["_id"])
+
+    # Convert the nested dictionary to a list of results for the template
+    aggregated_data = [
+        {
+            "courseEngName": course_name,
+            "locations": [
+                {
+                    "courseLocation": location,
+                    "quarters": [
+                        {"courseQuarter": quarter, "totalPrice": total}
+                        for quarter, total in quarters.items()
+                    ]
+                }
+                for location, quarters in locations.items()
+            ]
+        }
+        for course_name, locations in course_totals.items()
+    ]
+
+    # Pass both raw documents and aggregated data to the template
+    return render(request, 'woocommerce/salesReport.html', {'documents': documents, 'aggregated_data': aggregated_data})
+
+def format_quarter(month_name):
+    # Map month names to their corresponding month numbers
+    month_mapping = {
+        "January": 1, "February": 2, "March": 3,
+        "April": 4, "May": 5, "June": 6,
+        "July": 7, "August": 8, "September": 9,
+        "October": 10, "November": 11, "December": 12
+    }
+
+    # Get the month number from the full month name
+    month_number = month_mapping.get(month_name.strip(), None)
+    
+    if month_number is None:
+        return "Unknown Quarter"  # Handle invalid month names
+
+    # Determine the quarter based on the month number
+    if 1 <= month_number <= 3:
+        return "Q1 (January To March)"
+    elif 4 <= month_number <= 6:
+        return "Q2 (April To June)"
+    elif 7 <= month_number <= 9:
+        return "Q3 (July To September)"
+    elif 10 <= month_number <= 12:
+        return "Q4 (October To December)"
+    
+    return "Unknown Quarter"
+
+from pymongo import MongoClient
+from django.http import JsonResponse
+from bson import ObjectId
+import json
+from collections import defaultdict
+from datetime import datetime
+import inflect
+
+# Custom JSON encoder to handle MongoDB ObjectId
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return super().default(o)
+
+def format_price(price):
+    return f"${price:,.2f}"
+
+from collections import defaultdict
+from datetime import datetime
+from pymongo import MongoClient
+from django.shortcuts import render
+
+@csrf_exempt
+def generate_invoice_view(request):
+    # MongoDB connection
+    client = MongoClient("mongodb+srv://moseslee:Mlxy6695@ecss-course.hejib.mongodb.net/?retryWrites=true&w=majority&appName=ECSS-Course")
+    db = client["Courses-Management-System"]
+    collection = db["Registration Forms"]
+
+    p = inflect.engine()
+
+    # Filter for course.payment = "SkillsFuture", status = "Paid", and receiptNo is not empty
+    query = {
+        "course.payment": "SkillsFuture",
+        "status": "Paid",
+        "official.receiptNo": {"$ne": ""}
+    }
+
+    # Retrieve the filtered documents
+    documents = list(collection.find(query))
+
+    # Aggregation dictionary to store the data in the desired format
+    course_data = defaultdict(lambda: {
+        "courses": [],  # List of courses under this paymentDate
+        "total_price": 0  # Initialize total_price for each paymentDate
+    })
+
+    # Temporary dictionary to track course counts and accumulated total prices
+    course_accumulation = defaultdict(lambda: {"count": 0, "total_price": 0})
+
+    # To track courses and avoid duplicates later
+    seen_courses = set()
+
+    for doc in documents:
+        # Extract courseEngName (course name)
+        course_eng_name = doc["course"].get("courseEngName", None)
+        course_location = doc["course"].get("courseLocation", None)
+        if not course_eng_name:
+            continue  # Skip this document if no course name is found
+
+        # Extract price
+        course_price = doc["course"].get("coursePrice", 0)
+
+        # Check if the price is in string format with '$' sign and convert to float
+        if isinstance(course_price, str) and course_price.startswith('$'):
+            course_price = float(course_price.replace('$', '').strip())
+
+        # Round to 2 decimal places using float for precision
+        course_price *= 5
+        course_price = round(course_price, 2)
+
+        # Convert the course price to string format '$x.xx'
+        course_price_str = f"${course_price:.2f}"
+
+        # Extract number of people (default to 1 if not present)
+        no_of_people = doc["course"].get("numberOfPeople", 1)
+
+        # Calculate the total price for this course (price * number of people)
+        total_price = course_price * no_of_people
+        total_price = round(total_price, 2)  # Round to 2 decimal places
+
+        # Convert the total price to string format '$x.xx'
+        total_price_str = f"${total_price:.2f}"
+
+        # Extract and process courseDuration
+        course_duration_raw = doc["course"].get("courseDuration", None)
+        formatted_start_date = None
+        formatted_end_date = None
+
+        if course_duration_raw:
+            try:
+                # Expecting "dd MMMM yyyy - dd MMMM yyyy"
+                start_raw, end_raw = course_duration_raw.split(" - ")
+                start_date = datetime.strptime(start_raw, "%d %B %Y")
+                end_date = datetime.strptime(end_raw, "%d %B %Y")
+                
+                # Custom formatting without leading zeros for day and month
+                formatted_start_date = f"{start_date.day}.{start_date.month}.{start_date.year}"
+                formatted_end_date = f"{end_date.day}.{end_date.month}.{end_date.year}" if end_date else None
+            except (ValueError, IndexError):
+                pass  # If parsing fails, leave dates as None
+
+        # Extract official.date in dd/mm/yyyy format and parse it
+        official_date_raw = doc["official"].get("date", None)
+        formatted_month_year = None
+
+        if official_date_raw:
+            try:
+                official_date = datetime.strptime(official_date_raw, "%d/%m/%Y")
+                formatted_month_year = official_date.strftime("%B %Y")  # Format as "Month YYYY"
+            except ValueError:
+                pass  # If parsing fails, leave formatted_month_year as None
+
+        # Use the entry_counter as the primary key
+        if formatted_month_year:
+            payment_date = formatted_month_year
+        else:
+            payment_date = "Unknown Month-Year"
+
+        # Create a unique identifier for each course based on course name, location, and date range
+        course_key = (course_eng_name, course_location, formatted_start_date, formatted_end_date)
+
+        # Track the course count and accumulate total price
+        course_accumulation[course_key]["count"] += no_of_people
+        course_accumulation[course_key]["total_price"] += total_price
+
+        # Add the course details to the course data for later filtering
+        course_details = {
+            "course": course_eng_name,
+            "location": course_location,
+            "details": {
+                "price": course_price_str,  # Original price * 5, as a formatted string
+                "total_price": total_price_str,  # total_price = price * 5 * number of people, formatted
+                "startDate": formatted_start_date,
+                "endDate": formatted_end_date
+            }
+        }
+
+        if course_key not in seen_courses:
+            seen_courses.add(course_key)
+            course_data[payment_date]["courses"].append(course_details)
+
+    # Clean up the data to remove None or empty fields
+    cleaned_course_data = {}
+    for payment_date, data in course_data.items():
+        # Only include non-empty courses under each paymentDate
+        filtered_courses = []
+        for course in data["courses"]:
+            course_key = (course["course"], course["location"], course["details"]["startDate"], course["details"]["endDate"])
+            # Get the count and total price for this course key
+            count = course_accumulation[course_key]["count"]
+            total_price = course_accumulation[course_key]["total_price"]
+
+            # Add course to the filtered list if it has valid data
+            if course["course"] and any(v is not None and v != "" for v in course["details"].values()):
+                course["details"]["total_price"] = f"${total_price:.2f}"  # Format total price as string
+                course["details"]["count"] = count
+                filtered_courses.append(course)
+
+        # If there are any valid courses for this payment date, include them
+        if filtered_courses:
+            cleaned_course_data[payment_date] = {
+                "courses": filtered_courses,
+                "total_price": 0  # Placeholder for total price
+            }
+
+    # Calculate the total price for each payment date and convert it to words
+    for payment_date, data in cleaned_course_data.items():
+        for course in data["courses"]:
+            # Add the total price for this course to the payment date's overall total
+            data["total_price"] += float(course["details"]["total_price"].replace('$', '').replace(',', '').strip())
+
+        # Convert the total price to string and format as "$x.xx"
+        cleaned_course_data[payment_date]["total_price"] = f"${data['total_price']:.2f}"
+
+        price_value = float(data['total_price'].replace('$', '').replace(',', '').strip())
+            
+        # Split the price into dollars and cents
+        dollars = int(price_value)
+        cents = round((price_value - dollars) * 100)  # Round to the nearest cent
+            
+        # Convert the dollars to words
+        dollars_in_words = p.number_to_words(dollars)
+            
+        if cents > 0:
+            cents_in_words = p.number_to_words(cents)
+            price_in_words = f"{dollars_in_words} and {cents_in_words} Only"
+        else:
+            price_in_words = f"{dollars_in_words} Only"
+
+        # Update the total price in words
+        # Capitalize the first letter of each word (whether spaces exist or not)
+        price_in_words = ' '.join([word.capitalize() for word in price_in_words.split()])
+        
+        # Update the total price in words for the payment date
+        cleaned_course_data[payment_date]["total_price_in_words"] = price_in_words
+
+    # Pass the cleaned data to the template
+    print(cleaned_course_data)
+    return render(request, 'woocommerce/invoice_view.html', {'course_data': cleaned_course_data})
+
+@csrf_exempt
+def sales_report_view_react(request):
+    # MongoDB connection
+    client = MongoClient("mongodb+srv://moseslee:Mlxy6695@ecss-course.hejib.mongodb.net/?retryWrites=true&w=majority&appName=ECSS-Course")
+    db = client["Courses-Management-System"]
+    collection = db["Registration Forms"]
+
+    # Retrieve documents where courseType is 'NSA' and status is 'Paid'
+    documents = list(collection.find({"course.courseType": "NSA", "status": "Paid"}))
+
+    # Prepare an aggregation dictionary
+    course_totals = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))  # Nested dictionary for totals by location and quarter
+
+    # Helper function for quarter formatting
+    def format_quarter_for_price(course_duration):
+        try:
+            # Parse the duration to extract the month and determine the quarter
+            duration = course_duration.split("-")[0].strip()  # Assuming the quarter format logic is pre-defined
+            duration1 = duration.split(" ")[1].strip()
+            return format_quarter(duration1) + " " + duration.split(" ")[2].strip()
+        except:
+            return "Unknown Quarter"
+
+    # Process each document
+    for doc in documents:
+        # Clean up and convert coursePrice to a float
+        course_price = doc['course'].get('coursePrice', None)
+        if course_price and isinstance(course_price, str) and course_price.startswith('$'):
+            course_price = float(course_price.replace('$', '').strip())
+        else:
+            course_price = 0.0
+
+        # Ensure fields are included
+        course_duration = doc['course'].get('courseDuration', 'N/A')  # Default to 'N/A' if missing
+        course_quarter = format_quarter_for_price(course_duration)
+        course_eng_name = doc['course'].get('courseEngName', 'N/A')  # Default to 'N/A' if missing
+        course_location = doc['course'].get('courseLocation', 'N/A')  # Default to 'N/A' if missing
+
+        # Add to aggregation based on location and quarter
+        course_totals[course_eng_name][course_location][course_quarter] += course_price
+
+        # Serialize MongoDB ObjectId to a string for JSON compatibility
+        doc["_id"] = str(doc["_id"])
+
+    # Convert the nested dictionary to a list of results
+    aggregated_data = [
+        {
+            "courseEngName": course_name,
+            "locations": [
+                {
+                    "courseLocation": location,
+                    "quarters": [
+                        {"courseQuarter": quarter, "totalPrice": total}
+                        for quarter, total in quarters.items()
+                    ]
+                }
+                for location, quarters in locations.items()
+            ]
+        }
+        for course_name, locations in course_totals.items()
+    ]
+
+    # Return aggregated data as JSON response
+    return JsonResponse({'documents': documents, 'aggregated_data': aggregated_data}, safe=False)
