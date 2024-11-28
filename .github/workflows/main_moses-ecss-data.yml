@@ -32,6 +32,9 @@ jobs:
         
       - name: Install corsheader
         run:  pip install django-cors-headers
+
+      - name: Install inflect
+        run: pip install -r inflect
   
       - name: Run collectstatic
         run: python djangoPython/manage.py collectstatic --noinput
@@ -86,7 +89,10 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r djangoPython/djangoPython/requirements.txt
-          
+
+      - name: Install inflect
+        run: pip install -r inflect
+            
       - name: Install corsheader
         run:  pip install django-cors-headers
   
