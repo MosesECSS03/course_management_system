@@ -191,7 +191,7 @@ def sales_report_view(request):
 
     # Pass both raw documents and aggregated data to the template
     return render(request, 'woocommerce/salesReport.html', {'documents': documents, 'aggregated_data': aggregated_data})
-
+@csrf_exempt
 def format_quarter(month_name):
     # Map month names to their corresponding month numbers
     month_mapping = {
@@ -227,13 +227,14 @@ from collections import defaultdict
 from datetime import datetime
 import inflect
 
+@csrf_exempt
 # Custom JSON encoder to handle MongoDB ObjectId1
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
             return str(o)
         return super().default(o)
-
+@csrf_exempt
 def format_price(price):
     return f"${price:,.2f}"
 
@@ -433,7 +434,8 @@ def sales_report_view_react(request):
 
     # Prepare an aggregation dictionary
     course_totals = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))  # Nested dictionary for totals by location and quarter
-
+    
+    @csrf_exempt
     # Helper function for quarter formatting
     def format_quarter_for_price(course_duration):
         try:
