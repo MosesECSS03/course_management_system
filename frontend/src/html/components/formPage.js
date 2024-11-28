@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../../css/formPage.css';
-import FormDetails from './sub/formDetails'; // Import the FormDetails component
+import FormDetails from './sub/formDetails'; // Import the FormDetails component1
 import PersonalInfo from './sub/personalInfo'; // Import PersonalInfo component
 import CourseDetails from './sub/courseDetails'; // Import CourseDetails component
 import AgreementDetailsSection from './sub/agreementDetails';
