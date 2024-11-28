@@ -430,8 +430,6 @@ class DashboardSection extends Component {
         const courseTotalPrice = productNamesAndLocations.map((item) => parseFloat(item.totalPrice.toFixed(2)));
         const totalPriceSum = courseTotalPrice.reduce((acc, price) => acc + price, 0);
     
-        console.log("Total Price For ALL Course:", totalPriceSum);
-        
         // Calculate total price for the selected quarter
         const selectedQuarterData = filteredData1.flatMap((product) =>
             product.locations.flatMap((location) =>

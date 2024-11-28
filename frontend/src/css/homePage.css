@@ -138,6 +138,26 @@
     box-shadow: none;
   }
 
+  .invoice-section
+  {
+    grid-row: 1; /* Botom section */
+    z-index: 0;
+    margin-left: -20rem;
+   -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+
+  .dashboard-section
+  {
+    grid-row: 1; /* Botom section */
+    z-index: 1  ;
+   -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+
+
   .account-section, .courses-section
   {
     grid-row: 3; /* Botom section */
