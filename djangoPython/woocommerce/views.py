@@ -9,21 +9,35 @@ from django.shortcuts import render
 @csrf_exempt  # Temporarily disable CSRF validation for this view
 def product_list(request):
     """Fetches and returns a list of products from WooCommerce based on the courseType."""
-    data = json.loads(request.body)
-    courseType = data.get('courseType')  # Get the courseType from the request body
+    try:
+        # Parse the request body as JSON
+        data = json.loads(request.body)
+        print("Data received:", data)
+        courseType = data.get('courseType')  # Get the courseType from the request body
 
-    woo_api = WooCommerceAPI()  # Create an instance of WooCommerceAPI
+        # Initialize WooCommerce API instance
+        woo_api = WooCommerceAPI()
 
-    if courseType == "NSA": 
-        products = woo_api.get_nsa_products()  # Call the method on the instance
-    elif courseType == "ILP":
-        products = woo_api.get_ilp_products()  # Call the method on the instance
-    else:
-        products = woo_api.get_nsa_products()+woo_api.get_ilp_products() # Handle other course types if needed
+        # Fetch products based on courseType
+        if courseType == "NSA":
+            products = woo_api.get_nsa_products()
+        elif courseType == "ILP":
+            products = woo_api.get_ilp_products()
+        else:
+            # Handle cases where no valid courseType is provided
+            products = woo_api.get_nsa_products() + woo_api.get_ilp_products()
+        
+        print(products)
+
+        # Return the products as a JSON response
+        return JsonResponse({"courses": products})
     
-    # Convert the response data to a JSON string and return it
-    response_data = json.dumps(products)
-    return JsonResponse({"courses": response_data})
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON input."}, status=400)
+    except Exception as e:
+        # Catch and log unexpected errors
+        print("Error:", e)
+        return JsonResponse({"error": "An error occurred while processing the request."}, status=500)
 
 import re
 import json

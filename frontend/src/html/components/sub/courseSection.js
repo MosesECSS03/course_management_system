@@ -37,9 +37,10 @@
     async fetchCourses(courseType) {
       try {
         this.setState({ loading: true });
-        //var response = await axios.post(`http://localhost:3002/courses`, { "courseType": courseType });
-        var response = await axios.post(`https://moses-ecss-data.azurewebsites.net/courses/`, { "courseType": courseType });
-        var courses = JSON.parse(response.data.courses);
+        var response = await axios.post(`http://localhost:3002/courses/`, { "courseType": courseType });
+        console.log("Responses:", response)
+        //var response = await axios.post(`https://moses-ecss-data.azurewebsites.net/courses/`, { "courseType": courseType });
+        var courses = response.data.courses;
         console.log("From Django:", response);
 
         // Extract locations and languages
@@ -159,8 +160,8 @@
 
     // Axios instance with CSRF token attached
     axiosInstance = axios.create({
-      //baseURL: 'http://localhost:3002',  // Your Django backend URL
-      baseURL: 'https://moses-ecss-data.azurewebsites.net/',  // Your Django backend URL
+      baseURL: 'http://localhost:3002',  // Your Django backend URL
+      //baseURL: 'https://moses-ecss-data.azurewebsites.net/',  // Your Django backend URL
       withCredentials: true            // Ensure cookies are sent with requests
     });
 

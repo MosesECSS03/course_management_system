@@ -17,7 +17,9 @@ class InvoiceSection extends Component {
 
     // Fetch invoice data when the component mounts
     componentDidMount = async () => {
+        this.props.loadingPopup1();
         await this.fetchInvoiceDetails();
+        this.props.closePopup1();
     };
 
     // Fetch invoice data from API
@@ -73,6 +75,7 @@ class InvoiceSection extends Component {
 
     generateInvoice = async () => 
     {
+        await this.props.generateInvoicePopup();
         const { courses, months, totalPrice, totalPriceInWords, selectedMonth} = this.state;
     
         // Check if both arrays have elements
@@ -125,6 +128,7 @@ class InvoiceSection extends Component {
                     const pdfWindow = window.open();
                     pdfWindow.location.href = url;
                 }
+                this.props.closePopup1();
             } 
             catch (error) 
             {

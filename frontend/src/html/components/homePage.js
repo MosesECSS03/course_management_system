@@ -211,7 +211,7 @@
           this.setState({
             courseType: null,
             sidebarVisible: false,
-            isRegistrationPaymentVisible: false ,
+            isRegistrationPaymentVisible: false,
             section: "",
             accountType: null,
             createAccount: false,
@@ -557,7 +557,8 @@
             accountType: null,
             createAccount: false,
             isReceiptVisible: false,
-            item: item
+            item: item,
+            invoiceVisibility: false
             //viewMode: "full"
         }));
       }
@@ -701,7 +702,23 @@
       }, 5000);
     } 
 
-    
+    loadingPopup = async () =>
+    {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Loading Dashboard",
+        popupType: "loading",
+      });
+    }
+
+    loadingPopup1 = async () =>
+      {
+        this.setState({
+          isPopupOpen: true,
+          popupMessage: "Loading In Progress",
+          popupType: "loading",
+        });
+      }
 
     courseNameAndDetails(product_name) {
       var regex = /<br\s*\/?>/gi;
@@ -715,6 +732,15 @@
         return { "engName": array[0], "chiName": array[0], "location": array[1] };
       }
     } 
+
+    generateInvoicePopup = async() => 
+    {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Generating Invoice",
+        popupType: "loading",
+      });
+    }
 
     render() 
     {
@@ -773,6 +799,7 @@
                   <div className="dashboard-section">
                     {<DashboardSection
                      closePopup1={this.closePopup}
+                      loadingPopup = {this.loadingPopup}
                      />}
                   </div>
                   </>
@@ -993,7 +1020,10 @@
                   <>
                     <div className="invoice-section">
                     <InvoiceSection 
-                      userName = {userName}/>
+                      userName = {userName}
+                      closePopup1={this.closePopup}
+                      loadingPopup1 = {this.loadingPopup1}
+                      generateInvoicePopup = {this.generateInvoicePopup}/>
                     </div>
                   </>} 
                   {/* Conditionally render the section */}
