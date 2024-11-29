@@ -12,6 +12,7 @@
   import ReceiptSection from './sub/receiptSection';
   import SideBarContent from './sub/sideBarContent';
   import DashboardSection from './sub/dashboardSection';
+  import InvoiceSection from './sub/invoiceSection';
   import { withAuth } from '../../AuthContext';
   import axios from 'axios';  
 
@@ -94,7 +95,8 @@
         isReceiptVisible: false,
         item: '',
         isInactive: false,
-        refreshKey: 0
+        refreshKey: 0,
+        invoiceVisibility: false
       };
   
       // Set the initial state
@@ -197,6 +199,31 @@
       }
     }
 
+    toggleInvoiceComponent = async() =>
+    {
+      try 
+      {
+          this.setState({ resetSearch: true, }, () => {
+            this.setState({ resetSearch: false });
+          });
+
+         
+          this.setState({
+            courseType: null,
+            sidebarVisible: false,
+            isRegistrationPaymentVisible: false ,
+            section: "",
+            accountType: null,
+            createAccount: false,
+            invoiceVisibility: true
+          });
+      } 
+      catch (error) 
+      {
+        console.log(error);
+      }
+    }
+
     // Handle selection for registration payments
     handleRegPaymentSearchFromChild = async (data) => {
       this.setState({
@@ -263,7 +290,8 @@
           section: "courses",
           accountType: "",
           createAccount: false,
-          isReceiptVisible: false
+          isReceiptVisible: false,
+          invoiceVisibility: false
         });
       } catch (error) {
         console.log(error);
@@ -318,7 +346,8 @@
               isRegistrationPaymentVisible: false ,
               section: "",
               accountType: null,
-              createAccount: false
+              createAccount: false,
+              invoiceVisibility: false
             });
         } 
         catch (error) 
@@ -348,7 +377,8 @@
             isRegistrationPaymentVisible: false ,
             section: "accounts",
             accountType: accountType,
-            createAccount: false
+            createAccount: false,
+            invoiceVisibility: false
           });
         }
         else
@@ -362,7 +392,8 @@
             isRegistrationPaymentVisible: false ,
             section: "accounts",
             accountType: null,
-            createAccount: true
+            createAccount: true,
+            invoiceVisibility: false
           });
         }
       } 
@@ -680,12 +711,12 @@
         array[1] = array[1].replace(/[()]/g, '');
         return { "engName": array[0], "chiName": array[0], "location": array[1] };
       }
-    }
+    } 
 
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
-      const { item,isDropdownOpen, isReceiptVisible, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
+      const { item,isDropdownOpen, isReceiptVisible, invoiceVisibility, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
 
       return (
         <>
@@ -727,15 +758,18 @@
                   toggleAccountsComponent = {this.toggleAccountsComponent}
                   toggleCourseComponent = {this.toggleCourseComponent}
                   toggleRegistrationPaymentComponent = {this.toggleRegistrationPaymentComponent}
+                  toggleInvoiceComponent = {this.toggleInvoiceComponent}
                   key={this.state.refreshKey}
                 />
               </div>
               <div className="main-content">
               {
-                accountType === null && courseType === null && isRegistrationPaymentVisible === false && createAccount === false &&
+                accountType === null && courseType === null && isRegistrationPaymentVisible === false && createAccount === false && invoiceVisibility === false &&
                 (
                   <>
-                  {<DashboardSection/>}
+                  <div className="dashboard-section">
+                    {<DashboardSection/>}
+                  </div>
                   </>
                 )
               }
@@ -948,6 +982,13 @@
                         totalPages={totalPages} 
                         onPageChange={this.handlePageChange}
                       />
+                    </div>
+                  </>} 
+                  {invoiceVisibility && 
+                  <>
+                    <div className="invoice-section">
+                    <InvoiceSection 
+                      userName = {userName}/>
                     </div>
                   </>} 
                   {/* Conditionally render the section */}

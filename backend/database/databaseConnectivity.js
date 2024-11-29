@@ -465,6 +465,157 @@ class DatabaseConnectivity {
         }
     }
 
+    async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+        const db = this.client.db(databaseName);
+        const collection = db.collection(collectionName);
+    
+        // Retrieve all receipts matching the specified courseLocation
+        const existingReceipts = await collection.find({
+            receiptNo: { $regex: `^${courseLocation} - \\d+$` } // Match receipt numbers with courseLocation and numeric part
+        }).toArray();
+    
+        console.log("Current receipts:", existingReceipts);
+    
+        // If there are no receipts for the specific courseLocation, return '1' as the starting number
+        if (existingReceipts.length === 0) {
+            return `${courseLocation} - 0001`; // Start from '1' for new courseLocation
+        }
+    
+        // Extract the numeric part of receipt numbers
+        const receiptNumbers = existingReceipts.map(receipt => {
+            const match = receipt.receiptNo.match(new RegExp(`^${courseLocation} - (\\d+)$`));
+            return match ? parseInt(match[1], 10) : null; // Extract and parse numeric part
+        }).filter(num => num !== null); // Remove invalid entries
+    
+        // Find the latest (maximum) existing number
+        const latestNumber = Math.max(...receiptNumbers);
+    
+        // Determine the next number
+        const nextNumber = latestNumber + 1;
+    
+        // Calculate the length dynamically based on the maximum numeric length in existing receipts
+       // const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), String(nextNumber).length);
+       const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 4);
+    
+        // Format the next number with leading zeros to match the dynamic length
+        return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
+    }
+
+    async newInvoice(databaseName, collectionName, invoiceNumber, month, username, date, time) {
+        try {
+            // Connect to the database and collection
+            const db = this.client.db(databaseName);
+            const collection = db.collection(collectionName);
+    
+            // Prepare the invoice document to insert
+            const invoiceDocument = {
+                invoiceNumber: invoiceNumber,
+                month: month,
+                username: username,
+                date: date,
+                time: time,
+            };
+    
+            // Insert the document into the collection
+            const result = await collection.insertOne(invoiceDocument);
+    
+            console.log("Invoice inserted successfully:", result.insertedId);
+            return { success: true, id: result.insertedId }; // Return success with the inserted document ID
+        } catch (error) {
+            console.error("Error inserting new invoice:", error);
+            return { success: false, error: "Failed to insert new invoice. Please try again." }; // Return failure with an error message
+        }
+    }
+
+    async getNextInvoiceNumber(databaseName, collectionName) {
+        try {
+            const db = this.client.db(databaseName);
+            const collection = db.collection(collectionName);
+    
+            const prefix = "ECSS/TLE/205/";
+    
+            // Retrieve all invoices matching the specified prefix
+            const existingInvoices = await collection.find({
+                invoiceNumber: { $regex: `^${prefix}\\d+$` } // Match invoice numbers starting with the prefix and a numeric part
+            }).toArray();
+    
+            console.log("Current Invoices:", existingInvoices);
+    
+            // If there are no invoices, start with '1'
+            if (existingInvoices.length === 0) {
+                return `${prefix}1`;
+            }
+    
+            // Extract the numeric part of invoice numbers
+            const invoiceNumbers = existingInvoices.map(invoice => {
+                const match = invoice.invoiceNumber.match(new RegExp(`^${prefix}(\\d+)$`));
+                if (match) {
+                    console.log(`Extracted number: ${match[1]}`); // Debugging output
+                }
+                return match ? parseInt(match[1], 10) : null; // Extract and parse numeric part
+            }).filter(num => num !== null); // Remove invalid entries
+    
+            // Debugging output for extracted numbers
+            console.log("Extracted Invoice Numbers:", invoiceNumbers);
+    
+            // Find the latest (maximum) existing number
+            const latestNumber = Math.max(...invoiceNumbers);
+            console.log("Latest Invoice Number:", latestNumber); // Debugging output
+    
+            // Determine the next number
+            const nextNumber = latestNumber + 1;
+    
+            // Return the next invoice number without leading zeros
+            return `${prefix}${nextNumber}`;
+        } catch (error) {
+            console.error("Error in getNextInvoiceNumber:", error);
+            throw new Error("Unable to generate the next invoice number. Please try again.");
+        }
+    }
+
+    async getInvoiceNumber(databaseName, collectionName, selectedMonth) {
+        try {
+            const db = this.client.db(databaseName);
+            const collection = db.collection(collectionName);
+    
+            // Query to find the document with the specified month
+            const invoice = await collection.findOne({ month: selectedMonth });
+            console.log(invoice);
+    
+            if (!invoice) {
+                console.log(`No invoice found for the month: ${selectedMonth}`);
+                return null; // Return null if no document matches the query
+            }
+    
+            console.log("Found Invoice:", invoice.invoiceNumber);
+            return invoice.invoiceNumber; // Return the found document
+        } catch (error) {
+            console.error("Error in getInvoiceNumber:", error);
+            throw new Error("Unable to retrieve the invoice. Please try again.");
+        }
+    }
+    
+    async deleteAccount(databaseName, collectionName, id) {
+        const db = this.client.db(databaseName);
+        const table = db.collection(collectionName);
+    
+        try {
+            const filter = { _id: new ObjectId(id) }; // Find document by ID
+            const result = await table.deleteOne(filter);
+    
+            if (result.deletedCount === 1) {
+                console.log("Successfully deleted the document.");
+                return { success: true, message: "Document deleted successfully." };
+            } else {
+                console.log("No document found with that ID.");
+                return { success: false, message: "No document found with that ID." };
+            }
+        } catch (error) {
+            console.log("Error deleting document:", error);
+            return { success: false, error };
+        }
+    }
+
     async deleteFromDatabase(databaseName, collectionName, id)
      {
         const db = this.client.db(databaseName);
