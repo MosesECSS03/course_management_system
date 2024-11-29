@@ -70,33 +70,66 @@ class InvoiceSection extends Component {
         }
     };
 
-    generateInvoice = async () => {
-        const { courses, months, totalPrice, totalPriceInWords } = this.state;
+    generateInvoice = async () => 
+    {
+        const { courses, months, totalPrice, totalPriceInWords, selectedMonth} = this.state;
     
         // Check if both arrays have elements
-        if (courses.length > 0 || months.length > 0) {
-            try {
-                const response = await axios.post('http://localhost:3001/invoice', { purpose: 'generateInvoice', details: courses, totalPrice: totalPrice, totalPriceInWords: totalPriceInWords}, { responseType: 'blob' });
-                 
-                // Extract filename from Content-Disposition header
-                  const contentDisposition = response.headers['content-disposition'];
-                  const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                  let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+        if (courses.length > 0 || months.length > 0) 
+        {
+            try 
+            {
+                var response = await axios.post('http://localhost:3001/invoice', {purpose: 'findInvoiceNumber', selectedMonth: selectedMonth});
+                var invoiceNumber = response.data.invoiceNumber;
+                console.log(invoiceNumber);
+                if(invoiceNumber === "")
+                {
+                    var response1 = await axios.post('http://localhost:3001/invoice', {purpose: 'getInvoiceNumber'});
+                    var newInvoiceNumber = response1.data.invoiceNumber;
+                    var response2 = await axios.post('http://localhost:3001/invoice', { purpose: 'generateInvoice', details: courses, totalPrice: totalPrice, totalPriceInWords: totalPriceInWords, invoiceNumber: newInvoiceNumber, selectedMonth: selectedMonth, userName: this.props.userName}, { responseType: 'blob' });
+                    
+                    // Extract filename from Content-Disposition header
+                    const contentDisposition = response2.headers['content-disposition'];
+                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
 
-                  console.log(`Filename: ${filename}`);
+                    console.log(`Filename: ${filename}`);
 
-                  // Create a Blob for the PDF
-                  const blob = new Blob([response.data], { type: 'application/pdf' });
-                  const url = window.URL.createObjectURL(blob);
+                    // Create a Blob for the PDF
+                    const blob = new Blob([response2.data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
 
-                  // Open PDF in a new tab
-                  const pdfWindow = window.open();
-                  pdfWindow.location.href = url;
+                    // Open PDF in a new tab
+                    const pdfWindow = window.open();
+                    pdfWindow.location.href = url;
+                }
+                else
+                {
+                    var response1 = await axios.post('http://localhost:3001/invoice', { purpose: 'generateInvoice', details: courses, totalPrice: totalPrice, totalPriceInWords: totalPriceInWords, invoiceNumber: invoiceNumber, selectedMonth: selectedMonth, userName: this.props.userName}, { responseType: 'blob' });
+                    
+                    // Extract filename from Content-Disposition header
+                    const contentDisposition = response1.headers['content-disposition'];
+                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
 
-            } catch (error) {
+                    console.log(`Filename: ${filename}`);
+
+                    // Create a Blob for the PDF
+                    const blob = new Blob([response1.data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
+
+                    // Open PDF in a new tab
+                    const pdfWindow = window.open();
+                    pdfWindow.location.href = url;
+                }
+            } 
+            catch (error) 
+            {
                 console.error('Error generating invoice:', error);
             }
-        } else {
+        } 
+        else 
+        {
             console.log("Cannot generate invoice: Courses or months are empty");
         }
     };

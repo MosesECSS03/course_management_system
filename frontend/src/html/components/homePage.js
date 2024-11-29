@@ -987,7 +987,8 @@
                   {invoiceVisibility && 
                   <>
                     <div className="invoice-section">
-                    <InvoiceSection />
+                    <InvoiceSection 
+                      userName = {userName}/>
                     </div>
                   </>} 
                   {/* Conditionally render the section */}

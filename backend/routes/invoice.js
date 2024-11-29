@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 var PdfGenerator = require('../Others/Pdf/PdfGenerator');
+var InvoiceController = require("../Controller/Invoice/InvoiceController")
 
 function getCurrentDateTime() {
     const now = new Date();
@@ -32,10 +33,24 @@ router.post('/', async function(req, res, next)
     {   
         console.log("Generate Invoice");
         var pdf = new PdfGenerator();
-        await pdf.generateInvoice(res, req.body.details, req.body.totalPrice, req.body.totalPriceInWords);
-        /*var controller = new ReceiptController();
-        var result = await controller.newReceiptNo(req.body.courseLocation);
-        return res.json({"result": result});*/
+        var controller = new InvoiceController();
+        var currentDateTime = getCurrentDateTime();
+        var result = await controller.newInvoice(req.body.invoiceNumber, req.body.selectedMonth, req.body.userName, currentDateTime.date, currentDateTime.time);
+        await pdf.generateInvoice(res, req.body.details, req.body.totalPrice, req.body.totalPriceInWords, req.body.invoiceNumber);
+    }
+    else if(req.body.purpose === "getInvoiceNumber")
+    {
+        var controller = new InvoiceController();
+        var result = await controller.newInvoiceNo();
+        console.log(result);
+        return res.json({invoiceNumber: result.invoiceNumber});
+    }
+    else if(req.body.purpose === "findInvoiceNumber")
+    {
+        var controller = new InvoiceController();
+        var result = await controller.getInvoiceNumber(req.body.selectedMonth);
+        console.log("Find:", result.invoiceNumber);
+        return res.json({invoiceNumber: result.invoiceNumber});
     }
 });
 

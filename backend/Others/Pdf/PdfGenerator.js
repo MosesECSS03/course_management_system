@@ -525,24 +525,25 @@ class PdfGenerator {
     }
 
     
-    async addInvoiceContent(doc, details, totalPrice, totalPriceInWords) {
+    async addInvoiceContent(doc, details, totalPrice, totalPriceInWords, invoiceNumber) 
+    {
         // Initialize page counters
     
         // Add the initial header to the first page
         await this.addInvoiceHeader(doc);
     
         // Add the initial invoice body and check for overflow
-        let contentHeight = await this.addInvoiceBody(doc, details, totalPrice, totalPriceInWords);
+        let contentHeight = await this.addInvoiceBody(doc, details, totalPrice, totalPriceInWords, invoiceNumber);
     
         // Check if content overflowed and we need more pages
         while (contentHeight > doc.page.height - 100) { // 100 for footer margin
             // Add the invoice body for the new page, recalculate content height
-            contentHeight = await this.addInvoiceBody(doc, details, totalPrice, totalPriceInWords);
+            contentHeight = await this.addInvoiceBody(doc, details, totalPrice, totalPriceInWords, invoiceNumber);
         }
         // Now add the footer to every page to ensure consistency across pages
     }
     
-    async addInvoiceBody(doc, details, totalPrice, totalPriceInWords) {
+    async addInvoiceBody(doc, details, totalPrice, totalPriceInWords, invoiceNumber) {
         const leftMargin = 2.54 * 28.35; // 2.54 cm to points
         const rightMargin = 15.93; // Right margin in points
     
@@ -605,7 +606,7 @@ class PdfGenerator {
         await checkPageSpaceAndAddNewPage(doc, 20, currentPage, totalPages, leftMargin, rightMargin);
     
         // Add Invoice Number Section
-        var invoiceText = "Invoice No   : ECSS/TLE/205/24";
+        var invoiceText = `Invoice No   : ${invoiceNumber}`;
         let currentY = doc.y;
         doc.font(fontPathTimesRegular).fontSize(12).text(invoiceText, leftMargin, currentY, { continued: true });
     
@@ -922,7 +923,7 @@ class PdfGenerator {
         });
     }
 
-    async generateInvoice(res, details, totalPrice, totalPriceInWords) 
+    async generateInvoice(res, details, totalPrice, totalPriceInWords, invoiceNumber) 
     {
         return new Promise((resolve, reject) => 
         {
@@ -956,7 +957,7 @@ class PdfGenerator {
                 doc.pipe(res);
                 
                 // Ensure addContent is called correctly with await
-                this.addInvoiceContent(doc, details, totalPrice, totalPriceInWords)
+                this.addInvoiceContent(doc, details, totalPrice, totalPriceInWords, invoiceNumber)
                     .then(() => {
                         // Finalize the document
                         doc.end();
