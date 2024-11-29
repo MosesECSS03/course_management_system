@@ -42,11 +42,14 @@ class DashboardSection extends Component {
         }
     };
 
-     // Fetch product stock data when the component is mounted
-     fetchSalesReportVisualization = async () => {
+
+    // Fetch product stock data when the component is mounted
+    fetchSalesReportVisualization = async () => 
+    {
         try 
         {
             const response = await axios.post('http://localhost:3002/sales_report/');
+           // const response = await axios.post('https://moses-ecss-data.azurewebsites.net/sales_report/');
             const data = response.data;
             console.log(data.aggregated_data)
 
@@ -80,6 +83,7 @@ class DashboardSection extends Component {
     }
 
     componentDidMount = async () => {
+        this.props.loadingPopup();
         var dashboard = document.getElementById("data-visualization-section1");
         dashboard.style.display = "none";
         

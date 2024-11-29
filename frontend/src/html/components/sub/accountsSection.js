@@ -56,7 +56,7 @@ class AccountsSection extends Component {
     try {
       this.setState({ loading: true });
       //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/accessRights`, { "purpose": "retrieve"});
-      var response = await axios.post(`https://localhost:3001/accessRights`, { "purpose": "retrieve"});
+      var response = await axios.post(`http://localhost:3001/accessRights`, { "purpose": "retrieve"});
       console.log("Fetch Access Rights:",response.data.result);
       var roles = this.getAllRolesAccessRight(response.data.result);
 

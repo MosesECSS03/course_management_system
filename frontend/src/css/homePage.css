@@ -105,7 +105,7 @@
     box-sizing: border-box; /* Include padding in the width/height calculation */
     padding: 20px; /* Add some padding for better readability */
     transition: margin-left 0.3s ease; /* Smooth transition for margin change */
-    margin-left: 8.5rem;
+    margin-left: 6.5rem;
   }
 
   /* Show main content with sidebar collapsed or expanded */
@@ -163,10 +163,10 @@
     grid-row: 3; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;
-    /*margin-top: -20rem;*/
+    margin-top: -30rem;
   }
 
- .registration-payment-section, .receipt-section
+  .receipt-section
   {
     grid-row: 3; /* Botom section */
     z-index: 0;
@@ -180,9 +180,20 @@
     margin-top: -30rem !important;
   }*/
 
+
+  .registration-payment-section
+  {
+    grid-row: 3; /* Botom section */
+    z-index: 0;
+    margin-left: -6.5rem;
+    margin-top: -25rem;
+    height: fit-content;
+  }
+
   .pagination-section
   {
     grid-row: 4;
+    margin-left: 8.5rem;
   }
 
 
