@@ -347,7 +347,10 @@
               section: "",
               accountType: null,
               createAccount: false,
-              invoiceVisibility: false
+              invoiceVisibility: false,
+              isPopupOpen: true,
+              popupMessage: "Loading Dashboard",
+              popupType: "loading",
             });
         } 
         catch (error) 
@@ -768,7 +771,9 @@
                 (
                   <>
                   <div className="dashboard-section">
-                    {<DashboardSection/>}
+                    {<DashboardSection
+                     closePopup1={this.closePopup}
+                     />}
                   </div>
                   </>
                 )
