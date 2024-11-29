@@ -4,6 +4,7 @@
     max-height: fit-content;  /* Set a maximum height to trigger vertical scrolling */
     max-width: 90%;  /* Ensure it doesn’t overflow horizontally */
     overflow: auto;   /* Enable both vertical and horizontal scrolling */
+    margin-left: 3%;
 }
 
 #invoiceSelectBox {
