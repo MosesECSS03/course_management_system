@@ -107,6 +107,7 @@ class DashboardSection extends Component {
         }finally {
             // Show the dashboard after data is fetched
             dashboard.style.display = "grid";
+            this.props.closePopup1();
         }
     };
     
