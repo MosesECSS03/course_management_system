@@ -160,8 +160,8 @@ def product_stock_dashboard_react(request):
         # Return JSON response
         return JsonResponse({
             'product_data': product_data,  # Return the processed product data
-            'most_stocked_product': least_stocked_product,
-            'least_stocked_product': most_stocked_product
+            'most_stocked_product': most_stocked_product,
+            'least_stocked_product': least_stocked_product
         })
 
     except Exception as e:
