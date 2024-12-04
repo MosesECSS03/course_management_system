@@ -34,7 +34,7 @@ def product_list(request):
         return JsonResponse({"courses": products})
 
         except json.JSONDecodeError:
-        return JsonResponse({"error": "Invalid JSON input."}, status=400)
+            return JsonResponse({"error": "Invalid JSON input."}, status=400)
 
     except Exception as e:
         # Catch and log unexpected errors
