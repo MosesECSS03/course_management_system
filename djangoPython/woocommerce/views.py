@@ -1,10 +1,10 @@
-    from django.http import JsonResponse, HttpResponse
-    from .services import WooCommerceAPI
-    from django.views.decorators.csrf import csrf_exempt  # Temporarily disable CSRF validation for this view
-    import json
-    import plotly.express as px
-    import pandas as pd
-    from django.shortcuts import render
+from django.http import JsonResponse, HttpResponse
+from .services import WooCommerceAPI
+from django.views.decorators.csrf import csrf_exempt  # Temporarily disable CSRF validation for this view
+import json
+import plotly.express as px
+import pandas as pd
+from django.shortcuts import render
 
     @csrf_exempt  # Temporarily disable CSRF validation for this view
     def product_list(request):
