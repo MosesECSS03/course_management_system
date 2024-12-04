@@ -100,6 +100,10 @@ def product_stock_dashboard(request):
         print("Error in product_stock_dashboard:", e)
         return JsonResponse({"error": str(e)}, status=500)
 
+import re
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
 def product_stock_dashboard_react(request):
     try:
@@ -119,11 +123,17 @@ def product_stock_dashboard_react(request):
 
             # Split the product name by <br/> or <br />
             split_name = re.split(r'<br\s*/?>', product_name)
+            location = "Unknown"  # Default location if not found
 
             # Determine how to process the name based on the split length
-            if len(split_name) >= 2:
-                # Use first part and modify the second part (e.g., trimming brackets)
-                processed_name = f"{split_name[0]} | {split_name[1].strip('[]')}"
+            if len(split_name) == 3:
+                # Process the name as expected
+                processed_name = f"{split_name[1]} {split_name[2][1:-1]}"  # Remove brackets around the location
+                location = split_name[2][1:-1]
+            elif len(split_name) == 2:
+                # Process name and location if there are two parts
+                processed_name = f"{split_name[0]} {split_name[1][1:-1]}"  # Remove brackets around the location
+                location = split_name[1][1:-1]
             else:
                 # Join all parts if the name does not have the expected split structure
                 processed_name = " ".join(split_name)
@@ -139,7 +149,8 @@ def product_stock_dashboard_react(request):
             # Append processed product data
             product_data.append({
                 'name': processed_name,
-                'stock': stock_quantity
+                'stock': stock_quantity,
+                'location': location
             })
 
         # Check if product data is empty
@@ -147,8 +158,8 @@ def product_stock_dashboard_react(request):
             return JsonResponse({"error": "No product data available"}, status=400)
 
         # Calculate insights
-        most_stocked_product = min(product_data, key=lambda x: x['stock'])['name']
-        least_stocked_product = max(product_data, key=lambda x: x['stock'])['name']
+        most_stocked_product = min(product_data, key=lambda x: x['stock'])['name']  # Most stocked product
+        least_stocked_product = max(product_data, key=lambda x: x['stock'])['name']  # Least stocked product
 
         # Return JSON response
         return JsonResponse({
