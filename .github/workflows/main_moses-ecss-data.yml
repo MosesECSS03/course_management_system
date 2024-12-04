@@ -28,7 +28,20 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run:  pip install -r djangoPython/djangoPython/requirements.txt
+        
+      - name: Install corsheader
+        run:  pip install django-cors-headers
+
+      - name: Install inflect
+        run: pip install inflect
+      
+      - name: Install pymongo
+        run: pip install pymongo
+            
+      - name: Run collectstatic
+        run: python djangoPython/manage.py collectstatic --noinput
+        
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -76,3 +89,17 @@ jobs:
           app-name: 'moses-ecss-data'
           slot-name: 'Production'
           
+      - name: Install dependencies
+        run:  pip install -r djangoPython/djangoPython/requirements.txt
+          
+      - name: Install corsheader
+        run:  pip install django-cors-headers
+  
+      - name: Install inflect
+        run: pip install inflect
+        
+      - name: Install pymongo
+        run: pip install pymongo
+              
+      - name: Run collectstatic
+        run: python djangoPython/manage.py collectstatic --noinput
