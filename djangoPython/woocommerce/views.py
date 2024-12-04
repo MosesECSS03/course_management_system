@@ -107,7 +107,7 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def product_stock_dashboard_react(request):
     try:
-        # Fetch products from WooCommerce API
+        # Fetch products from WooCommerce APIok
         woo_api = WooCommerceAPI()  # Ensure WooCommerceAPI is correctly implemented elsewhere
         products = woo_api.get_nsa_products()  # Replace with the correct method to fetch products
 
