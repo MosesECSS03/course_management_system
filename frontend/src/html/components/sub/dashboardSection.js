@@ -601,8 +601,8 @@ class DashboardSection extends Component {
         const productNames = filteredData.map((product) => product.name.replace(/\s?\|\s?/g, ' '));
         const stockQuantities = filteredData.map((product) => product.stock);
 
-        const maxStock = Math.max(...stockQuantities);
-        const minStock = Math.min(...stockQuantities);
+        const maxStock = Math.min(...stockQuantities);
+        const minStock = Math.max(...stockQuantities);
         const mostPopularProductIndex = stockQuantities.indexOf(maxStock);
         const leastPopularProductIndex = stockQuantities.indexOf(minStock);
 
