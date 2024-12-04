@@ -98,36 +98,36 @@ from some_woocommerce_module import WooCommerceAPI  # Adjust based on actual Woo
 @csrf_exempt
 def product_stock_dashboard_react(request):
     try:
-        # Fetch products from WooCommerce API pl
+        # Fetch products from WooCommerce API
         woo_api = WooCommerceAPI()
         products = woo_api.get_nsa_products()  # Adjust as needed
 
         # Extract product names and stock quantities with custom logic for name splitting
         product_data = []
         for product in products:
-        # Ensure 'name' and 'stock_quantity' exist
-        if 'name' not in product or 'stock_quantity' not in product:
-        continue  # Skip this product if no name or stock quantity is found
+            # Ensure 'name' and 'stock_quantity' exist
+            if 'name' not in product or 'stock_quantity' not in product:
+                continue  # Skip this product if no name or stock quantity is found
 
-        # Split the product name by <br/> or <br />
-        split_name = re.split(r'<br\s*/?>', product['name'])
+            # Split the product name by <br/> or <br />
+            split_name = re.split(r'<br\s*/?>', product['name'])
 
-        # Determine how to process the name based on the split length
-        if len(split_name) >= 2:
-        processed_name = f"{split_name[0]} | {split_name[1][1:-1]}"  # Correct slicing syntax
-        else:
-        processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
+            # Determine how to process the name based on the split length
+            if len(split_name) >= 2:
+                processed_name = f"{split_name[0]} | {split_name[1][1:-1]}"  # Correct slicing syntax
+            else:
+                processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
 
-        # Ensure stock quantity is a valid number
-        stock_quantity = product.get('stock_quantity', 0)
-        if stock_quantity < 0:
-        continue  # Skip products with invalid stock quantities
+            # Ensure stock quantity is a valid number
+            stock_quantity = product.get('stock_quantity', 0)
+            if stock_quantity < 0:
+                continue  # Skip products with invalid stock quantities
 
-        # Append processed product data
-        product_data.append({
-        'name': processed_name,
-        'stock': stock_quantity
-        })
+            # Append processed product data
+            product_data.append({
+            'name': processed_name,
+            'stock': stock_quantity
+            })
 
         # Check if product data is empty
         if not product_data:
