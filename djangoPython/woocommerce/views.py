@@ -102,8 +102,8 @@ def product_stock_dashboard(request):
 
 @csrf_exempt
 #import re
-from django.http import JsonResponse
-from some_woocommerce_module import WooCommerceAPI  # Adjust based on actual WooCommerce API client
+#from django.http import JsonResponse
+#from some_woocommerce_module import WooCommerceAPI  # Adjust based on actual WooCommerce API client
 
 @csrf_exempt
 def product_stock_dashboard_react(request):
