@@ -46,48 +46,58 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 
-@csrf_exempt 
+@csrf_exempt
 def product_stock_dashboard(request):
+    """Dashboard for displaying product stock data and insights."""
     try:
+        # Ensure it's a GET request
+        if request.method != "GET":
+            return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
+
         # Fetch products from WooCommerce API
         woo_api = WooCommerceAPI()
-        products = woo_api.get_nsa_products() # Adjust as needed
+        products = woo_api.get_nsa_products()  # Adjust the method name if necessary
 
-        # Extract product names and stock quantities with custom logic for name splitting
+        # Extract product names and stock quantities
         product_data = []
         for product in products:
             # Split the product name by <br/> or <br />
-            split_name = re.split(r'<br\s*/?>', product['name'])
+            split_name = re.split(r'<br\s*/?>', product.get('name', ''))
 
-            # Determine how to process the name based on the split length
+            # Process the name based on split length
             if len(split_name) == 3:
-                processed_name = f"{split_name[1]} {split_name[2][1:-1]}"  # Correct slicing syntax
+                processed_name = f"{split_name[1].strip()} {split_name[2][1:-1].strip()}"  # Correct slicing
             elif len(split_name) == 2:
-                processed_name = f"{split_name[0]} {split_name[1][1:-1]}"  # Correct slicing syntax
+                processed_name = f"{split_name[0].strip()} {split_name[1][1:-1].strip()}"  # Correct slicing
             else:
-                processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
-
+                processed_name = " ".join(part.strip() for part in split_name)  # Handle unexpected length
 
             # Append processed product data
             product_data.append({
                 'name': processed_name,
-                'stock': product['stock_quantity']
+                'stock': product.get('stock_quantity', 0)  # Default stock to 0 if missing
             })
 
         # Calculate insights
-        most_stocked_product = max(product_data, key=lambda x: x['stock'])['name']
-        least_stocked_product = min(product_data, key=lambda x: x['stock'])['name']
+        if product_data:
+            most_stocked_product = min(product_data, key=lambda x: x['stock'])['name']
+            least_stocked_product = max(product_data, key=lambda x: x['stock'])['name']
+        else:
+            most_stocked_product = "N/A"
+            least_stocked_product = "N/A"
 
-        # Pass data to template
+        # Prepare context for the template
         context = {
-        'product_data': json.dumps(product_data),  # Serialize product data to JSON string
-        'most_stocked_product': most_stocked_product,
-        'least_stocked_product': least_stocked_product,
+            'product_data': json.dumps(product_data),  # Serialize product data to JSON
+            'most_stocked_product': most_stocked_product,
+            'least_stocked_product': least_stocked_product,
         }
 
         return render(request, 'woocommerce/example.html', context)
 
     except Exception as e:
+        # Log the error (optional) and return a JSON error response
+        print("Error in product_stock_dashboard:", e)
         return JsonResponse({"error": str(e)}, status=500)
 
 @csrf_exempt
@@ -655,44 +665,44 @@ def generate_invoice_view_react(request):
 
     # If there are any valid courses for this payment date, include them
     if filtered_courses:
-    cleaned_course_data[payment_date] = {
-        "courses": filtered_courses,
-        "total_price": 0  # Placeholder for total price
-    }
+        cleaned_course_data[payment_date] = {
+            "courses": filtered_courses,
+            "total_price": 0  # Placeholder for total price
+        }
 
-    # Calculate the total price for each payment date and convert it to words
-    for payment_date, data in cleaned_course_data.items():
-        for course in data["courses"]:
-            # Add the total price for this course to the payment date's overall total
-            data["total_price"] += float(course["details"]["total_price"].replace('$', '').replace(',', '').strip())
+        # Calculate the total price for each payment date and convert it to words
+        for payment_date, data in cleaned_course_data.items():
+            for course in data["courses"]:
+                # Add the total price for this course to the payment date's overall total
+                data["total_price"] += float(course["details"]["total_price"].replace('$', '').replace(',', '').strip())
 
-            # Convert the total price to string and format as "$x.xx"
-            cleaned_course_data[payment_date]["total_price"] = f"${data['total_price']:.2f}"
+                # Convert the total price to string and format as "$x.xx"
+                cleaned_course_data[payment_date]["total_price"] = f"${data['total_price']:.2f}"
 
-            price_value = float(data['total_price'].replace('$', '').replace(',', '').strip())
+                price_value = float(data['total_price'].replace('$', '').replace(',', '').strip())
 
-            # Split the price into dollars and cents
-            dollars = int(price_value)
-            cents = round((price_value - dollars) * 100)  # Round to the nearest cent
+                # Split the price into dollars and cents
+                dollars = int(price_value)
+                cents = round((price_value - dollars) * 100)  # Round to the nearest cent
 
-            # Convert the dollars to words
-            dollars_in_words = p.number_to_words(dollars)
+                # Convert the dollars to words
+                dollars_in_words = p.number_to_words(dollars)
 
-            if cents > 0:
-            cents_in_words = p.number_to_words(cents)
-            price_in_words = f"{dollars_in_words} Singapore Dollars and {cents_in_words} cents Only"
-            else:
-            price_in_words = f"{dollars_in_words} Singapore Dollars Only"
+                if cents > 0:
+                cents_in_words = p.number_to_words(cents)
+                price_in_words = f"{dollars_in_words} Singapore Dollars and {cents_in_words} cents Only"
+                else:
+                price_in_words = f"{dollars_in_words} Singapore Dollars Only"
 
-            # Update the total price in words
-            # Capitalize the first letter of each word (whether spaces exist or not)
-            price_in_words = ' '.join([word.capitalize() for word in price_in_words.split()])
+                # Update the total price in words
+                # Capitalize the first letter of each word (whether spaces exist or not)
+                price_in_words = ' '.join([word.capitalize() for word in price_in_words.split()])
 
-            # Update the total price in words for the payment date
-            cleaned_course_data[payment_date]["total_price_in_words"] = price_in_words
+                # Update the total price in words for the payment date
+                cleaned_course_data[payment_date]["total_price_in_words"] = price_in_words
 
-            # Return the data as JSON
-            return JsonResponse({"invoice": cleaned_course_data})
+                # Return the data as JSON
+                return JsonResponse({"invoice": cleaned_course_data})
 
 import json
 import re
@@ -703,67 +713,66 @@ from django.views.decorators.csrf import csrf_exempt
 def gather_products(request):
     """Fetches and returns a list of products from WooCommerce, processing course names with <br/> and <p> delimiters."""
     try:
-    # Only handle GET requests
-    if request.method == "GET":
-    # Initialize WooCommerce API instance
-    woo_api = WooCommerceAPI()
+        # Only handle GET requests
+        if request.method == "GET":
+            # Initialize WooCommerce API instance
+            woo_api = WooCommerceAPI()
 
-    # Fetch both NSA and ILP products unconditionally
-    products = woo_api.get_nsa_products()
+            # Fetch both NSA and ILP products unconditionally
+            products = woo_api.get_nsa_products()
 
-    # Prepare a list to store the cleaned product data (name, id, short description)
-    cleaned_products = []
-    for product in products:
-        name = product.get('name', '').strip()  # Get the product name and remove leading/trailing spaces
-        product_id = product.get('id')  # Get the product ID
-        short_description = product.get('short_description', '').strip()  # Get the short description and clean it
+            # Prepare a list to store the cleaned product data (name, id, short description)
+            cleaned_products = []
+            for product in products:
+                name = product.get('name', '').strip()  # Get the product name and remove leading/trailing spaces
+                product_id = product.get('id')  # Get the product ID
+                short_description = product.get('short_description', '').strip()  # Get the short description and clean it
 
-        # Split the short description by <p> or </p> tags
-        short_description_parts = re.split(r'<\s*/?\s*p\s*/?>', short_description)
+                # Split the short description by <p> or </p> tags
+                short_description_parts = re.split(r'<\s*/?\s*p\s*/?>', short_description)
 
-        # Split the name by <br/> or <br /> tags
-        name_parts = re.split(r'<br\s*/?>', name)
+                # Split the name by <br/> or <br /> tags
+                name_parts = re.split(r'<br\s*/?>', name)
 
-        # Handle the length of the resulting list for the name
-        if len(name_parts) == 3:
-            cleaned_name = f"{name_parts[1].strip()} | {name_parts[2][1:-1].strip()}"
-            location = name_parts[2][1:-1].strip()
-        elif len(name_parts) == 2:
-            cleaned_name = f"{name_parts[0].strip()} | {name_parts[1][1:-1].strip()}"
-            location = name_parts[1][1:-1].strip()
+                # Handle the length of the resulting list for the name
+                if len(name_parts) == 3:
+                    cleaned_name = f"{name_parts[1].strip()} | {name_parts[2][1:-1].strip()}"
+                    location = name_parts[2][1:-1].strip()
+                elif len(name_parts) == 2:
+                    cleaned_name = f"{name_parts[0].strip()} | {name_parts[1][1:-1].strip()}"
+                    location = name_parts[1][1:-1].strip()
+                else:
+                    cleaned_name = name_parts[0].strip()
+                    location = ""
+
+                # Determine the WhatsApp button based on the location
+                if location == "CT Hub":
+                    whatsapp = '[njwa_button id="14187"]'
+                elif location == "Tampines 253 Centre":
+                    whatsapp = '[njwa_button id="14182"]'
+                elif location == "Pasir Ris Wellness Centre":
+                    whatsapp = '[njwa_button id="14185"]'
+                else:
+                    whatsapp = ''
+
+                # Append the cleaned product details to the list
+                cleaned_products.append({
+                    'name': cleaned_name,
+                    'id': product_id,
+                    'short_description': short_description_parts,
+                    'location': whatsapp
+                })
+
+            # Return the cleaned product data to the template
+            return render(request, 'woocommerce/update.html', {'courses': cleaned_products})
+
         else:
-            cleaned_name = name_parts[0].strip()
-            location = ""
-
-        # Determine the WhatsApp button based on the location
-        if location == "CT Hub":
-            whatsapp = '[njwa_button id="14187"]'
-        elif location == "Tampines 253 Centre":
-            whatsapp = '[njwa_button id="14182"]'
-        elif location == "Pasir Ris Wellness Centre":
-            whatsapp = '[njwa_button id="14185"]'
-        else:
-            whatsapp = ''
-
-        # Append the cleaned product details to the list
-        cleaned_products.append({
-            'name': cleaned_name,
-            'id': product_id,
-            'short_description': short_description_parts,
-            'location': whatsapp
-        })
-
-    # Return the cleaned product data to the template
-    return render(request, 'woocommerce/update.html', {'courses': cleaned_products})
-
-    else:
-        return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
+            return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
 
     except Exception as e:
-    # Catch and log unexpected errors
-    print("Error:", e)
-    return JsonResponse({"error": "An error occurred while processing the request."}, status=500)
-
+        # Catch and log unexpected errors
+        print("Error:", e)
+        return JsonResponse({"error": "An error occurred while processing the request."}, status=500)
 
 @csrf_exempt
 def sendToWooCommerce(request):
