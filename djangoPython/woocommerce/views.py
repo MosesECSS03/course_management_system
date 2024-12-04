@@ -20,12 +20,12 @@ def product_list(request):
 
         # Fetch products based on courseType
         if courseType == "NSA":
-        products = woo_api.get_nsa_products()
+            products = woo_api.get_nsa_products()
         elif courseType == "ILP":
-        products = woo_api.get_ilp_products()
+            products = woo_api.get_ilp_products()
         else:
-        # Handle cases where no valid courseType is provided
-        products = woo_api.get_nsa_products() + woo_api.get_ilp_products()
+            # Handle cases where no valid courseType is provided
+            products = woo_api.get_nsa_products() + woo_api.get_ilp_products()
 
         print(products)
 
