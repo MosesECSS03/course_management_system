@@ -756,7 +756,7 @@ def gather_products(request):
     return render(request, 'woocommerce/update.html', {'courses': cleaned_products})
 
     else:
-    return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
+        return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
 
     except Exception as e:
     # Catch and log unexpected errors
