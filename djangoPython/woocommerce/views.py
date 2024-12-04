@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from .services import WooCommerceAPI
-from django.views.decorators.csrf import csrf_exempt  # Temporarily disable CSRF validation for this view u
+from django.views.decorators.csrf import csrf_exempt  # Temporarily disable CSRF validation for this view
 
 import json
 import plotly.express as px
