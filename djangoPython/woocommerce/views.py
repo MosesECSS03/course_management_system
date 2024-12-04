@@ -56,23 +56,23 @@ def product_stock_dashboard(request):
         # Extract product names and stock quantities with custom logic for name splitting
         product_data = []
         for product in products:
-        # Split the product name by <br/> or <br />
-        split_name = re.split(r'<br\s*/?>', product['name'])
+            # Split the product name by <br/> or <br />
+            split_name = re.split(r'<br\s*/?>', product['name'])
 
-        # Determine how to process the name based on the split length
-        if len(split_name) == 3:
-            processed_name = f"{split_name[1]} {split_name[2][1:-1]}"  # Correct slicing syntax
-        elif len(split_name) == 2:
-            processed_name = f"{split_name[0]} {split_name[1][1:-1]}"  # Correct slicing syntax
-        else:
-            processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
+            # Determine how to process the name based on the split length
+            if len(split_name) == 3:
+                processed_name = f"{split_name[1]} {split_name[2][1:-1]}"  # Correct slicing syntax
+            elif len(split_name) == 2:
+                processed_name = f"{split_name[0]} {split_name[1][1:-1]}"  # Correct slicing syntax
+            else:
+                processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
 
 
-        # Append processed product data
-        product_data.append({
-            'name': processed_name,
-            'stock': product['stock_quantity']
-        })
+            # Append processed product data
+            product_data.append({
+                'name': processed_name,
+                'stock': product['stock_quantity']
+            })
 
         # Calculate insights
         most_stocked_product = max(product_data, key=lambda x: x['stock'])['name']
