@@ -131,7 +131,7 @@ def product_stock_dashboard_react(request):
 
         # Check if product data is empty
         if not product_data:
-        return JsonResponse({"error": "No product data available"}, status=400)
+            return JsonResponse({"error": "No product data available"}, status=400)
 
         # Calculate insights
         most_stocked_product = min(product_data, key=lambda x: x['stock'])['name']
