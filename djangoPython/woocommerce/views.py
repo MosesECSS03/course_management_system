@@ -154,14 +154,14 @@ def product_stock_dashboard_react(request):
             return JsonResponse({"error": "No product data available"}, status=400)
 
         # Calculate insights
-        most_stocked_product = min(product_data, key=lambda x: x['stock'])['name']  # Most stocked product
-        least_stocked_product = max(product_data, key=lambda x: x['stock'])['name']  # Least stocked product
+        most_stocked_product = max(product_data, key=lambda x: x['stock'])['name']  # Most stocked product
+        least_stocked_product = min(product_data, key=lambda x: x['stock'])['name']  # Least stocked product
 
         # Return JSON response
         return JsonResponse({
             'product_data': product_data,  # Return the processed product data
-            'most_stocked_product': most_stocked_product,
-            'least_stocked_product': least_stocked_product
+            'most_stocked_product': least_stocked_product,
+            'least_stocked_product': most_stocked_product
         })
 
     except Exception as e:
@@ -658,7 +658,7 @@ def generate_invoice_view_react(request):
             cleaned_course_data[payment_date]["total_price_in_words"] = ' '.join([word.capitalize() for word in price_in_words.split()])
 
     return JsonResponse({"invoice": cleaned_course_data})
-    
+
 import json
 import re
 from django.shortcuts import render
