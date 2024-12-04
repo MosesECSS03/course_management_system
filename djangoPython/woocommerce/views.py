@@ -708,3 +708,119 @@ def generate_invoice_view_react(request):
 
     # Return the data as JSON
     return JsonResponse({"invoice": cleaned_course_data})
+    
+import json
+import re
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+# Ensure WooCommerceAPI is imported correctly
+# from your_project.woocommerce import WooCommerceAPI
+
+@csrf_exempt
+def gather_products(request):
+    """Fetches and returns a list of products from WooCommerce, processing course names with <br/> and <p> delimiters."""
+    try:
+        # Only handle GET requests
+        if request.method == "GET":
+            # Initialize WooCommerce API instance
+            woo_api = WooCommerceAPI()
+
+            # Fetch both NSA and ILP products unconditionally
+            products = woo_api.get_nsa_products()
+
+            # Prepare a list to store the cleaned product data (name, id, short description)
+            cleaned_products = []
+            for product in products:
+                name = product.get('name', '').strip()  # Get the product name and remove leading/trailing spaces
+                product_id = product.get('id')  # Get the product ID
+                short_description = product.get('short_description', '').strip()  # Get the short description and clean it
+
+                # Split the short description by <p> or </p> tags
+                short_description_parts = re.split(r'<\s*/?\s*p\s*/?>', short_description)
+
+                # Split the name by <br/> or <br /> tags
+                name_parts = re.split(r'<br\s*/?>', name)
+
+                # Handle the length of the resulting list for the name
+                if len(name_parts) == 3:
+                    cleaned_name = f"{name_parts[1].strip()} | {name_parts[2][1:-1].strip()}"
+                    location = name_parts[2][1:-1].strip()
+                elif len(name_parts) == 2:
+                    cleaned_name = f"{name_parts[0].strip()} | {name_parts[1][1:-1].strip()}"
+                    location = name_parts[1][1:-1].strip()
+                else:
+                    cleaned_name = name_parts[0].strip()
+                    location = ""
+
+                # Determine the WhatsApp button based on the location
+                if location == "CT Hub":
+                    whatsapp = '[njwa_button id="14187"]'
+                elif location == "Tampines 253 Centre":
+                    whatsapp = '[njwa_button id="14182"]'
+                elif location == "Pasir Ris Wellness Centre":
+                    whatsapp = '[njwa_button id="14185"]'
+                else:
+                    whatsapp = ''
+
+                # Append the cleaned product details to the list
+                cleaned_products.append({
+                    'name': cleaned_name,
+                    'id': product_id,
+                    'short_description': short_description_parts,
+                    'location': whatsapp
+                })
+
+            # Return the cleaned product data to the template
+            return render(request, 'woocommerce/update.html', {'courses': cleaned_products})
+
+        else:
+            return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
+
+    except Exception as e:
+        # Catch and log unexpected errors
+        print("Error:", e)
+        return JsonResponse({"error": "An error occurred while processing the request."}, status=500)
+
+
+@csrf_exempt
+def sendToWooCommerce(request):
+    if request.method == 'POST':
+        try:
+            # Parse incoming JSON data from request body
+            woo_api = WooCommerceAPI()
+            data = json.loads(request.body)
+            product_id = data.get('courseId')  # Get the WooCommerce product ID
+
+            if not product_id:
+                return JsonResponse({'success': False, 'error': 'Product ID is required'})
+
+            short_description = data.get('shortDescription', '')
+
+            # Validate and format short_description
+            if isinstance(short_description, list):
+                short_description = ' '.join([f'<p>{str(item)}</p>' for item in short_description])
+            else:
+                short_description = str(short_description)
+
+            # Prepare the data to send in the request body to WooCommerce
+            product_data = {
+                'short_description': short_description  # Include other fields like price, description, etc.
+            }
+
+            # Call the function to update the product in WooCommerce
+            updated_product = woo_api.update_product(product_id, product_data)
+            print("Result:", updated_product)
+
+            # Return a success or failure response
+            if 'error' in updated_product:
+                return JsonResponse({'success': False, 'error': updated_product['error']})
+            else:
+                return JsonResponse({'success': True, 'product': updated_product})
+
+        except Exception as e:
+            print("Error:", e)  # Log the error to the console
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})

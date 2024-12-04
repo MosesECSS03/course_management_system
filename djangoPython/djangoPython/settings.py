@@ -30,8 +30,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'moses-ecss-data.azurewebsites.net', '169.254.129.3', 'thankful-water-08ce4bd10.5.azurestaticapps.net', 'ecss.org.sg']
 
 WOOCOMMERCE_API_URL = 'https://ecss.org.sg/wp-json/wc/v3/'
-WOOCOMMERCE_CONSUMER_KEY= 'ck_64b4cd6275b5d67bb30cf6b8a004974061ca7c12'
-WOOCOMMERCE_CONSUMER_SECRET = 'cs_f8b4434b612ee8825ce3778b45b430980cf4ca3d'
+WOOCOMMERCE_CONSUMER_KEY= 'ck_be09fee650a20cf08d693e4fe88d340a8f2c63ec'
+WOOCOMMERCE_CONSUMER_SECRET = 'cs_37a64021bcb71424551c4c5a1f56ad7c5dc05dbb'
 
 
 # Application definition
