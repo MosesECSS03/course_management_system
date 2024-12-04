@@ -88,53 +88,62 @@
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
-    from django.http import JsonResponse
-    import json
-    import re
+@csrf_exempt
+import re
+from django.http import JsonResponse
+from some_woocommerce_module import WooCommerceAPI  # Adjust based on actual WooCommerce API client
 
-    @csrf_exempt
-    def product_stock_dashboard_react(request):
-        try:
-            # Fetch products from WooCommerce API
-            woo_api = WooCommerceAPI()
-            products = woo_api.get_nsa_products()  # Adjust as needed
+@csrf_exempt
+def product_stock_dashboard_react(request):
+    try:
+        # Fetch products from WooCommerce API
+        woo_api = WooCommerceAPI()
+        products = woo_api.get_nsa_products()  # Adjust as needed
 
-            # Extract product names and stock quantities with custom logic for name splitting
-            product_data = []
-            for product in products:
-                # Split the product name by <br/> or <br />
-                split_name = re.split(r'<br\s*/?>', product['name'])
+        # Extract product names and stock quantities with custom logic for name splitting
+        product_data = []
+        for product in products:
+            # Ensure 'name' and 'stock_quantity' exist
+            if 'name' not in product or 'stock_quantity' not in product:
+                continue  # Skip this product if no name or stock quantity is found
 
-                # Determine how to process the name based on the split length
-                if len(split_name) == 3:
-                    processed_name = f"{split_name[1]} | {split_name[2][1:-1]}"  # Correct slicing syntax
-                elif len(split_name) == 2:
-                    processed_name = f"{split_name[0]} | {split_name[1][1:-1]}"  # Correct slicing syntax
-                else:
-                    processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
+            # Split the product name by <br/> or <br />
+            split_name = re.split(r'<br\s*/?>', product['name'])
 
-                print(processed_name)
-            
+            # Determine how to process the name based on the split length
+            if len(split_name) >= 2:
+                processed_name = f"{split_name[0]} | {split_name[1][1:-1]}"  # Correct slicing syntax
+            else:
+                processed_name = " ".join(split_name)  # Join all parts in case of an unexpected length
 
-                # Append processed product data
-                product_data.append({
-                    'name': processed_name,
-                    'stock': product['stock_quantity']
-                })
+            # Ensure stock quantity is a valid number
+            stock_quantity = product.get('stock_quantity', 0)
+            if stock_quantity < 0:
+                continue  # Skip products with invalid stock quantities
 
-            # Calculate insights
-            most_stocked_product = min(product_data, key=lambda x: x['stock'])['name']
-            least_stocked_product = max(product_data, key=lambda x: x['stock'])['name']
-
-            # Return JSON response
-            return JsonResponse({
-                'product_data': product_data,  # Return the processed product data
-                'most_stocked_product': most_stocked_product,
-                'least_stocked_product': least_stocked_product
+            # Append processed product data
+            product_data.append({
+                'name': processed_name,
+                'stock': stock_quantity
             })
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+        # Check if product data is empty
+        if not product_data:
+            return JsonResponse({"error": "No product data available"}, status=400)
+
+        # Calculate insights
+        most_stocked_product = min(product_data, key=lambda x: x['stock'])['name']
+        least_stocked_product = max(product_data, key=lambda x: x['stock'])['name']
+
+        # Return JSON response
+        return JsonResponse({
+            'product_data': product_data,  # Return the processed product data
+            'most_stocked_product': most_stocked_product,
+            'least_stocked_product': least_stocked_product
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
     '''Working with Database'''
     from collections import defaultdict
