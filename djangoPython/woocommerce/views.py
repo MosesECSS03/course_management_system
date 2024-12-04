@@ -98,7 +98,7 @@ from some_woocommerce_module import WooCommerceAPI  # Adjust based on actual Woo
 @csrf_exempt
 def product_stock_dashboard_react(request):
     try:
-        # Fetch products from WooCommerce API
+        # Fetch products from WooCommerce API pl
         woo_api = WooCommerceAPI()
         products = woo_api.get_nsa_products()  # Adjust as needed
 
@@ -313,29 +313,29 @@ def generate_invoice_view(request):
 
     # Check if the price is in string format with '$' sign and convert to float
     if isinstance(course_price, str) and course_price.startswith('$'):
-    course_price = float(course_price.replace('$', '').strip())
+        course_price = float(course_price.replace('$', '').strip())
 
-    # Round to 2 decimal places using float for precision
-    course_price *= 5
-    course_price = round(course_price, 2)
+        # Round to 2 decimal places using float for precision
+        course_price *= 5
+        course_price = round(course_price, 2)
 
-    # Convert the course price to string format '$x.xx'
-    course_price_str = f"${course_price:.2f}"
+        # Convert the course price to string format '$x.xx'
+        course_price_str = f"${course_price:.2f}"
 
-    # Extract number of people (default to 1 if not present)
-    no_of_people = doc["course"].get("numberOfPeople", 1)
+        # Extract number of people (default to 1 if not present)
+        no_of_people = doc["course"].get("numberOfPeople", 1)
 
-    # Calculate the total price for this course (price * number of people)
-    total_price = course_price * no_of_people
-    total_price = round(total_price, 2)  # Round to 2 decimal places
+        # Calculate the total price for this course (price * number of people)
+        total_price = course_price * no_of_people
+        total_price = round(total_price, 2)  # Round to 2 decimal places
 
-    # Convert the total price to string format '$x.xx'
-    total_price_str = f"${total_price:.2f}"
+        # Convert the total price to string format '$x.xx'
+        total_price_str = f"${total_price:.2f}"
 
-    # Extract and process courseDuration
-    course_duration_raw = doc["course"].get("courseDuration", None)
-    formatted_start_date = None
-    formatted_end_date = None
+        # Extract and process courseDuration
+        course_duration_raw = doc["course"].get("courseDuration", None)
+        formatted_start_date = None
+        formatted_end_date = None
 
     if course_duration_raw:
         try:
