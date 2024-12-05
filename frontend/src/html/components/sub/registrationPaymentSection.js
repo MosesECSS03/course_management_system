@@ -422,7 +422,6 @@
     updateWooCommerceForRegistrationPayment = async (value, id, page) =>
     {
       console.log("WooCommerce", value, page,id);
-      if(value.i)
       axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', {page: page, status: value })
       //axios.post('http://localhost:3002/update_stock/', { type: 'update', page: page, status: value })
         .then(response => {
@@ -937,7 +936,11 @@
                       <td>{item.participant.educationLevel}</td>
                       <td>{item.participant.workStatus}</td>
                       <td>{item.course.courseType}</td>
-                      <td>{item.course.courseEngName}</td>
+                      <td>
+                      {item.course.courseEngName.includes('Protected: ')
+                        ? item.course.courseEngName.replace('Protected: ', '')
+                        : item.course.courseEngName}
+                      </td>
                       <td>{item.course.courseLocation}</td>
                       <td>{item.course.courseDuration}</td>
                       <td>{item.course.payment}</td>
