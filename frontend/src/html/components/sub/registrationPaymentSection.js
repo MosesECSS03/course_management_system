@@ -866,7 +866,7 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      this.props.refreshChild();
+      'this.props.refreshChild();'
   };
   
     render() {
