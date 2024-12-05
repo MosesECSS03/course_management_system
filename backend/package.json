@@ -6,7 +6,6 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "axios": "^1.7.9",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
@@ -23,7 +22,6 @@
     "path": "^0.12.7",
     "pdfkit": "^0.15.0",
     "qrcode": "^1.5.4",
-    "sharp": "^0.33.5",
-    "woocommerce-api": "^1.5.0"
+    "sharp": "^0.33.5"
   }
 }
