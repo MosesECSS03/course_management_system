@@ -92,7 +92,7 @@ class WooCommerceAPI:
 
         return all_products
 
-     def get_product_id(self, product_name, per_page=100):
+    def get_product_id(self, product_name, per_page=100):
         """Fetches the product ID for a given product name from WooCommerce."""
         try:
             page = 1
