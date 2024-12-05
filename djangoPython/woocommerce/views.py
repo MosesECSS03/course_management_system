@@ -775,21 +775,36 @@ def sendToWooCommerce(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})
     
-@csrf_exempt
 def update_stock_react(request):
     """Fetches and returns a list of products from WooCommerce based on the courseType."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})
+
     try:
         # Parse the request body as JSON
         data = json.loads(request.body)
         print("Data received:", data)
-        courseName = data.get('page')  # Get the courseType from the request body
-        courseName = re.sub(r'^[<br\s*/?>]+', '', courseName)
-        courseName = courseName.split(':')[1].trim()
+
+        # Get courseName from the request body and clean it up
+        courseName = data.get('page')  # Assuming 'page' is where the course name is stored
+        if not courseName:
+            return JsonResponse({'success': False, 'error': 'courseName not provided'})
+
+        courseName = re.sub(r'^[<br\s*/?>]+', '', courseName)  # Remove <br /> or <br/> tags before the courseName
+        courseName = courseName.split(':')[1].strip()  # Split by ':' and remove any leading/trailing spaces
+
+        # Initialize WooCommerce API and fetch the product ID
         woo_api = WooCommerceAPI()
         productId = woo_api.getProductId(courseName)
+
+        # Check if productId was retrieved successfully
+        if not productId:
+            return JsonResponse({'success': False, 'error': 'Product not found'})
+
         print("Product Id:", productId)
-        return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})
+
+        return JsonResponse({'success': True, 'productId': productId})
 
     except Exception as e:
-            print("Error:", e)  # Log the error to the console
-            return JsonResponse({'success': False, 'error': str(e)})
+        print("Error:", e)  # Log the error to the console
+        return JsonResponse({'success': False, 'error': str(e)})
