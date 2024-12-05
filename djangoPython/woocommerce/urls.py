@@ -8,5 +8,6 @@ urlpatterns = [
     path('sales_report_draft/', views.sales_report_view, name='working_with_database'),
     path('sales_report/', views.sales_report_view_react, name='sales_report_react'),
     path('generate_invoice_draft/', views.generate_invoice_view, name='generate_invoice'),
-    path('invoice_report/', views.generate_invoice_view_react, name='generate_invoice_react')
+    path('invoice_report/', views.generate_invoice_view_react, name='generate_invoice_react'),
+    path('update_stock/', views.update_stock_react, name='update_stock_react')
 ]

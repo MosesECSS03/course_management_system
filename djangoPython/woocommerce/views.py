@@ -774,3 +774,14 @@ def sendToWooCommerce(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})
+@csrf_exempt
+def update_stock_react(request):
+    """Fetches and returns a list of products from WooCommerce based on the courseType."""
+    try:
+        # Parse the request body as JSON
+        data = json.loads(request.body)
+        print("Data received:", data)
+
+    except Exception as e:
+            print("Error:", e)  # Log the error to the console
+            return JsonResponse({'success': False, 'error': str(e)})
