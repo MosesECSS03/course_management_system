@@ -421,7 +421,7 @@
 
     updateWooCommerceForRegistrationPayment = async (value, id, page) =>
     {
-      console.log("WooCommerce");
+      console.log("WooCommerce", value, page,id);
       axios.post('https://moses-ecss-backend.azurewebsites.net/courses', { type: 'update', page: page, status: value })
       //axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {

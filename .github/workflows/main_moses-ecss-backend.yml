@@ -21,20 +21,6 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: install woocommerce
-        run: | 
-            npm install --save @woocommerce/woocommerce-rest-api
-            npm uninstall axios
-            npm install axios@latest
-
-      - name: uninstall axios
-        run: | 
-            npm uninstall axios
-        
-      - name: install axios latest version
-        run: | 
-              npm install axios@latest 
-
       - name: npm install, build, and test
         run: |
           npm install
