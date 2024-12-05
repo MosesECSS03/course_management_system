@@ -787,11 +787,6 @@ def update_stock_react(request):
 
         # Get courseName from the request body and clean it up
         courseName = data.get('page')  # Assuming 'page' is where the course name is stored
-        if not courseName:
-            return JsonResponse({'success': False, 'error': 'courseName not provided'})
-
-        courseName = re.sub('<br />', '', courseName)  # Remove <br /> or <br/> tags before the courseName
-        courseName = courseName.split(':')[1].strip()  # Split by ':' and remove any leading/trailing spaces
 
         # Initialize WooCommerce API and fetch the product ID
         woo_api = WooCommerceAPI()
