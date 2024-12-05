@@ -784,7 +784,7 @@ def update_stock_react(request):
         print("Data received:", data)
         courseName = data.get('page')  # Get the courseType from the request body
         courseName = re.sub(r'^[<br\s*/?>]+', '', courseName)
-        courseName = courseName.split(':')[1]
+        courseName = courseName.split(':')[1].trim()
         woo_api = WooCommerceAPI()
         productId = woo_api.getProductId(courseName)
         print("Product Id:", productId)
