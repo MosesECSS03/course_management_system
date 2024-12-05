@@ -92,18 +92,31 @@ class WooCommerceAPI:
 
         return all_products
 
-    def getProductId(productName):
+    def getProductId(self, productName):
         """
         Retrieve the product ID for a given product name from WooCommerce.
         """
-        # Fetch products matching the product name
-        response = wcapi.get("products", params={"search": productName}).json()
+        try:
+            # Fetch products matching the product name
+            url = f"{self.base_url}products"
+            params = {
+                'search': productName
+            }
+            response = requests.get(url, params=params, auth=self.auth)
+            response.raise_for_status()  # Check for request errors
 
-        # If no products are found, return None
-        if not response:
+            # Parse the response as JSON
+            products = response.json()
+
+            # If no products are found, return None
+            if not products:
+                return None
+
+            # Get the product ID from the first matching product
+            product_id = products[0].get("id")
+            return product_id
+
+        except requests.exceptions.RequestException as e:
+            # Handle any errors during the request
+            print(f"Error while fetching product ID: {e}")
             return None
-
-        # Get the product ID from the first matching product (you can modify this if needed)
-        product_id = response[0].get("id")
-
-        return product_id
