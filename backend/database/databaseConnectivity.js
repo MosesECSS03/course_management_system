@@ -589,7 +589,7 @@ class DatabaseConnectivity {
                 time: time,
             };
     
-            // Insert the document into the collection
+            // Insert the document into the collectionm
             const result = await collection.insertOne(invoiceDocument);
     
             console.log("Invoice inserted successfully:", result.insertedId);
