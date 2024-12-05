@@ -91,3 +91,19 @@ class WooCommerceAPI:
                 break
 
         return all_products
+
+    def getProductId(productName):
+        """
+        Retrieve the product ID for a given product name from WooCommerce.
+        """
+        # Fetch products matching the product name
+        response = wcapi.get("products", params={"search": productName}).json()
+
+        # If no products are found, return None
+        if not response:
+            return None
+
+        # Get the product ID from the first matching product (you can modify this if needed)
+        product_id = response[0].get("id")
+
+        return product_id

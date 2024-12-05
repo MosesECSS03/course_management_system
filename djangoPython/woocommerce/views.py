@@ -782,6 +782,10 @@ def update_stock_react(request):
         # Parse the request body as JSON
         data = json.loads(request.body)
         print("Data received:", data)
+        courseName = data.get('page')  # Get the courseType from the request body
+        woo_api = WooCommerceAPI()
+        productId = woo_api.getProductId(courseName)
+        print("Product Id:", productId)
         return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})
 
     except Exception as e:
