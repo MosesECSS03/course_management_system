@@ -782,6 +782,7 @@ def update_stock_react(request):
         # Parse the request body as JSON
         data = json.loads(request.body)
         print("Data received:", data)
+        return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})
 
     except Exception as e:
             print("Error:", e)  # Log the error to the console
