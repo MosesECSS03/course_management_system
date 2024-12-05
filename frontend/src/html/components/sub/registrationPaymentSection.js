@@ -43,14 +43,14 @@
       // Perform the submit action here, e.g., API call
       //console.log(`Submitting remark for item with id ${id}:`, remark);
 
-      /*const response = await axios.post(
+      const response = await axios.post(
         'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
         { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
-      );*/
-      const response = await axios.post(
+      );
+      /*const response = await axios.post(
         'http://localhost:3001/courseregistration', 
         { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
-      );
+      );*/
       console.log("handleSubmit:", response.data);
       if(response.data.result.success === true)
       {
@@ -97,14 +97,14 @@
 
     fetchCourseRegistrations = async (language) => {
       try {
-        /*const response = await axios.post(
+        const response = await axios.post(
           'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
           { purpose: 'retrieve' }
-        );*/
-        const response = await axios.post(
+        );
+        /*const response = await axios.post(
           'http://localhost:3001/courseregistration', 
           { purpose: 'retrieve' }
-        );
+        );*/
 
         console.log("Course Registration:", response);
     
@@ -397,22 +397,22 @@
 
     updateDatabaseForRegistrationPayment = async (value, id, page) => {
       console.log(value, id);
-     /*return axios
+     return axios
         .post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
             this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
-        })*/
-      return axios
+        })
+      /*return axios
         .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
             this.updateWooCommerceForRegistrationPayment(value, id, page)
           }
-        })
+        })*/
         .catch(error => {
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
@@ -422,15 +422,15 @@
     updateWooCommerceForRegistrationPayment = async (value, id, page) =>
     {
       console.log("WooCommerce");
-      //axios.post('https://moses-ecss-backend.azurewebsites.net/courses', { type: 'update', page: page, status: value })
-      axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
+      axios.post('https://moses-ecss-backend.azurewebsites.net/courses', { type: 'update', page: page, status: value })
+      //axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
         .then(response => {
           console.log("Update Woo Commerce", response.data);
           if(response.data.result ===  true)
           {
             console.log(this.props);
-            //axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
-            axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            //axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
               if(response.data.result ===  true)
               {
                 //this.props.createAccountPopupMessage(true, response.data.message, response.data.message);
@@ -518,21 +518,21 @@
                             ? rowDataArray[i].course?.courseLocation 
                             : 'SFC'; // Use 'SFC' for SkillsFuture payments
     
-                       /* response = await axios.post(
+                       response = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/receipt',
                             {
                                 purpose: 'getReceiptNo',
                                 courseLocation: courseLocation
                             }
-                        );*/
+                        );
 
-                        response = await axios.post(
+                        /*response = await axios.post(
                           'http://localhost:3001/receipt',
                           {
                               purpose: 'getReceiptNo',
                               courseLocation: courseLocation
                           }
-                      );
+                      );*/
                         console.log("Get receipt number:", response.data);
                         receiptNo = response.data.result.receiptNumber;
                     } else {
@@ -542,7 +542,7 @@
     
                     if (response?.data?.result?.success) {
                         // Fetch the PDF receipt
-                        /*const pdfResponse = await axios.post(
+                        const pdfResponse = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/courseregistration',
                             {
                                 purpose: 'receipt',
@@ -551,8 +551,8 @@
                                 receiptNo: receiptNo
                             },
                             { responseType: 'blob' }
-                        );*/
-                        const pdfResponse = await axios.post(
+                        );
+                        /*const pdfResponse = await axios.post(
                           'http://localhost:3001/courseregistration',
                           {
                               purpose: 'receipt',
@@ -561,7 +561,7 @@
                               receiptNo: receiptNo
                           },
                           { responseType: 'blob' }
-                      );
+                      );*/
                         console.log("pdfResponse:", pdfResponse);
     
                         // Extract filename from Content-Disposition header
@@ -580,7 +580,7 @@
                         pdfWindow.location.href = url;
     
                         // Create the receipt in the database
-                        /*const receiptCreationResponse = await axios.post(
+                        const receiptCreationResponse = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/receipt',
                             {
                                 purpose: 'createReceipt',
@@ -589,8 +589,8 @@
                                 url: url,
                                 staff: this.props.userName
                             }
-                        );*/
-                        const receiptCreationResponse = await axios.post(
+                        );
+                        /*const receiptCreationResponse = await axios.post(
                           'http://localhost:3001/receipt',
                           {
                               purpose: 'createReceipt',
@@ -599,12 +599,12 @@
                               url: url,
                               staff: this.props.userName
                           }
-                      );
+                      );*/
                         console.log("Receipt Created:", receiptCreationResponse.data);
                     } 
                     else 
                     {
-                      /*const pdfResponse = await axios.post(
+                      const pdfResponse = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/courseregistration',
                             {
                                 purpose: 'receipt',
@@ -613,8 +613,8 @@
                                 receiptNo: receiptNo
                             },
                             { responseType: 'blob' }
-                        );*/
-                        const pdfResponse = await axios.post(
+                        );
+                        /*const pdfResponse = await axios.post(
                           'http://localhost:3001/courseregistration',
                           {
                               purpose: 'receipt',
@@ -623,7 +623,7 @@
                               receiptNo: receiptNo
                           },
                           { responseType: 'blob' }
-                      );
+                      );*/
                         console.log("pdfResponse:", pdfResponse);
 
                         // Extract filename from Content-Disposition header
