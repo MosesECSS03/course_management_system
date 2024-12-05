@@ -938,7 +938,7 @@
                       <td>{item.course.courseType}</td>
                       <td>
                       {item.course.courseEngName.includes('Protected: ')
-                        ? item.course.courseEngName.replace('Protected: ', '')
+                        ? item.course.courseEngName.replace('<br />Protected: ', '')
                         : item.course.courseEngName}
                       </td>
                       <td>{item.course.courseLocation}</td>
