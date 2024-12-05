@@ -516,7 +516,7 @@
                         // Get a new receipt number if not available
                         const courseLocation = (rowDataArray[i].course.payment !== "SkillsFuture") 
                             ? rowDataArray[i].course?.courseLocation 
-                            : 'SFC'; // Use 'SFC' for SkillsFuture payments
+                            : 'ECSS/SFC/'; // Use 'SFC' for SkillsFuture payments
     
                        response = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/receipt',
@@ -810,7 +810,7 @@
           sourceSheet.getCell(`G${rowIndex}`).value = year.trim();
           
           sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender;
-          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race[0];
+          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.split(" ")[0];
           sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
           sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
           sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
@@ -843,8 +843,9 @@
   
           sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
           sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "SkillsFuture" ? "SFC" : detail.course.payment;
-  
+          sourceSheet.getCell(`V${rowIndex}`).value = detail.official.receiptNo
           // Copy styles from the original row
+
           originalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
               const newCell = newDataRow.getCell(colNumber);
               newCell.style = cell.style;
