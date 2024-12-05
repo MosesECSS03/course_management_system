@@ -24,6 +24,7 @@ jobs:
       - name: install woocommerce
         run: | 
             npm install --save @woocommerce/woocommerce-rest-api
+            npm uninstall axios
             npm install axios@latest
 
       - name: npm install, build, and test
