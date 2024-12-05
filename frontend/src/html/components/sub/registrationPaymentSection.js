@@ -789,7 +789,7 @@
       const originalRow = sourceSheet.getRow(9);
       const startRow = 9;
 
-      console.log("Paginated Details:", paginatedDetails);
+      console.log("Paginated Details:", paginatedDetails, paginatedDetails.length);
   
       paginatedDetails.forEach((detail, index) => {
         if(detail.course.courseType === "NSA")
@@ -866,7 +866,7 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      'this.props.refreshChild();'
+      this.props.refreshChild();
   };
   
     render() {
