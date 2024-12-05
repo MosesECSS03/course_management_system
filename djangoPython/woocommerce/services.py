@@ -99,6 +99,7 @@ class WooCommerceAPI:
         try:
             # Fetch products matching the product name
             url = f"{self.base_url}products"
+            print("Url:", url)
             params = {
                 'search': productName
             }
