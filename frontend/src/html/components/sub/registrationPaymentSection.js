@@ -423,10 +423,10 @@
     {
       console.log("WooCommerce", value, page,id);
       axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', {page: page, status: value })
-      //axios.post('http://localhost:3001/courses', { type: 'update', page: page, status: value })
+      //axios.post('http://localhost:3002/update_stock/', { type: 'update', page: page, status: value })
         .then(response => {
           console.log("Update Woo Commerce", response.data);
-          if(response.data.result ===  true)
+          if(response.data.success ===  true)
           {
             console.log(this.props);
             axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {

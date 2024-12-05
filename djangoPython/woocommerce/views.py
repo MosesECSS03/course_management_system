@@ -790,16 +790,19 @@ def update_stock_react(request):
 
         # Initialize WooCommerce API and fetch the product ID
         woo_api = WooCommerceAPI()
-        productId = woo_api.getProductId(courseName)
+        result = woo_api.getProductId(courseName)
+        print("Result:", result['exists'])
 
-        # Check if productId was retrieved successfully
-        if not productId:
-            return JsonResponse({'success': False, 'error': 'Product not found'})
+        if result['exists'] == True:
+            print("Update Product Stocks")
+            status = data.get('status') 
+            productId = result['productId']
+            result2 = woo_api.updateCourseQuantity(productId, status)
 
-        print("Product Id:", productId)
-
-        return JsonResponse({'success': True, 'productId': productId})
+        return JsonResponse({'success': result2})
 
     except Exception as e:
         print("Error:", e)  # Log the error to the console
         return JsonResponse({'success': False, 'error': str(e)})
+
+    
