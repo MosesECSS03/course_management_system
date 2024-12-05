@@ -733,7 +733,6 @@ def gather_products(request):
         print("Error:", e)
         return JsonResponse({"error": "An error occurred while processing the request."}, status=500)
 
-
 @csrf_exempt
 def sendToWooCommerce(request):
     if request.method == 'POST':
@@ -775,6 +774,7 @@ def sendToWooCommerce(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method, please use POST'})
     
+@csrf_exempt
 def update_stock_react(request):
     """Fetches and returns a list of products from WooCommerce based on the courseType."""
     if request.method != 'POST':
