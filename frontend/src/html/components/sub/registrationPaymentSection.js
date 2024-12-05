@@ -788,6 +788,8 @@
   
       const originalRow = sourceSheet.getRow(9);
       const startRow = 9;
+
+      console.log(paginatedDetails);
   
       paginatedDetails.forEach((detail, index) => {
         if(detail.course.courseType === "NSA")
