@@ -21,6 +21,11 @@ jobs:
         with:
           node-version: '20.x'
 
+      - name: install woocommerce
+        run: | 
+            npm install --save @woocommerce/woocommerce-rest-api
+            npm install axios@latest
+
       - name: npm install, build, and test
         run: |
           npm install
