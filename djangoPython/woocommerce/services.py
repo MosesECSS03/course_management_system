@@ -97,9 +97,7 @@ class WooCommerceAPI:
         try:
             page = 1
             product_id = None
-            products = []
 
-            # Loop through the pages until a product is found or all pages are checked
             while True:
                 # Fetch products for the current page
                 url = f"{self.base_url}products"
@@ -112,6 +110,11 @@ class WooCommerceAPI:
                 response.raise_for_status()  # Ensure we raise an error for bad requests
 
                 products = response.json()  # Get products from the response
+                print("Selected:", products)
+
+                # If no products are returned, break the loop
+                if not products:
+                    break
 
                 # Check each product for a match
                 for product in products:
