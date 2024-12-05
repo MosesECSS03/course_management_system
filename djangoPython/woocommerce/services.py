@@ -92,32 +92,45 @@ class WooCommerceAPI:
 
         return all_products
 
-    def getProductId(self, productName):
-        """
-        Retrieve the product ID for a given product name from WooCommerce.
-        """
+     def get_product_id(self, product_name, per_page=100):
+        """Fetches the product ID for a given product name from WooCommerce."""
         try:
-            # Fetch products matching the product name
-            url = f"{self.base_url}products"
-            print("Url:", url)
-            params = {
-                'search': productName
-            }
-            response = requests.get(url, params=params, auth=self.auth)
-            response.raise_for_status()  # Check for request errors
+            page = 1
+            product_id = None
+            products = []
 
-            # Parse the response as JSON
-            products = response.json()
+            # Loop through the pages until a product is found or all pages are checked
+            while True:
+                # Fetch products for the current page
+                url = f"{self.base_url}products"
+                params = {
+                    'page': page,
+                    'per_page': per_page,
+                    'search': product_name  # Search filter by product name
+                }
+                response = requests.get(url, params=params, auth=self.auth)
+                response.raise_for_status()  # Ensure we raise an error for bad requests
 
-            # If no products are found, return None
-            if not products:
-                return None
+                products = response.json()  # Get products from the response
 
-            # Get the product ID from the first matching product
-            product_id = products[0].get("id")
+                # Check each product for a match
+                for product in products:
+                    if product['name'] == product_name:
+                        product_id = product['id']
+                        break  # Exit the loop if the product is found
+
+                if product_id:
+                    break  # Exit the outer loop if the product is found
+
+                if len(products) < per_page:
+                    break  # Exit the loop if we've reached the last page
+
+                page += 1  # Move to the next page
+
+            # Return the product ID if found, otherwise None
             return product_id
 
         except requests.exceptions.RequestException as e:
             # Handle any errors during the request
-            print(f"Error while fetching product ID: {e}")
+            print(f"Error fetching product ID: {e}")
             return None
