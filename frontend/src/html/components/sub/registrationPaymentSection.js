@@ -789,7 +789,7 @@
       const originalRow = sourceSheet.getRow(9);
       const startRow = 9;
 
-      console.log(paginatedDetails);
+      console.log("Paginated Details:", paginatedDetails);
   
       paginatedDetails.forEach((detail, index) => {
         if(detail.course.courseType === "NSA")
