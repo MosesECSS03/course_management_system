@@ -510,7 +510,7 @@ class DatabaseConnectivity {
         return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
     }*/
 
-    async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+        async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
             const db = this.client.db(databaseName);
             const collection = db.collection(collectionName);
         
@@ -534,10 +534,12 @@ class DatabaseConnectivity {
                 return true; // For other prefixes, year isn't relevant
             });
         
-            // If no valid receipts exist, start from the default
+            // Handle special case for ECSS/SFC/ in 2024
             if (validReceipts.length === 0) {
-                if (courseLocation === "ECSS/SFC/") {
-                    return `${courseLocation}001/${currentYear}`;
+                if (courseLocation === "ECSS/SFC/" && currentYear === "24") {
+                    return `${courseLocation}037/${currentYear}`; // Start from 037 in 2024
+                } else if (courseLocation === "ECSS/SFC/") {
+                    return `${courseLocation}001/${currentYear}`; // Start from 001 for other years
                 } else {
                     return `${courseLocation} - 0001`;
                 }
@@ -546,7 +548,7 @@ class DatabaseConnectivity {
             // Extract numeric parts for the running number
             const receiptNumbers = validReceipts.map(receipt => {
                 if (courseLocation === "ECSS/SFC/") {
-                    // Match format: ECSS/SFC/036/2024
+                    // Match format: ECSS/SFC/037/2024
                     const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
                     const match = receipt.receiptNo.match(regex);
                     return match ? parseInt(match[1], 10) : null;
@@ -571,7 +573,7 @@ class DatabaseConnectivity {
             } else {
                 return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
             }
-    }
+        }
         
 
     async newInvoice(databaseName, collectionName, invoiceNumber, month, username, date, time) {
