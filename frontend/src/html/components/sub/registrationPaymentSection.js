@@ -548,6 +548,7 @@
                                 purpose: 'receipt',
                                 rowData: rowDataArray,
                                 staff: this.props.userName,
+                                payment: rowDataArray[i].course.payment,
                                 receiptNo: receiptNo
                             },
                             { responseType: 'blob' }
@@ -610,6 +611,7 @@
                                 purpose: 'receipt',
                                 rowData: rowDataArray,
                                 staff: this.props.userName,
+                                payment: rowDataArray[i].course.payment,
                                 receiptNo: receiptNo
                             },
                             { responseType: 'blob' }

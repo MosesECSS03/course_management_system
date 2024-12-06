@@ -81,7 +81,14 @@ router.post('/', async function(req, res, next)
         var result = await controller.updateReceiptNumber(req.body.rowData[0]._id, req.body.receiptNo);
         console.log("updateReceiptNumber:", result); 
         var pdf = new PdfGenerator();
-        await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
+        if(req.body.payment !== "SkillsFuture")
+        {
+            await pdf.generateReceipt(res, req.body.rowData, req.body.staff, req.body.receiptNo);
+        }
+        else
+        {
+            await pdf.generateInvoice(res, req.body.rowData, req.body.staff, req.body.receiptNo);
+        }
     }
     else if(req.body.purpose === "updateRemarks")
     {
