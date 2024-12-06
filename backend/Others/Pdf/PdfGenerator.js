@@ -194,7 +194,7 @@ class PdfGenerator {
         const fontPathTimesRegular = path.join(__dirname, '../../fonts/timesNewRoman.ttf'); // Path to your Times New Roman font file
 
         // Set the font to Arial Bold and add the title "RECEIPT"
-        if(receiptNo.includes("SFC"))
+        if(!receiptNo.includes("SFC"))
         {
             doc.font(fontPathBold).fontSize(16).text('RECEIPT', {
                 align: 'center' // Center the text
