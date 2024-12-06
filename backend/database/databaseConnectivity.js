@@ -360,7 +360,7 @@ class DatabaseConnectivity {
     }
 
     async updatePaymentRemarks(dbname, id, remarks, staff, date, time) {
-        var db = this.client.db(dbname); // return the db object
+        var db = this.client.db(dbname); // return the db object ok
         try {
             if (db) {
                 var tableName = "Registration Forms";
