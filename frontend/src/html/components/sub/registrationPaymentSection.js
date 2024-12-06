@@ -809,8 +809,8 @@
           sourceSheet.getCell(`F${rowIndex}`).value = month.trim();
           sourceSheet.getCell(`G${rowIndex}`).value = year.trim();
           
-          sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender;
-          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.split(" ")[0];
+          sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender.split(" ")[0];
+          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race;
           sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
           sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
           sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
