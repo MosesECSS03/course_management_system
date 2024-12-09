@@ -372,15 +372,22 @@ class CreateAccountsSection extends Component {
                         )}
                         {this.state.siteError && <p className="error-message1">{this.state.siteError}</p>}
                         <div className="button-container">
-                            <button 
-                                type="button" 
-                                onClick={this.clearForm}
-                                className="clear-form-button"
-                            >
-                            Clear Form
-                            </button>
-                            <button type="submit" className="submit-form-button">Create Account</button>
-                        </div>
+                          <button 
+                              type="button" 
+                              onClick={this.clearForm}
+                              className="clear-form-button"
+                              style={{ fontSize: "12px", padding: "5px 10px" }}
+                          >
+                              Clear Form
+                          </button>
+                          <button 
+                              type="submit" 
+                              className="submit-form-button"
+                              style={{ fontSize: "12px", padding: "5px 10px" }}
+                          >
+                              Create Account
+                          </button>
+                      </div>
                     </form>
                 </div>
             </div>
