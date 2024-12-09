@@ -371,11 +371,10 @@ class DatabaseConnectivity {
     
                 // Define the update object conditionally based on status
                 let update = null;
-                var newPaymentMethod = remarks.split(" ")[5].trim();
-
                 //Remarks: Change Payment From What To What
                 if(remarks.includes("Change") || remarks.includes("Payment"))
                 {
+                    var newPaymentMethod = remarks.split(" ")[5].trim();
                     update = {
                             $set: {
                                 "course.payment": newPaymentMethod,
@@ -391,10 +390,42 @@ class DatabaseConnectivity {
                 {
                     update = {
                         $set: {
-                            "official.remarks": remarks,
+                            "official.remarks": remarks
                         }
                     };
                 }
+    
+                // Call updateOne
+                const result = await table.updateOne(filter, update);
+                console.log("Result:", result);
+    
+                return result;
+            }
+        } catch (error) {
+            console.log("Error updating database:", error);
+        }
+    }
+
+    async updateRegistrationEntry(dbname, id, name, nric, contactNumber, email, postalCode) {
+        var db = this.client.db(dbname); // return the db object ok
+        try {
+            if (db) {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+    
+                // Use updateOne to update a single document
+                const filter = { _id: new ObjectId(id) };
+    
+                // Define the update object conditionally based on status
+                var update = {
+                            $set: {
+                                "participant.name": name,
+                                "participant.nric": nric,
+                                "participant.contactNumber": contactNumber,
+                                "participant.email": email,
+                                "participant.postalCode": postalCode
+                            }
+                        };
     
                 // Call updateOne
                 const result = await table.updateOne(filter, update);

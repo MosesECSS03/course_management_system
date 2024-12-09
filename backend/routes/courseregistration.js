@@ -85,14 +85,25 @@ router.post('/', async function(req, res, next)
     }
     else if(req.body.purpose === "updateRemarks")
     {
+        console.log(req.body);
         var controller = new RegistrationController();
         const currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
         var result = await controller.updateRemarks(req.body.id, req.body.remarks, req.body.staff, date, time);
+        console.log("Update Remarks:". result);
         var controller1 = new ReceiptController();
         var result1 = await controller1.deleteReceipt(req.body.id);
         return res.json({"result": result1}); 
+    }
+    else if(req.body.purpose === "updateEntry")
+    {
+        console.log(req.body)
+        var {id, name, nric, contactNumber, email, postalCode} = req.body.entry
+        var controller = new RegistrationController();
+        var result = await controller.updateEntry(id, name, nric, contactNumber, email, postalCode);
+        console.log(result);
+        return res.json({"result": result}); 
     }
 });
 

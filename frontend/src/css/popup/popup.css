@@ -464,3 +464,73 @@
   font-weight: bold;
   margin: 1rem 0; /* Space around the title */
 }
+
+.edit-message {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 40vw;
+  height: 45vh; /* Fixed height for the scrollable content */
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow for style */
+  margin-left: -40%;
+}
+
+/* Title */
+.edit-message h1 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Scrollable content */
+.edit-content {
+  flex: 1; /* Allows it to take available space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 10px;
+  margin-bottom: 20px;
+}
+
+.edit-row {
+  display: flex; /* Use flexbox to arrange items side by side */
+  align-items: center; /* Vertically align the label and input */
+  margin-bottom: 15px;
+}
+
+.edit-row label {
+  flex: 0 0 30%; /* Labels take up 30% of the row width */
+  font-weight: bold;
+  margin-right: 10px; /* Space between the label and input */
+}
+
+.edit-row input {
+  flex: 1; /* Input takes up the remaining width */
+  padding: 8px;
+  box-sizing: border-box; /* Includes padding in width calculation */
+}
+
+/* Actions (buttons) */
+.edit-actions {
+  display: flex;
+  justify-content: center; /* Center buttons horizontally */
+  gap: 30%; /* Adds space between buttons */
+}
+
+.edit-actions button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+}
+
+.edit-actions button:last-child {
+  background-color: #4CAF50; /* Green for Submit */
+  color: white;
+}
+
+.edit-actions button:first-child {
+  background-color: #f44336; /* Red for Close */
+  color: white;
+}

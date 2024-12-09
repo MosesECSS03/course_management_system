@@ -36,35 +36,40 @@
       }));
     };
   
-    // Handle the submit action for a specific row
     handleSubmit = async (id, index) => {
-      this.props.updateRemarksPopup();
       const remark = this.state.remarks[index];
+      console.log("handleRemarks:", id, remark);
+    
+      this.props.updateRemarksPopup();
+    
       // Perform the submit action here, e.g., API call
-      //console.log(`Submitting remark for item with id ${id}:`, remark);
-
-      /*const response = await axios.post(
-        'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
-        { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
-      );*/
-      const response = await axios.post(
-        'http://localhost:3001/courseregistration', 
-        { purpose: 'updateRemarks', id: id, remarks: remark, staff: this.props.userName }
-      );
-      console.log("handleSubmit:", response.data);
-      if(response.data.result.success === true)
-      {
+      try {
+        const response = await axios.post(
+          'http://localhost:3001/courseregistration', 
+          { 
+            purpose: 'updateRemarks', 
+            id: id, 
+            remarks: remark, 
+            staff: this.props.userName 
+          }
+        );
+    
+        console.log("handleSubmit:", response.data);
+        if (response.data.result.success === true) {
+          this.props.closePopup();
+          this.props.refreshChild();
+        } else {
+          // Handle unsuccessful submission if needed
+          this.props.closePopup();
+          this.props.refreshChild();
+        }
+      } catch (error) {
+        console.error('Error during submission:', error);
         this.props.closePopup();
         this.props.refreshChild();
       }
-      else
-      {
-        this.props.closePopup();
-        this.props.refreshChild()
-      }
-    }
+    };
     
-
 
     handleEntriesPerPageChange = (e) => {
       this.setState({
@@ -757,6 +762,11 @@
       return `${day.toString().padStart(2, '0')}/${monthNumber.toString().padStart(2, '0')}/${year.toString().padStart(4, '0')}`;
     }
 
+    handleEdit = async(item, index) =>
+    {
+      this.props.showEditPopup(item)
+    }
+
     convertDateFormat(dateString) {
       const date = new Date(dateString);
       const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
@@ -894,7 +904,7 @@
                     <th colSpan="5">{this.props.language === 'zh' ? '课程' : 'Courses'}</th>
                     <th>{this.props.language === 'zh' ? '其他' : 'Others'}</th>
                     <th>{this.props.language === 'zh' ? '确认状态' : 'Confirmation Status'}</th>
-                    <th colSpan="5">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
+                    <th colSpan="6">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
                   </tr>
                   <tr>
                     <th>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
@@ -920,6 +930,7 @@
                     <th>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
                     <th>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
+                    <th>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1010,6 +1021,23 @@
                           }}
                         >
                           Submit
+                        </button>
+                        {this.state.errorMessage && <div className="error-message1">{this.state.errorMessage}</div>}
+                      </td>
+                      <td>
+                      <button
+                          onClick={() => this.handleEdit(item, index)}
+                          style={{
+                            marginTop: '0.5rem',
+                            padding: '0.5rem',
+                            color: '#fff',
+                            border: 'none',
+                            marginBottom: '0.5em',
+                            marginLeft: '2em',
+                            width: '50%'
+                          }}
+                        >
+                          Edit
                         </button>
                       </td>
                     </tr>

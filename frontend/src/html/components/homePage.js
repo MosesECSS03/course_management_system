@@ -436,6 +436,24 @@
       });
     };
 
+    closePopup2 = () => {
+      // Open the popup with success message
+      this.setState({
+        isPopupOpen: true,  // Set popup to open
+        popupMessage: "You have updated the entry successfully",  // Success message
+        popupType: "success-message"  // Type of popup message
+      });
+
+      // Set timeout to close the popup after 5 seconds
+      setTimeout(() => {
+        this.setState({ 
+          isPopupOpen: false  // Close the popup
+        });
+        this.refreshChild();  // Refresh or call any child method if needed
+      }, 5000);  // 5000 milliseconds = 5 seconds
+    };
+
+
     
     generateReceiptPopup = () => {
       this.setState({
@@ -742,6 +760,16 @@
       });
     }
 
+    showEditPopup = async(item)=>
+    {
+      console.log("Selected:", item);
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: item,
+        popupType: "edit"
+      });
+    }
+
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
@@ -959,6 +987,7 @@
                         updatePaymentPopup = {this.updatePaymentPopup}
                         updateRemarksPopup = {this.updateRemarksPopup}
                         warningPopUpMessage = {this.warningPopUpMessage}
+                        showEditPopup = {this.showEditPopup}
                     />
                     </div>
                     <div className="pagination-section">
@@ -1034,7 +1063,7 @@
                 All rights reserved.</p>
             </div>
           </div>
-          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage}/>
+          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} closePopup2={this.closePopup2} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage}/>
         </>
       );
     }

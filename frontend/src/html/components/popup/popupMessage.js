@@ -21,46 +21,111 @@ class Popup extends Component {
       countdown: 10,
       checked: true, 
       message4: null,
+      participant: {
+        id: '',
+        name: '',
+        nric: '',
+        contactNumber:  '',
+        email: '',
+        postalCode:  '',
+      },
+      errors: {
+        name: '',
+        nric: '',
+        contactNumber: '',
+        email: '',
+        postalCode: ''
+      },
+      showEditMessage: false,
     };
     this.countdownInterval = null;
-  }
+  } 
 
-  componentDidMount = async() => {
-    // Check the type prop to decide whether to start the countdown
-    if (this.props.type === "no-activity") {
-      console.log("Start CountDown");
-      this.startCountdown();
-    }
-    if (this.props.type === "update-access-right") {
-      console.log("Update Access Right", this.props.message);
-      this.setState({ message4: this.props.message }, () => {
-          // Callback to log the new state after it's been set
-          console.log("Updated message4 state:", this.state.message4);
-      });
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    // Check if the type prop has changed from the previous value
-    if (this.props.type !== prevProps.type) {
-      console.log("Type prop changed. Current type:", this.props.type);
-      // If the new type is "no-activity", restart the countdown
+    componentDidMount = async () => {  
       if (this.props.type === "no-activity") {
-        console.log("Restart CountDown");
+        console.log("Start CountDown");
         this.startCountdown();
-      }else if (this.props.type === "update-access-right" && this.props.message !== prevProps.message) {
+      }
+    
+      if (this.props.type === "update-access-right") {
         console.log("Update Access Right", this.props.message);
         this.setState({ message4: this.props.message }, () => {
-            // Log the new state after it's been set
-            console.log("Updated message4 state:", this.state.message4);
+          console.log("Updated message4 state:", this.state.message4);
         });
-    } else {
-        clearInterval(this.countdownInterval);
-       // this.setState({ countdown: 10 });
-        // If the type changed to something else, clear the countdown
+      }
+    
+      if (this.props.type === "edit") {
+        console.log("Edit", this.props.message);
+  
+        // Check if message and participant data are available
+        if (this.props.message && this.props.message.participant) {
+          this.setState({
+            participant: {
+              id: this.props.message._id|| '',
+              name: this.props.message.participant.name || '',
+              nric: this.props.message.participant.nric || '',
+              contactNumber: this.props.message.participant.contactNumber || '',
+              email: this.props.message.participant.email || '',
+              postalCode: this.props.message.participant.postalCode || ''
+            },
+            showEditMessage: true // Set state to show the edit-message div
+          }, () => {
+            console.log("Updated participant state:", this.state.participant);
+          });
+        } else {
+          console.error("Participant data is missing in message.");
+        }
+      }
+    };
+    
+
+    componentDidUpdate(prevProps) {
+      // Check if the type prop has changed from the previous value
+      if (this.props.type !== prevProps.type) {
+        console.log("Type prop changed. Current type:", this.props.type);
+    
+        // If the new type is "no-activity", restart the countdown
+        if (this.props.type === "no-activity") {
+          console.log("Restart CountDown");
+          this.startCountdown();
+        }
+        // If the new type is "update-access-right", update the message state
+        else if (this.props.type === "update-access-right" && this.props.message !== prevProps.message) {
+          console.log("Update Access Right", this.props.message);
+          this.setState({ message4: this.props.message }, () => {
+            console.log("Updated message4 state:", this.state.message4);
+          });
+        }
+        // For any other type change, clear the countdown
+        else {
+          clearInterval(this.countdownInterval);
+          console.log("Countdown cleared due to type change");
+        }
+      }
+    
+      // Handle "edit" type condition
+      if (this.props.type === "edit" && this.props.message !== prevProps.message) {
+        console.log("Edit", this.props.message);
+    
+        if (this.props.message && this.props.message.participant) {
+          this.setState({
+            participant: {
+              id: this.props.message._id || '',
+              name: this.props.message.participant.name || '',
+              nric: this.props.message.participant.nric || '',
+              contactNumber: this.props.message.participant.contactNumber || '',
+              email: this.props.message.participant.email || '',
+              postalCode: this.props.message.participant.postalCode || ''
+            },
+            showEditMessage: true // Show the edit form
+          }, () => {
+            console.log("Updated participant state:", this.state.participant);
+          });
+        } else {
+          console.error("Participant data is missing in the message.");
+        }
       }
     }
-  }
 
  componentWillUnmount() {
     clearInterval(this.countdownInterval);
@@ -315,7 +380,88 @@ class Popup extends Component {
         this.props.closePopupMessage(response.data.success, "Update Access Rights Failure");
       }
   }
- 
+
+  handleInputChange = (e, field) => {
+    const { value } = e.target;
+    this.setState(prevState => ({
+      participant: {
+        ...prevState.participant,
+        [field]: value, // Dynamically update the specific field
+      },
+    }));
+  };
+
+   // Handle form submission
+  handleSubmitEdit = async (e) => {
+    e.preventDefault();
+
+    const { participant } = this.state;
+    let errors = { ...this.state.errors };
+
+    // Validation: Ensure that all required fields are filled out
+    if (!participant.name) {
+      errors.name = 'Name is required.';
+    } else {
+      errors.name = '';
+    }
+
+    if (!participant.nric) {
+      errors.nric = 'NRIC is required.';
+    } else {
+      errors.nric = '';
+    }
+
+    if (!participant.contactNumber) {
+      errors.contactNumber = 'Contact Number is required.';
+    } else {
+      errors.contactNumber = '';
+    }
+
+    if (!participant.email) {
+      errors.email = 'Email is required.';
+    } else {
+      errors.email = '';
+    }
+
+    if (!participant.postalCode) {
+      errors.postalCode = 'Postal Code is required.';
+    } else {
+      errors.postalCode = '';
+    }
+
+    // Update state with errors
+    this.setState({ errors });
+
+    // Check if there are any errors
+    const hasErrors = Object.values(errors).some((error) => error !== '');
+    if (hasErrors) {
+      console.error('Validation Errors:', errors);
+      return;  // Stop further execution if validation fails
+    }
+
+    console.log("Updated Details:", participant);
+
+    try {
+      // Send the updated participant data to the backend
+      const response = await axios.post('http://localhost:3001/courseregistration', {
+        purpose: "updateEntry",
+        entry: participant
+      });
+
+      // Check the response data
+      if (response.data.result === true) {
+        console.log("Successfully updated participant.");
+        this.props.closePopup2(); // Close the popup if update is successful
+      } else {
+        console.error("Backend validation error:", response.data.message);
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error("Error submitting form:", error);
+      alert("An error occurred while submitting the form. Please try again.");
+    }
+  };
+  
   render() {
     const { message, isOpen, onClose, type } = this.props;
     const {newPassword,
@@ -331,7 +477,10 @@ class Popup extends Component {
       message1,
       error,
       countdown, 
-      message4
+      message4,
+      participant,
+      showEditMessage,
+      errors
     } = this.state;
 
     if (!isOpen) return null;
@@ -550,7 +699,74 @@ class Popup extends Component {
                 </div>
             </div>
           )
-          :(
+          : type === "edit" ? (
+            <div>
+        {/* Conditionally render the edit-message section */}
+        {showEditMessage && (
+          <div className="edit-message">
+            <h1>Edit Entry</h1>
+
+            <div className="edit-content">
+              <div className="edit-row">
+                <label htmlFor="name">Name:</label>
+                <input
+                  type="text"
+                  id="name"
+                  value={participant.name}
+                  onChange={(e) => this.handleInputChange(e, 'name')}
+                />
+                 {errors.name && <div className="error-message1">{errors.name}</div>}
+              </div>
+              <div className="edit-row">
+                <label htmlFor="nric">NRIC:</label>
+                <input
+                  type="text"
+                  id="nric"
+                  value={participant.nric}
+                  onChange={(e) => this.handleInputChange(e, 'nric')}
+                />
+                 {errors.nric && <div className="error-message1">{errors.nric}</div>}
+              </div>
+              <div className="edit-row">
+                <label htmlFor="contactNumber">Contact Number:</label>
+                <input
+                  type="text"
+                  id="contactNumber"
+                  value={participant.contactNumber}
+                  onChange={(e) => this.handleInputChange(e, 'contactNumber')}
+                />
+                 {errors.contactNumber && <div className="error-message1">{errors.contactNumber}</div>}
+              </div>
+              <div className="edit-row">
+                <label htmlFor="email">Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  value={participant.email}
+                  onChange={(e) => this.handleInputChange(e, 'email')}
+                />
+                {errors.email && <div className="error-message1">{errors.email}</div>}
+              </div>
+              <div className="edit-row">
+                <label htmlFor="postalCode">Postal Code:</label>
+                <input
+                  type="text"
+                  id="postalCode"
+                  value={participant.postalCode}
+                  onChange={(e) => this.handleInputChange(e, 'postalCode')}
+                />
+                {errors.postalCode && <div className="error-message1">{errors.postalCode}</div>}
+              </div>
+            </div>
+
+            <div className="edit-actions">
+              <button type="button" onClick={this.cancel}>Close</button>
+              <button type="submit" onClick={this.handleSubmitEdit}>Submit</button>
+            </div>
+          </div>
+        )}
+      </div>              
+          ):(
             // Default layout for other types (like "message")
             <>  
             </>
