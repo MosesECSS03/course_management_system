@@ -22,7 +22,7 @@ app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(cors({
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Add any other methods you want to supportok
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Add any other methods you want to support
   allowedHeaders: ['Content-Type', 'Authorization', 'Content-Disposition'], 
   exposedHeaders: ['Content-Disposition'], // Add this line to expose the header
 }));
