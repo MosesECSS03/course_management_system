@@ -376,14 +376,14 @@ class CreateAccountsSection extends Component {
                               type="button" 
                               onClick={this.clearForm}
                               className="clear-form-button"
-                              style={{padding: "10px", height: "3rem" }}
+                              style={{padding: "10px", height: "3rem", fontSize: "20px"}}
                           >
                               Clear Form
                           </button>
                           <button 
                               type="submit" 
                               className="submit-form-button"
-                              style={{padding: "10px", height: "3rem" }}
+                              style={{padding: "10px", height: "3rem", fontSize: "20px"}}
                           >
                               Create Account
                           </button>
