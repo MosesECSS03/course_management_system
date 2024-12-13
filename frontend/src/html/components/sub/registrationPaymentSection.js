@@ -424,7 +424,7 @@
             {
               //Generate Invoice Number 
               console.log("Invoice Number Generating")
-              this.receiptGenerator(item)
+              this.receiptGenerator(item, value)
             }
           }
         })
@@ -460,7 +460,7 @@
                 //this.props.refreshChild();
                 if(value === "Paid")
                 {
-                  this.receiptGenerator(item);
+                  this.receiptGenerator(item, value);
                 }
               }
               }).catch(error => {
@@ -518,13 +518,13 @@
         }))];
       }
 
-      receiptGenerator = async (rowDataArray) => {
-        console.log("Selected:", rowDataArray);
-        if(rowDataArray.status === "Paid")
+      receiptGenerator = async (rowDataArray, value) => {
+        console.log("Selected:", rowDataArray, value);
+        if(value === "Paid")
         {
           this.props.generateReceiptPopup();
         }
-        else if(rowDataArray.status === "Generate Invoice Number")
+        else if(value === "Generate Invoice Number")
         {
           this.props.generateInvoiceNumber();
         }
@@ -570,7 +570,7 @@
                         receiptNo = rowDataArray.official.receiptNo;
                     }
     
-                    if (response?.data?.result?.success) 
+                      if (response?.data?.result?.success) 
                       {
                         // Fetch the PDF receipt
                         const pdfResponse = await axios.post(
@@ -579,7 +579,8 @@
                                 purpose: 'receipt',
                                 rowData: rowDataArray,
                                 staff: this.props.userName,
-                                receiptNo: receiptNo
+                                receiptNo: receiptNo, 
+                                status: value
                             },
                             { responseType: 'blob' }
                         );
@@ -594,25 +595,36 @@
                           { responseType: 'blob' }
                       );*/
                         console.log("pdfResponse:", pdfResponse);
-    
-                        // Extract filename from Content-Disposition header
-                        const contentDisposition = pdfResponse.headers['content-disposition'];
-                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                        let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
-    
-                        console.log(`Filename: ${filename}`);
-    
-                        // Create a Blob for the PDF
-                        const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
-                        const url = window.URL.createObjectURL(blob);
-    
-                        // Open PDF in a new tab
-                        const pdfWindow = window.open();
-                        pdfWindow.location.href = url;
-    
-                        // Create the receipt in the database
-                        const receiptCreationResponse = await axios.post(
-                            'https://moses-ecss-backend.azurewebsites.net/receipt',
+                        if(value === "Paid")
+                        {
+                          // Extract filename from Content-Disposition header
+                          const contentDisposition = pdfResponse.headers['content-disposition'];
+                          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                          let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+      
+                          console.log(`Filename: ${filename}`);
+      
+                          // Create a Blob for the PDF
+                          const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+                          const url = window.URL.createObjectURL(blob);
+      
+                          // Open PDF in a new tab
+                          const pdfWindow = window.open();
+                          pdfWindow.location.href = url;
+      
+                          // Create the receipt in the database
+                          const receiptCreationResponse = await axios.post(
+                              'https://moses-ecss-backend.azurewebsites.net/receipt',
+                              {
+                                  purpose: 'createReceipt',
+                                  receiptNo: receiptNo,
+                                  registration_id: registration_id,
+                                  url: url,
+                                  staff: this.props.userName
+                              }
+                          );
+                          /*const receiptCreationResponse = await axios.post(
+                            'http://localhost:3001/receipt',
                             {
                                 purpose: 'createReceipt',
                                 receiptNo: receiptNo,
@@ -620,19 +632,10 @@
                                 url: url,
                                 staff: this.props.userName
                             }
-                        );
-                        /*const receiptCreationResponse = await axios.post(
-                          'http://localhost:3001/receipt',
-                          {
-                              purpose: 'createReceipt',
-                              receiptNo: receiptNo,
-                              registration_id: registration_id,
-                              url: url,
-                              staff: this.props.userName
-                          }
-                      );*/
-                        console.log("Receipt Created:", receiptCreationResponse.data);
-                    } 
+                        );*/
+                          console.log("Receipt Created:", receiptCreationResponse.data);
+                      } 
+                    }
                     else 
                     {
                       const pdfResponse = await axios.post(

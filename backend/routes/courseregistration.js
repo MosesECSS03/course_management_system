@@ -81,14 +81,17 @@ router.post('/', async function(req, res, next)
         var result = await controller.updateReceiptNumber(req.body.rowData._id, req.body.receiptNo);
         console.log("updateReceiptNumber:", result); 
         console.log("Array:", req.body.rowData);
-        if(req.body.rowData.status === "Paid")
+        if(req.body.status === "Paid")
         {
             var pdf = new PdfGenerator();
             var array = [];
             array.push(req.body.rowData);
             await pdf.generateReceipt(res, array, req.body.staff, req.body.receiptNo);
         }
-        return res.json({"result": "Ok"}); 
+        else
+        {
+            return res.json({"result": "Ok"}); 
+        }
     }
     else if(req.body.purpose === "updateRemarks")
     {

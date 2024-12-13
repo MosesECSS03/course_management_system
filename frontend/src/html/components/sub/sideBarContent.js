@@ -35,7 +35,7 @@ class SideBarContent extends Component {
         return true; // Objects are equal
     }
 
-    componentDidUpdate = async (prevProps, prevState) => {
+    componentWillUpdate = async (prevProps, prevState) => {
         // Check if accountId has changed
        if (prevProps.accountId !== this.props.accountId) {
             this.getAccessRight(this.props.accountId);
