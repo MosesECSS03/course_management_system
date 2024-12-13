@@ -922,7 +922,7 @@
               <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
             </div>
             <div className="table-wrapper" style={{marginLeft: '8%', height: '40vh'}}>
-            <table style={{borderCollapse: 'collapse', width: '350%'}} ref={this.tableRef}>
+            <table style={{borderCollapse: 'collapse', width: '300%'}} ref={this.tableRef}>
                 <thead>
                   <tr>
                     <th colSpan="5">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
@@ -956,7 +956,7 @@
                   {paginatedDetails.map((item, index) => (
                     <tr key={index}>
                        <td>{index+1}</td>
-                      <td>{item.participant.name}</td>
+                      <td >{item.participant.name}</td>
                       <td>{item.participant.nric}</td>
                       <td>{item.participant.gender}</td>
                       <td>{item.participant.dateOfBirth}</td>
@@ -1003,7 +1003,7 @@
                         )}
 
                       </td>
-                      <td {/*onClick={(event) => this.receiptGenerator(event, item)}*/}>{item.official?.name}</td>
+                      <td>{item.official?.name}</td>
                       <td>{item.official?.date}</td>                      
                       <td>{item.official?.time}</td>
                       <td>{item.official?.receiptNo}</td>                      
