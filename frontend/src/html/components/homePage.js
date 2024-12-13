@@ -770,6 +770,15 @@
       });
     }
 
+    generateInvoiceNumber = async() =>
+    {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Generating Invoice Number For SkillsFuture Payment",
+        popupType: "loading",
+      });
+    }
+
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
@@ -988,6 +997,7 @@
                         updateRemarksPopup = {this.updateRemarksPopup}
                         warningPopUpMessage = {this.warningPopUpMessage}
                         showEditPopup = {this.showEditPopup}
+                        generateInvoiceNumber = {this.generateInvoiceNumber}
                     />
                     </div>
                     <div className="pagination-section">

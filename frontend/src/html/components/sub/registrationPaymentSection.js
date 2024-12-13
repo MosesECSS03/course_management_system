@@ -15,7 +15,7 @@
         inputValues: {},
         dropdownVisible: {}, // Store input values for each row
         cashPaynowSuggestions: ["Pending", "Paid", "Cancelled"], // General suggestions
-        skillsFutureOptions: ["Pending", "Paid", "Cancelled"], // SkillsFuture specific options
+        skillsFutureOptions: ["Pending", "Generate Invoice Number", "Paid", "Cancelled"], // SkillsFuture specific options
         filteredSuggestions: [],
         focusedInputIndex: null,
         originalData: [],
@@ -404,7 +404,6 @@
           [index]: false, // Hide dropdown after selection
         },
       }));
-    
       // You can uncomment the following if you need to update the database
       this.updateDatabaseForRegistrationPayment(value, id, page, item);
     };
@@ -414,9 +413,19 @@
      return axios
         .post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
+          console.log("Update Database", response);
           if(response.data.result ===  true)
           {
-            this.updateWooCommerceForRegistrationPayment(value, id, page, item)
+            if(value === "Paid")
+            {
+              this.updateWooCommerceForRegistrationPayment(value, id, page, item);
+            }
+            else if(value === "Generate Invoice Number")
+            {
+              //Generate Invoice Number 
+              console.log("Invoice Number Generating")
+              this.receiptGenerator(item)
+            }
           }
         })
       /*return axios
@@ -511,14 +520,20 @@
 
       receiptGenerator = async (rowDataArray) => {
         console.log("Selected:", rowDataArray);
-        this.props.generateReceiptPopup();
+        if(rowDataArray.status === "Paid")
+        {
+          this.props.generateReceiptPopup();
+        }
+        else if(rowDataArray.status === "Generate Invoice Number")
+        {
+          this.props.generateInvoiceNumber();
+        }
             if (
                 (rowDataArray.course.payment === "Cash" || 
                  rowDataArray.course.payment === "PayNow" || 
                  rowDataArray.course.payment === "SkillsFuture") && 
-                rowDataArray.status === "Paid" && 
-                rowDataArray.official.name !== null
-            ) {
+                (rowDataArray.status === "Paid" || rowDataArray.status === "Generate Invoice Number")&& 
+                rowDataArray.official.name !== null ) {
                 try {
                     console.log("Generating Receipt for:", rowDataArray._id);
                     console.log("Payment Method:", rowDataArray.course.payment);
@@ -555,7 +570,8 @@
                         receiptNo = rowDataArray.official.receiptNo;
                     }
     
-                    if (response?.data?.result?.success) {
+                    if (response?.data?.result?.success) 
+                      {
                         // Fetch the PDF receipt
                         const pdfResponse = await axios.post(
                             'https://moses-ecss-backend.azurewebsites.net/courseregistration',
@@ -655,7 +671,7 @@
                         // Open PDF in a new tab
                         const pdfWindow = window.open();
                         pdfWindow.location.href = url;
-                    }
+                  }
     
                     // Close the popup and refresh
                     this.props.closePopup();
