@@ -80,6 +80,7 @@ router.post('/', async function(req, res, next)
         var controller = new RegistrationController();
         var result = await controller.updateReceiptNumber(req.body.rowData._id, req.body.receiptNo);
         console.log("updateReceiptNumber:", result); 
+        console.log("Array:", req.body.rowData);
         if(req.body.rowData.status === "Paid")
         {
             var pdf = new PdfGenerator();

@@ -933,7 +933,7 @@
                   </tr>
                   <tr>
                    <th style={{width: '0.01%'}}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
+                    <th style={{width: '0.02%'}}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
                     <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? 'NRIC' : 'NRIC'}</th>
                     <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '性别' : 'Gender'}</th>
                     <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '出生日期' : 'Date Of Birth'}</th>
