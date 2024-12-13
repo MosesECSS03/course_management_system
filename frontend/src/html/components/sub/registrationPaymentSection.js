@@ -1003,7 +1003,7 @@
                         )}
 
                       </td>
-                      <td onClick={{/*(event) => this.receiptGenerator(event, item)*/}}>{item.official?.name}</td>
+                      <td {/*onClick={(event) => this.receiptGenerator(event, item)}*/}>{item.official?.name}</td>
                       <td>{item.official?.date}</td>                      
                       <td>{item.official?.time}</td>
                       <td>{item.official?.receiptNo}</td>                      
