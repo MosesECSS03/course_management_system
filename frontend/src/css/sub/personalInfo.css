@@ -58,3 +58,37 @@
   margin-right: 0.5rem;
   width: fit-content; /* Adds space between the radio button and the label */
 }
+
+.calendar-popup {
+  position: absolute;
+  z-index: 1;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.month-year-selection {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px; /* Space between the month/year selectors and the calendar */
+  width: 100%;
+}
+
+.month-dropdown, .year-dropdown {
+  padding: 5px;
+  font-size: 14px;
+}
+
+.day-picker {
+  /* Style for the DayPicker calendar */
+  margin-top: 10px;
+}
+
+.rdp-chevron
+{
+  display: none;
+}
