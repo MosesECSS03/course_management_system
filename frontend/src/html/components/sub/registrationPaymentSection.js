@@ -182,7 +182,7 @@
       return array;
     }
 
-    async componentDidMount() {
+    async componentDidMount() { 
       const { language } = this.props;
       const data = await this.fetchCourseRegistrations(language);
       console.log('Data:', data);
@@ -376,7 +376,7 @@
       }));
     };
 
-    handleSuggestionClick = (index, value, id, page) => {
+    handleSuggestionClick = (index, value, id, page, item) => {
       this.props.updatePaymentPopup();
       // Log the index and value for debugging
       console.log("Index:", index);
@@ -406,17 +406,17 @@
       }));
     
       // You can uncomment the following if you need to update the database
-      this.updateDatabaseForRegistrationPayment(value, id, page);
+      this.updateDatabaseForRegistrationPayment(value, id, page, item);
     };
 
-    updateDatabaseForRegistrationPayment = async (value, id, page) => {
+    updateDatabaseForRegistrationPayment = async (value, id, page, item) => {
       console.log(value, id);
      return axios
         .post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
           {
-            this.updateWooCommerceForRegistrationPayment(value, id, page)
+            this.updateWooCommerceForRegistrationPayment(value, id, page, item)
           }
         })
       /*return axios
@@ -433,7 +433,7 @@
         });
     };
 
-    updateWooCommerceForRegistrationPayment = async (value, id, page) =>
+    updateWooCommerceForRegistrationPayment = async (value, id, page, item) =>
     {
       console.log("WooCommerce", value, page,id);
       axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', {page: page, status: value })
@@ -448,7 +448,11 @@
               if(response.data.result ===  true)
               {
                 //this.props.createAccountPopupMessage(true, response.data.message, response.data.message);
-                this.props.refreshChild();
+                //this.props.refreshChild();
+                if(value === "Paid")
+                {
+                  this.receiptGenerator(item);
+                }
               }
               }).catch(error => {
                 console.error('Error fetching course registrations:', error);
@@ -462,6 +466,7 @@
           return []; // Return an empty array in case of error
         });
     }
+
     
     handleBlur = (index) => {
       var currentInput = this.state.inputValues[index] || ""; // Get the current input value, default to an empty string
@@ -504,32 +509,28 @@
         }))];
       }
 
-      receiptGenerator = async (event, rowData) => {
-        event.stopPropagation();
+      receiptGenerator = async (rowDataArray) => {
+        console.log("Selected:", rowDataArray);
         this.props.generateReceiptPopup();
-    
-        const rowDataArray = Array.isArray(rowData) ? rowData : [rowData];
-    
-        for (var i = 0; i < rowDataArray.length; i++) {
             if (
-                (rowDataArray[i].course.payment === "Cash" || 
-                 rowDataArray[i].course.payment === "PayNow" || 
-                 rowDataArray[i].course.payment === "SkillsFuture") && 
-                rowDataArray[i].status === "Paid" && 
-                rowDataArray[i].official.name !== null
+                (rowDataArray.course.payment === "Cash" || 
+                 rowDataArray.course.payment === "PayNow" || 
+                 rowDataArray.course.payment === "SkillsFuture") && 
+                rowDataArray.status === "Paid" && 
+                rowDataArray.official.name !== null
             ) {
                 try {
-                    console.log("Generating Receipt for:", rowDataArray[i]._id);
-                    console.log("Payment Method:", rowDataArray[i].course.payment);
-                    const registration_id = rowDataArray[i]._id;
+                    console.log("Generating Receipt for:", rowDataArray._id);
+                    console.log("Payment Method:", rowDataArray.course.payment);
+                    const registration_id = rowDataArray._id;
                     let receiptNo = "";
                     let response;
     
                     // Check if there's an existing receipt number
-                    if (rowDataArray[i].official.receiptNo === "") {
+                    if (rowDataArray.official.receiptNo === "") {
                         // Get a new receipt number if not available
-                        const courseLocation = (rowDataArray[i].course.payment !== "SkillsFuture") 
-                            ? rowDataArray[i].course?.courseLocation 
+                        const courseLocation = (rowDataArray.course.payment !== "SkillsFuture") 
+                            ? rowDataArray.course?.courseLocation 
                             : 'ECSS/SFC/'; // Use 'SFC' for SkillsFuture payments
     
                        response = await axios.post(
@@ -551,7 +552,7 @@
                         receiptNo = response.data.result.receiptNumber;
                     } else {
                         // Use the existing receipt number
-                        receiptNo = rowDataArray[i].official.receiptNo;
+                        receiptNo = rowDataArray.official.receiptNo;
                     }
     
                     if (response?.data?.result?.success) {
@@ -663,7 +664,6 @@
                     console.error('Error during receipt generation process:', error);
                 }
             }
-        }
     };
     
     
@@ -905,58 +905,46 @@
               </div>            
               <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
             </div>
-            <div className="table-wrapper" ref={this.tableRef}>
-            <table style={{borderCollapse: 'collapse',tableLayout: 'fixed', width: '600%'}}>
+            <div className="table-wrapper" style={{marginLeft: '8%', height: '40vh'}}>
+            <table style={{borderCollapse: 'collapse', width: '350%'}} ref={this.tableRef}>
                 <thead>
                   <tr>
-                    <th colSpan="11">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
+                    <th colSpan="5">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
                     <th colSpan="5">{this.props.language === 'zh' ? '课程' : 'Courses'}</th>
                     <th>{this.props.language === 'zh' ? '其他' : 'Others'}</th>
                     <th>{this.props.language === 'zh' ? '确认状态' : 'Confirmation Status'}</th>
                     <th colSpan="6">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
                   </tr>
                   <tr>
-                    <th>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
-                    <th>{this.props.language === 'zh' ? 'NRIC' : 'NRIC'}</th>
-                    <th>{this.props.language === 'zh' ? '居住状态' : 'Residential Status'}</th>
-                    <th>{this.props.language === 'zh' ? '种族' : 'Race'}</th>
-                    <th>{this.props.language === 'zh' ? '性别' : 'Gender'}</th>
-                    <th>{this.props.language === 'zh' ? '出生日期' : 'Date Of Birth'}</th>
-                    <th>{this.props.language === 'zh' ? '联系电话' : 'Contact Number'}</th>
-                    <th>{this.props.language === 'zh' ? '电子邮件' : 'Email'}</th>
-                    <th>{this.props.language === 'zh' ? '邮政编码' : 'Postal Code'}</th>
-                    <th>{this.props.language === 'zh' ? '教育水平' : 'Education Level'}</th>
-                    <th>{this.props.language === 'zh' ? '工作状态' : 'Work Status'}</th>
-                    <th>{this.props.language === 'zh' ? '类型' : 'Type'}</th>
-                    <th>{this.props.language === 'zh' ? '课程名' : 'Name'}</th>
-                    <th>{this.props.language === 'zh' ? '地点' : 'Location'}</th>
-                    <th>{this.props.language === 'zh' ? '时长' : 'Duration'}</th>
-                    <th>{this.props.language === 'zh' ? '支付方式' : 'Payment Method'}</th>
-                    <th>{this.props.language === 'zh' ? '协议' : 'Agreement'}</th>
-                    <th>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Staff Name'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Date Received'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
+                   <th style={{width: '0.01%'}}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? 'NRIC' : 'NRIC'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '性别' : 'Gender'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '出生日期' : 'Date Of Birth'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '课程名' : 'Name'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '地点' : 'Location'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '时长' : 'Duration'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '支付方式' : 'Payment Method'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '协议' : 'Agreement'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Staff Name'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Date Received'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
+                    <th style={{width: '1%'}}>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
+                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedDetails.map((item, index) => (
                     <tr key={index}>
+                       <td>{index+1}</td>
                       <td>{item.participant.name}</td>
                       <td>{item.participant.nric}</td>
-                      <td>{item.participant.residentialStatus}</td>
-                      <td>{item.participant.race}</td>
                       <td>{item.participant.gender}</td>
                       <td>{item.participant.dateOfBirth}</td>
                       <td>{item.participant.contactNumber}</td>
-                      <td>{item.participant.email}</td>
-                      <td>{item.participant.postalCode}</td>
-                      <td>{item.participant.educationLevel}</td>
-                      <td>{item.participant.workStatus}</td>
-                      <td>{item.course.courseType}</td>
                       <td>
                       {item.course.courseEngName.includes('Protected: ')
                         ? item.course.courseEngName.replace('<br />Protected: ', '')
@@ -987,7 +975,7 @@
                                       event.stopPropagation();
                                       var coursePage = `${item.course.courseChiName}<br />${item.course.courseEngName}<br />(${item.course.courseLocation})`;
                                       coursePage = coursePage.replace(/–/g, "-");
-                                      this.handleSuggestionClick(index, suggestion, item._id, coursePage);
+                                      this.handleSuggestionClick(index, suggestion, item._id, coursePage, item);
                                     }}
                                   >
                                     {suggestion}
@@ -999,18 +987,18 @@
                         )}
 
                       </td>
-                      <td onClick={(event) => this.receiptGenerator(event, item)}>{item.official?.name}</td>
+                      <td onClick={{/*(event) => this.receiptGenerator(event, item)*/}}>{item.official?.name}</td>
                       <td>{item.official?.date}</td>                      
                       <td>{item.official?.time}</td>
                       <td>{item.official?.receiptNo}</td>                      
-                      <td style={{ width: '100%', padding: '0', overflow: 'hidden' }}>
+                      <td style={{ width: '20vw', padding: '0', overflow: 'hidden' }}>
                       <input
                           type="text"
                           value={this.state.remarks[index]}
                           maxLength={1000}
                           onChange={(e) => this.handleInputChange1(e, index)}
                           style={{
-                            width: '100%',
+                            width: '70%',
                             padding: '0.5rem',
                             border: '1px solid #ccc',
                             boxSizing: 'border-box',
@@ -1026,7 +1014,8 @@
                             padding: '0.5rem',
                             color: '#fff',
                             border: 'none',
-                            marginBottom: '0.5em'
+                            marginBottom: '0.5em',
+                            width:"fit-content"
                           }}
                         >
                           Submit
