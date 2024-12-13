@@ -90,6 +90,7 @@ router.post('/', async function(req, res, next)
         }
         else
         {
+            console.log("Dont need to generate Receipt");
             return res.json({"result": "Ok"}); 
         }
     }

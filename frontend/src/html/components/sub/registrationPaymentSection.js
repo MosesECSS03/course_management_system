@@ -187,8 +187,8 @@
       const data = await this.fetchCourseRegistrations(language);
       console.log('Data:', data);
       var locations = await this.getAllLocations(data);
-      var types = await this.getAllType(data);
-      this.props.passDataToParent(locations, types);
+      var names = await this.getAllNames(data);
+      this.props.passDataToParent(locations, names);
 
       const statuses = data.map(item => item.status); // Extract statuses
       console.log('Statuses:', statuses); // Log the array of statuses
@@ -213,7 +213,7 @@
         inputValues: inputValues,  // Show dropdown for the focused input
         remarks: inputValues1,  // Show dropdown for the focused input
         locations: locations, // Set locations in state
-        types: types
+        names: names
       });
       this.props.closePopup();
     }
@@ -221,24 +221,27 @@
     
 
     async componentDidUpdate(prevProps) {
-      const { selectedLocation, selectedCourseType, searchQuery} = this.props;
+      const { selectedLocation, selectedCourseName, searchQuery} = this.props;
       if (selectedLocation !== prevProps.selectedLocation ||
-        selectedCourseType !== prevProps.selectedCourseType ||
+        selectedCourseName !== prevProps.selectedCourseName ||
         searchQuery !== prevProps.searchQuery 
       ) {
         this.filterRegistrationDetails();
       }
     }
 
-    filterRegistrationDetails() {
+    filterRegistrationDetails() 
+    {
       const { section } = this.props;
   
       if (section === "registration") {
           const { originalData } = this.state;
-          const { selectedLocation, selectedCourseType, searchQuery } = this.props;
+          const { selectedLocation, selectedCourseName, searchQuery } = this.props;
+          console.log("Section:", section);
+          console.log("Selected Course Type:", selectedCourseName);
   
           // Reset filtered courses to all courses if the search query is empty
-          if (selectedCourseType === "All Types" && selectedLocation === "All Locations") {
+          if (selectedCourseName === "All Courses" && selectedLocation === "All Locations") {
               this.setState({ registerationDetails: originalData });
               return;
           }
@@ -284,12 +287,14 @@
                   ? true 
                   : location === selectedLocation.toLowerCase().trim();
   
-              const matchesType = selectedCourseType === "All Types" || 
-                  selectedCourseType === "所有地点" || 
-                  selectedCourseType === "" || 
-                  !selectedCourseType 
+              const matchesNames = selectedCourseName === "All Courses" || 
+                  selectedCourseName === "" || 
+                  selectedCourseName === "" || 
+                  !selectedCourseName
                   ? true 
-                  : type === selectedCourseType.toLowerCase().trim();
+                  : courseEngName === selectedCourseName.toLowerCase().trim();
+              
+              console.log("matchNames:", matchesNames);
 
               const matchesSearchQuery = normalizedSearchQuery
                   ? (pName.includes(normalizedSearchQuery) ||
@@ -315,7 +320,7 @@
                      oTime.includes(normalizedSearchQuery))
                   : true;
   
-              return matchesType && matchesLocation && matchesSearchQuery;
+              return matchesNames && matchesLocation && matchesSearchQuery;
           });
   
           // If filteredDetails is empty, set registerationDetails to an empty array
@@ -512,178 +517,144 @@
       }
   
       // Method to get all languages
-      getAllType = async (datas) => {
+      getAllNames = async (datas) => {
         return [...new Set(datas.map(data => {
-          return data.course.courseType;
+          return data.course.courseEngName;
         }))];
       }
 
       receiptGenerator = async (rowDataArray, value) => {
         console.log("Selected:", rowDataArray, value);
-        if(value === "Paid")
-        {
-          this.props.generateReceiptPopup();
-        }
-        else if(value === "Generate Invoice Number")
-        {
-          this.props.generateInvoiceNumber();
-        }
-            if (
-                (rowDataArray.course.payment === "Cash" || 
-                 rowDataArray.course.payment === "PayNow" || 
-                 rowDataArray.course.payment === "SkillsFuture") && 
-                (rowDataArray.status === "Paid" || rowDataArray.status === "Generate Invoice Number")&& 
-                rowDataArray.official.name !== null ) {
-                try {
-                    console.log("Generating Receipt for:", rowDataArray._id);
-                    console.log("Payment Method:", rowDataArray.course.payment);
-                    const registration_id = rowDataArray._id;
-                    let receiptNo = "";
-                    let response;
-    
-                    // Check if there's an existing receipt number
-                    if (rowDataArray.official.receiptNo === "") {
-                        // Get a new receipt number if not available
-                        const courseLocation = (rowDataArray.course.payment !== "SkillsFuture") 
-                            ? rowDataArray.course?.courseLocation 
-                            : 'ECSS/SFC/'; // Use 'SFC' for SkillsFuture payments
-    
-                       response = await axios.post(
-                            'https://moses-ecss-backend.azurewebsites.net/receipt',
-                            {
-                                purpose: 'getReceiptNo',
-                                courseLocation: courseLocation
-                            }
-                        );
-
-                        /*response = await axios.post(
-                          'http://localhost:3001/receipt',
-                          {
-                              purpose: 'getReceiptNo',
-                              courseLocation: courseLocation
-                          }
-                      );*/
-                        console.log("Get receipt number:", response.data);
-                        receiptNo = response.data.result.receiptNumber;
-                    } else {
-                        // Use the existing receipt number
-                        receiptNo = rowDataArray.official.receiptNo;
-                    }
-    
-                      if (response?.data?.result?.success) 
-                      {
-                        // Fetch the PDF receipt
-                        const pdfResponse = await axios.post(
-                            'https://moses-ecss-backend.azurewebsites.net/courseregistration',
-                            {
-                                purpose: 'receipt',
-                                rowData: rowDataArray,
-                                staff: this.props.userName,
-                                receiptNo: receiptNo, 
-                                status: value
-                            },
-                            { responseType: 'blob' }
-                        );
-                        /*const pdfResponse = await axios.post(
-                          'http://localhost:3001/courseregistration',
-                          {
-                              purpose: 'receipt',
-                              rowData: rowDataArray,
-                              staff: this.props.userName,
-                              receiptNo: receiptNo
-                          },
-                          { responseType: 'blob' }
-                      );*/
-                        console.log("pdfResponse:", pdfResponse);
-                        if(value === "Paid")
-                        {
-                          // Extract filename from Content-Disposition header
-                          const contentDisposition = pdfResponse.headers['content-disposition'];
-                          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                          let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+        
+        const generateReceiptNumber = async (rowData) => {
+          // Check if there's an existing receipt number
+          if (rowData.official.receiptNo) {
+            return rowData.official.receiptNo;
+          }
+          const courseLocation = rowData.course.payment === "SkillsFuture" 
+            ? "ECSS/SFC/" 
+            : rowData.course.courseLocation;
       
-                          console.log(`Filename: ${filename}`);
+          try {
+            const response = await axios.post(
+              'https://moses-ecss-backend.azurewebsites.net/receipt',
+              { purpose: 'getReceiptNo', courseLocation }
+            );
       
-                          // Create a Blob for the PDF
-                          const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
-                          const url = window.URL.createObjectURL(blob);
-      
-                          // Open PDF in a new tab
-                          const pdfWindow = window.open();
-                          pdfWindow.location.href = url;
-      
-                          // Create the receipt in the database
-                          const receiptCreationResponse = await axios.post(
-                              'https://moses-ecss-backend.azurewebsites.net/receipt',
-                              {
-                                  purpose: 'createReceipt',
-                                  receiptNo: receiptNo,
-                                  registration_id: registration_id,
-                                  url: url,
-                                  staff: this.props.userName
-                              }
-                          );
-                          /*const receiptCreationResponse = await axios.post(
-                            'http://localhost:3001/receipt',
-                            {
-                                purpose: 'createReceipt',
-                                receiptNo: receiptNo,
-                                registration_id: registration_id,
-                                url: url,
-                                staff: this.props.userName
-                            }
-                        );*/
-                          console.log("Receipt Created:", receiptCreationResponse.data);
-                      } 
-                    }
-                    else 
-                    {
-                      const pdfResponse = await axios.post(
-                            'https://moses-ecss-backend.azurewebsites.net/courseregistration',
-                            {
-                                purpose: 'receipt',
-                                rowData: rowDataArray,
-                                staff: this.props.userName,
-                                receiptNo: receiptNo
-                            },
-                            { responseType: 'blob' }
-                        );
-                        /*const pdfResponse = await axios.post(
-                          'http://localhost:3001/courseregistration',
-                          {
-                              purpose: 'receipt',
-                              rowData: rowDataArray,
-                              staff: this.props.userName,
-                              receiptNo: receiptNo
-                          },
-                          { responseType: 'blob' }
-                      );*/
-                        console.log("pdfResponse:", pdfResponse);
-
-                        // Extract filename from Content-Disposition header
-                        const contentDisposition = pdfResponse.headers['content-disposition'];
-                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                        let filename = filenameMatch && filenameMatch[1] ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
-
-                        console.log(`Filename: ${filename}`);
-
-                        // Create a Blob for the PDF
-                        const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
-                        const url = window.URL.createObjectURL(blob);
-
-                        // Open PDF in a new tab
-                        const pdfWindow = window.open();
-                        pdfWindow.location.href = url;
-                  }
-    
-                    // Close the popup and refresh
-                    this.props.closePopup();
-                    this.props.refreshChild();
-                } catch (error) {
-                    console.error('Error during receipt generation process:', error);
-                }
+            if (response?.data?.result?.success) {
+              return response.data.result.receiptNumber;
+            } else {
+              throw new Error('Failed to fetch receipt number');
             }
-    };
+          } catch (error) {
+            console.error("Error fetching receipt number:", error);
+            throw error;
+          }
+        };
+      
+        const generatePDFReceipt = async (rowData, receiptNo, status) => {
+          try {
+            const pdfResponse = await axios.post(
+              'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+              { purpose: 'receipt', rowData, staff: this.props.userName, receiptNo: receiptNo, status },
+              { responseType: 'blob' }
+            );
+            console.log("Result From PDF Response:", pdfResponse);
+            if(status === "Paid")
+            {
+              // Extract filename from Content-Disposition header
+              const contentDisposition = pdfResponse.headers['content-disposition'];
+              const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+              const filename = filenameMatch ? filenameMatch[1].replace(/['"]/g, '') : 'unknown.pdf';
+              console.log(`Filename: ${filename}`);
+        
+              // Create a Blob for the PDF
+              const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+              const url = window.URL.createObjectURL(blob);
+        
+              // Open PDF in a new tab
+              const pdfWindow = window.open();
+              pdfWindow.location.href = url;
+        
+              return url;
+            }
+          } catch (error) {
+            console.error("Error generating PDF receipt:", error);
+            throw error;
+          }
+        };
+      
+        const createReceiptInDatabase = async (receiptNo, registration_id, url) => {
+          try {
+            const receiptCreationResponse = await axios.post(
+              'https://moses-ecss-backend.azurewebsites.net/receipt',
+              { purpose: 'createReceipt', receiptNo, registration_id, url, staff: this.props.userName }
+            );
+            console.log("Receipt Created:", receiptCreationResponse.data);
+          } catch (error) {
+            console.error("Error creating receipt in database:", error);
+            throw error;
+          }
+        };
+      
+        if (value === "Paid") {
+          this.props.generateReceiptPopup();
+          if (
+            (rowDataArray.course.payment === "Cash" || 
+            rowDataArray.course.payment === "PayNow" || 
+            rowDataArray.course.payment === "SkillsFuture") && 
+            rowDataArray.official.name !== null
+          ) {
+            try {
+              console.log("Generating Receipt for:", rowDataArray._id);
+              const registration_id = rowDataArray._id;
+              
+              // Get or use existing receipt number
+              if(rowDataArray.official.receiptNo === "")
+              {
+                var receiptNo = await generateReceiptNumber(rowDataArray);
+              }
+              else
+              {
+                var receiptNo = rowDataArray.official.receiptNo;
+              }
+
+              // Fetch the PDF receipt and open in a new tab
+              const url = await generatePDFReceipt(rowDataArray, receiptNo, value);
+              
+              // Create the receipt in the database
+              await createReceiptInDatabase(receiptNo, registration_id, url);
+              
+              this.props.closePopup();
+              this.props.refreshChild();
+              
+            } catch (error) {
+              console.error('Error during receipt generation process:', error);
+            }
+          }
+        } else if (value === "Generate Invoice Number") {
+          this.props.generateInvoiceNumber();
+      
+          if (rowDataArray.course.payment === "SkillsFuture") {
+            try {
+              console.log("Generating Invoice Number for:", rowDataArray._id);
+              const registration_id = rowDataArray._id;
+      
+              // Get or use existing receipt number
+              const receiptNo = await generateReceiptNumber(rowDataArray);
+              console.log("SkillsFuture Invoice Number:", receiptNo);
+              const url = await generatePDFReceipt(rowDataArray, receiptNo, value);
+              await createReceiptInDatabase(receiptNo, registration_id, "");
+      
+              this.props.closePopup();
+              this.props.refreshChild();
+            } catch (error) {
+              console.error('Error during invoice number generation process:', error);
+            }
+          }
+        }
+      };
+      
     
     
     async saveData(paginatedDetails) {

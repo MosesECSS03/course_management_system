@@ -983,7 +983,7 @@
                         section={section}
                         passDataToParent={this.handleDataFromChild}
                         selectedLocation={selectedLocation}
-                        selectedCourseType={selectedCourseType}
+                        selectedCourseName={selectedCourseType}
                         searchQuery={searchQuery}
                         resetSearch={resetSearch}
                         getTotalNumberofDetails={this.getTotalNumberofDetails}
