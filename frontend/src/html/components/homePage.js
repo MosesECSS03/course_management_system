@@ -640,8 +640,8 @@
   goBackHome = async() =>
   {
     console.log("Logout");
-    //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
-    var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    //var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
     if(response.data.message.message === "Logout successful")
     {
       this.props.auth.logout();
@@ -767,6 +767,15 @@
         isPopupOpen: true,
         popupMessage: item,
         popupType: "edit"
+      });
+    }
+
+    generateInvoiceNumber = async() =>
+    {
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: "Generating Invoice Number For SkillsFuture Payment",
+        popupType: "loading",
       });
     }
 
@@ -974,7 +983,7 @@
                         section={section}
                         passDataToParent={this.handleDataFromChild}
                         selectedLocation={selectedLocation}
-                        selectedCourseType={selectedCourseType}
+                        selectedCourseName={selectedCourseType}
                         searchQuery={searchQuery}
                         resetSearch={resetSearch}
                         getTotalNumberofDetails={this.getTotalNumberofDetails}
@@ -988,6 +997,7 @@
                         updateRemarksPopup = {this.updateRemarksPopup}
                         warningPopUpMessage = {this.warningPopUpMessage}
                         showEditPopup = {this.showEditPopup}
+                        generateInvoiceNumber = {this.generateInvoiceNumber}
                     />
                     </div>
                     <div className="pagination-section">

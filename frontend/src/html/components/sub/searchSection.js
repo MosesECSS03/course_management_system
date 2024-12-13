@@ -69,7 +69,7 @@
                 language: value
               });
             }  else if (name === 'courseType') {
-              console.log(value);
+              console.log("Course Name:", value);
               this.setState({
                 filteredTypes: this.state.types.filter(type =>
                   type.toLowerCase().includes(value.toLowerCase())
@@ -249,7 +249,7 @@
 
                      
             if (this.props.types !== prevProps.types) {
-              const uniqueTypes = ["All Types", ...new Set(this.props.types)];
+              const uniqueTypes = ["All Courses", ...new Set(this.props.types)];
               this.setState({
                 types: uniqueTypes,
                 filteredTypes: uniqueTypes
@@ -271,7 +271,7 @@
         const uniqueRoles = ["All Roles", ...new Set(props.roles)];
         const uniqueLocations = ["All Locations", ...new Set(props.locations)];
         const uniqueLanguages = ["All Languages", ...new Set(props.languages)];
-        const uniqueTypes = ["All Types", ...new Set(props.types)];
+        const uniqueTypes = ["All Courses", ...new Set(props.types)];
         console.log("Props:", props);
 
         this.setState({
@@ -465,7 +465,7 @@ render() {
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="courseType">{this.props.language === 'zh' ? '类型' : 'Types'}</label>
+              <label htmlFor="courseType">{this.props.language === 'zh' ? '': 'Course'}</label>
               <div
                 className={`dropdown-container ${showTypeDropdown ? 'open' : ''}`}
                 ref={this.typeDropdownRef}
@@ -477,7 +477,7 @@ render() {
                   value={courseType}
                   onChange={this.handleChange}
                   onClick={() => this.handleDropdownToggle('showTypeDropdown')}
-                  placeholder={this.props.language === 'zh' ? '按类型筛选' : 'Filter by types'}
+                  placeholder={this.props.language === 'zh' ? '' : 'Filter by course name'}
                   autoComplete="off"
                 />
                 

@@ -152,9 +152,9 @@ class CreateAccountsSection extends Component {
 
   isValidEmail = (email) => {
     // Regular expression for validating email format
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
     return emailPattern.test(email);
-}
+  };
 
   handleSubmit = (event) => {
     event.preventDefault();
@@ -217,8 +217,8 @@ class CreateAccountsSection extends Component {
         {
             var accountDetails = {"name": name, "email": email, "password": password, "role": role, "site": site};
         }
-        //axios.post('https://moses-ecss-backend.azurewebsites.net/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
-        axios.post('http://localhost:3001/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
+        axios.post('https://moses-ecss-backend.azurewebsites.net/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
+        //axios.post('http://localhost:3001/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
         .then((response) => {
             if(response.data.message === 'New account with respectively access rights created successfully')
             {
@@ -372,15 +372,22 @@ class CreateAccountsSection extends Component {
                         )}
                         {this.state.siteError && <p className="error-message1">{this.state.siteError}</p>}
                         <div className="button-container">
-                            <button 
-                                type="button" 
-                                onClick={this.clearForm}
-                                className="clear-form-button"
-                            >
-                            Clear Form
-                            </button>
-                            <button type="submit" className="submit-form-button">Create Account</button>
-                        </div>
+                          <button 
+                              type="button" 
+                              onClick={this.clearForm}
+                              className="clear-form-button"
+                              style={{padding: "10px", height: "2.5rem", fontSize: "15px"}}
+                          >
+                              Clear Form
+                          </button>
+                          <button 
+                              type="submit" 
+                              className="submit-form-button"
+                              style={{padding: "10px", height: "2.5rem", fontSize: "15px"}}
+                          >
+                              Create Account
+                          </button>
+                      </div>
                     </form>
                 </div>
             </div>

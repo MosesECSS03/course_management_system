@@ -5,6 +5,7 @@
     align-items: center;
     padding: 1rem; /* Padding using rem units */
     z-index: 0;
+    margin-top: -9rem;
   }
 
 

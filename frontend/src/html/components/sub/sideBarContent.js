@@ -35,7 +35,7 @@ class SideBarContent extends Component {
         return true; // Objects are equal
     }
 
-    componentDidUpdate = async (prevProps, prevState) => {
+    componentWillUpdate = async (prevProps, prevState) => {
         // Check if accountId has changed
        if (prevProps.accountId !== this.props.accountId) {
             this.getAccessRight(this.props.accountId);
@@ -57,14 +57,14 @@ class SideBarContent extends Component {
 
     getAccessRight = async (accountId) => {
         try {
-           /*const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/accessRights', {
+           const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/accessRights', {
                 "purpose": "retrieveAccessRight",
                 "accountId": accountId
-            });*/
-           const response = await axios.post('http://localhost:3001/accessRights', {
+            });
+           /*const response = await axios.post('http://localhost:3001/accessRights', {
                 "purpose": "retrieveAccessRight",
                 "accountId": accountId
-             });
+             });*/
             console.log(response);
 
             // Store the access rights in state

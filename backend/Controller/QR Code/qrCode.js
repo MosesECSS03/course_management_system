@@ -18,7 +18,7 @@ class QRCodeGenerator {
             const buffer = await QRCode.toBuffer(this.text, this.options);
 
             // Save the buffer to a JPG file
-            const filename = 'qr-code.jpg';
+            const filename = 'qr-code for andriod.jpg';
             fs.writeFileSync(filename, buffer);
             console.log(`QR code generated and saved as ${filename}`);
         } catch (error) {
@@ -28,5 +28,5 @@ class QRCodeGenerator {
 }
 
 // Usage
-const qrCodeGenerator = new QRCodeGenerator('https://docs.google.com/forms/d/e/1FAIpQLSfYy30vs0gc4t9k4DO4rGR0X9-Yfi8xPmb8xKe_58R2KY_9dw/formResponse');
+const qrCodeGenerator = new QRCodeGenerator('https://play.google.com/store/apps/details?id=io.givllyecssedhub');
 qrCodeGenerator.generate();
