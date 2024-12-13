@@ -88,6 +88,7 @@ router.post('/', async function(req, res, next)
             array.push(req.body.rowData);
             await pdf.generateReceipt(res, array, req.body.staff, req.body.receiptNo);
         }
+        return res.json({"result": "Ok"}); 
     }
     else if(req.body.purpose === "updateRemarks")
     {
