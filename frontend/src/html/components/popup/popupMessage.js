@@ -25,9 +25,14 @@ class Popup extends Component {
         id: '',
         name: '',
         nric: '',
+        residentalStatus: '',
+        race: '',
+        gender: '', 
         contactNumber:  '',
         email: '',
         postalCode:  '',
+        educationLevel: '',
+        workStatus: ''
       },
       errors: {
         name: '',
@@ -56,7 +61,7 @@ class Popup extends Component {
     
       if (this.props.type === "edit") {
         console.log("Edit", this.props.message);
-  
+        console.log("Participants Details:", this.props.message.participant);
         // Check if message and participant data are available
         if (this.props.message && this.props.message.participant) {
           this.setState({
@@ -64,9 +69,14 @@ class Popup extends Component {
               id: this.props.message._id|| '',
               name: this.props.message.participant.name || '',
               nric: this.props.message.participant.nric || '',
+              residentialStatus: this.props.message.participant.residentialStatus || '',
+              race: this.props.message.participant.race || '',
+              gender: this.props.message.participant.gender || '',
               contactNumber: this.props.message.participant.contactNumber || '',
               email: this.props.message.participant.email || '',
-              postalCode: this.props.message.participant.postalCode || ''
+              postalCode: this.props.message.participant.postalCode || '',
+              educationLevel: this.props.message.participant.educationLevel || '',
+              workStatus: this.props.message.participant.workStatus || ''
             },
             showEditMessage: true // Set state to show the edit-message div
           }, () => {
@@ -106,16 +116,21 @@ class Popup extends Component {
       // Handle "edit" type condition
       if (this.props.type === "edit" && this.props.message !== prevProps.message) {
         console.log("Edit", this.props.message);
-    
+        console.log("Participants Details:", this.props.message.participant);
         if (this.props.message && this.props.message.participant) {
           this.setState({
             participant: {
-              id: this.props.message._id || '',
+              id: this.props.message._id|| '',
               name: this.props.message.participant.name || '',
               nric: this.props.message.participant.nric || '',
+              residentialStatus: this.props.message.participant.residentialStatus || '',
+              race: this.props.message.participant.race || '',
+              gender: this.props.message.participant.gender || '',
               contactNumber: this.props.message.participant.contactNumber || '',
               email: this.props.message.participant.email || '',
-              postalCode: this.props.message.participant.postalCode || ''
+              postalCode: this.props.message.participant.postalCode || '',
+              educationLevel: this.props.message.participant.educationLevel || '',
+              workStatus: this.props.message.participant.workStatus || ''      
             },
             showEditMessage: true // Show the edit form
           }, () => {
@@ -443,15 +458,15 @@ class Popup extends Component {
 
     try {
       // Send the updated participant data to the backend
-      /*const response = await axios.post('http://localhost:3001/courseregistration', {
-        purpose: "updateEntry",
-        entry: participant
-      });*/
-
-      const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {
+      const response = await axios.post('http://localhost:3001/courseregistration', {
         purpose: "updateEntry",
         entry: participant
       });
+
+      /*const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {
+        purpose: "updateEntry",
+        entry: participant
+      });*/
 
       // Check the response data
       if (response.data.result === true) {
@@ -468,6 +483,13 @@ class Popup extends Component {
   };
   
   render() {
+    const workStatusOptions = [
+      { label: 'Retired 退休', value: 'Retired 退休' },
+      { label: 'Employed full-time 全职工作', value: 'Employed full-time 全职工作' },
+      { label: 'Self-employed 自雇人', value: 'Self-employed 自雇人' },
+      { label: 'Part-time 兼职', value: 'Part-time 兼职' },
+      { label: 'Unemployed 失业', value: 'Unemployed 失业' }
+    ]; 
     const { message, isOpen, onClose, type } = this.props;
     const {newPassword,
       newPassword1,
@@ -708,68 +730,223 @@ class Popup extends Component {
             <div>
         {/* Conditionally render the edit-message section */}
         {showEditMessage && (
-          <div className="edit-message">
-            <h1>Edit Entry</h1>
+  <div className="edit-message">
+    <h1>Edit Entry</h1>
+    {console.log("Participants:", participant)}
 
-            <div className="edit-content">
-              <div className="edit-row">
-                <label htmlFor="name">Name:</label>
-                <input
-                  type="text"
-                  id="name"
-                  value={participant.name}
-                  onChange={(e) => this.handleInputChange(e, 'name')}
-                />
-                 {errors.name && <div className="error-message1">{errors.name}</div>}
-              </div>
-              <div className="edit-row">
-                <label htmlFor="nric">NRIC:</label>
-                <input
-                  type="text"
-                  id="nric"
-                  value={participant.nric}
-                  onChange={(e) => this.handleInputChange(e, 'nric')}
-                />
-                 {errors.nric && <div className="error-message1">{errors.nric}</div>}
-              </div>
-              <div className="edit-row">
-                <label htmlFor="contactNumber">Contact Number:</label>
-                <input
-                  type="text"
-                  id="contactNumber"
-                  value={participant.contactNumber}
-                  onChange={(e) => this.handleInputChange(e, 'contactNumber')}
-                />
-                 {errors.contactNumber && <div className="error-message1">{errors.contactNumber}</div>}
-              </div>
-              <div className="edit-row">
-                <label htmlFor="email">Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={participant.email}
-                  onChange={(e) => this.handleInputChange(e, 'email')}
-                />
-                {errors.email && <div className="error-message1">{errors.email}</div>}
-              </div>
-              <div className="edit-row">
-                <label htmlFor="postalCode">Postal Code:</label>
-                <input
-                  type="text"
-                  id="postalCode"
-                  value={participant.postalCode}
-                  onChange={(e) => this.handleInputChange(e, 'postalCode')}
-                />
-                {errors.postalCode && <div className="error-message1">{errors.postalCode}</div>}
-              </div>
-            </div>
+    <div className="edit-content">
+      <div className="edit-row">
+        <label htmlFor="name">Name:</label>
+        <input
+          type="text"
+          id="name"
+          value={participant.name}
+          onChange={(e) => this.handleInputChange(e, 'name')}
+        />
+        {errors.name && <div className="error-message1">{errors.name}</div>}
+      </div>
 
-            <div className="edit-actions">
-              <button type="button" onClick={this.cancel}>Close</button>
-              <button type="submit" onClick={this.handleSubmitEdit}>Submit</button>
-            </div>
+      <div className="edit-row">
+        <label htmlFor="nric">NRIC:</label>
+        <input
+          type="text"
+          id="nric"
+          value={participant.nric}
+          onChange={(e) => this.handleInputChange(e, 'nric')}
+        />
+        {errors.nric && <div className="error-message1">{errors.nric}</div>}
+      </div>
+
+      <div className="edit-row">
+        <label htmlFor="residentialStatus" style={{ marginRight: '1rem' }}>
+          Residential Status:
+        </label>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+            <input
+              type="radio"
+              name="residentialStatus"
+              value="SC 新加坡公民"
+              checked={participant.residentialStatus === "SC 新加坡公民"}
+              onChange={(e) => this.handleInputChange(e, 'residentialStatus')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            SC 新加坡公民
           </div>
-        )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+            <input
+              type="radio"
+              name="residentialStatus"
+              value="PR 永久居民"
+              checked={participant.residentialStatus === "PR 永久居民"}
+              onChange={(e) => this.handleInputChange(e, 'residentialStatus')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            PR 永久居民
+          </div>
+        </div>
+      </div>
+
+      <div className="edit-row">
+        <label htmlFor="race" style={{ marginRight: '10px' }}>Race:</label>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+            <input
+              type="radio"
+              name="race"
+              value="Chinese 华"
+              checked={participant.race === 'Chinese 华'}
+              onChange={(e) => this.handleInputChange(e, 'race')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            Chinese 华
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+            <input
+              type="radio"
+              name="race"
+              value="Indian 印"
+              checked={participant.race === 'Indian 印'}
+              onChange={(e) => this.handleInputChange(e, 'race')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            Indian 印
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+            <input
+              type="radio"
+              name="race"
+              value="Malay 马"
+              checked={participant.race === 'Malay 马'}
+              onChange={(e) => this.handleInputChange(e, 'race')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            Malay 马
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+            <input
+              type="radio"
+              name="race"
+              value="Others 其他"
+              checked={participant.race === 'Others 其他'}
+              onChange={(e) => this.handleInputChange(e, 'race')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            Others 其他
+          </div>
+        </div>
+      </div>
+
+      <div className="edit-row">
+  <label htmlFor="gender" style={{ marginRight: '10px' }}>Gender:</label>
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+      <input
+        type="radio"
+        name="gender"
+        value="M 男"
+        checked={participant.gender === 'M 男'}
+        onChange={(e) => this.handleInputChange(e, 'gender')}
+        style={{ marginRight: '0.5rem' }}
+      />
+      M 男
+    </div>
+
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+      <input
+        type="radio"
+        name="gender"
+        value="F 女"
+        checked={participant.gender === 'F 女'}
+        onChange={(e) => this.handleInputChange(e, 'gender')}
+        style={{ marginRight: '0.5rem' }}
+      />
+      F 女
+    </div>
+  </div>
+</div>
+
+
+      <div className="edit-row">
+        <label htmlFor="contactNumber">Contact Number:</label>
+        <input
+          type="text"
+          id="contactNumber"
+          value={participant.contactNumber}
+          onChange={(e) => this.handleInputChange(e, 'contactNumber')}
+        />
+        {errors.contactNumber && <div className="error-message1">{errors.contactNumber}</div>}
+      </div>
+
+      <div className="edit-row">
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          value={participant.email}
+          onChange={(e) => this.handleInputChange(e, 'email')}
+        />
+        {errors.email && <div className="error-message1">{errors.email}</div>}
+      </div>
+
+      <div className="edit-row">
+        <label htmlFor="postalCode">Postal Code:</label>
+        <input
+          type="text"
+          id="postalCode"
+          value={participant.postalCode}
+          onChange={(e) => this.handleInputChange(e, 'postalCode')}
+        />
+        {errors.postalCode && <div className="error-message1">{errors.postalCode}</div>}
+      </div>
+
+      <div className="edit-row">
+        <label htmlFor="educationLevel" style={{ marginRight: '10px' }}>Education Level:</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+          {['Primary 小学', 'Secondary 中学', 'Post-Secondary (Junior College/ITE) 专上教育', 'Diploma 文凭', 'Bachelor\'s Degree 学士学位', 'Master\'s Degree 硕士', 'Others 其它'].map((level) => (
+            <div key={level} style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
+              <input
+                type="radio"
+                name="educationLevel"
+                value={level}
+                checked={participant.educationLevel === level}
+                onChange={(e) => this.handleInputChange(e, 'educationLevel')}
+                style={{ marginRight: '5px' }}
+              />
+              {level}
+            </div>
+          ))}
+        </div>
+      </div>
+    <div className="edit-row">
+      <label htmlFor="workStatus">Work Status:</label>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+        {workStatusOptions.map((option) => (
+          <div key={option.value} style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
+            <input
+              type="radio"
+              name="workStatus"
+              value={option.value}
+              checked={participant.workStatus === option.value}
+              onChange={(e) => this.handleInputChange(e, 'workStatus')}
+              style={{ marginRight: '5px' }}
+            />
+            {option.label}
+          </div>
+        ))}
+      </div>
+    </div>
+      <div className="edit-actions">
+        <button type="button" onClick={this.cancel}>Close</button>
+        <button type="submit" onClick={this.handleSubmitEdit}>Submit</button>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>              
           ):(
             // Default layout for other types (like "message")

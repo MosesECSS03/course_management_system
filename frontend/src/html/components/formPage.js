@@ -37,6 +37,7 @@ class FormPage extends Component {
   componentDidMount() {
     window.scrollTo(0, 0);
     const queryParams = new URLSearchParams(window.location.search);
+    console.log("QueryParams:", queryParams);
     const englishName = queryParams.get('engName')?.trim() || '';
     const chineseName = (() => {
       const param = queryParams.get('chiName') || '';

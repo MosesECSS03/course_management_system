@@ -57,14 +57,14 @@ class SideBarContent extends Component {
 
     getAccessRight = async (accountId) => {
         try {
-           const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/accessRights', {
+           /*const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/accessRights', {
                 "purpose": "retrieveAccessRight",
                 "accountId": accountId
-            });
-           /*const response = await axios.post('http://localhost:3001/accessRights', {
+            });*/
+           const response = await axios.post('http://localhost:3001/accessRights', {
                 "purpose": "retrieveAccessRight",
                 "accountId": accountId
-             });*/
+             });
             console.log(response);
 
             // Store the access rights in state
@@ -80,9 +80,9 @@ class SideBarContent extends Component {
         }));
     }
     
-    toggleHome = () =>
+    toggleDashboard = () =>
     {
-        this.props.toggleHomeComponent();
+        this.props.toggleDashboardComponent();
     }
 
     handleSubKeyClick = (subKey) => {
@@ -134,6 +134,7 @@ class SideBarContent extends Component {
         // Map of icons for each main item
         const iconMap = {
             "Home": 'fa-solid fa-house-user',
+            "Dashboard": 'fa fa-dashboard',
             "Account": 'fa-solid fa-users',
             "Courses": "fa-solid fa-chalkboard-user",
             "Registration And Payment": 'fa-brands fa-wpforms',
@@ -144,9 +145,15 @@ class SideBarContent extends Component {
             <div className="sidebar-content"  onMouseLeave={this.closeSubMenu}>
                 <ul>
                     <div style={{marginBottom: "-20px"}}> 
-                        <li key={"Home"} onClick={() => this.toggleHome()}>
+                        <li key={"Home"}>
                             <i className={iconMap["Home"]} aria-hidden="true"></i>
                             <span style={{marginLeft: "5px"}}>Home</span>
+                        </li>
+                    </div>
+                    <div style={{marginBottom: "-20px"}}> 
+                        <li key={"Dashboard"} onClick={() => this.toggleDashboard()}>
+                            <i className={iconMap["Dashboard"]} aria-hidden="true"></i>
+                            <span style={{marginLeft: "5px"}}>Dashboard</span>
                         </li>
                     </div>
                     {Object.keys(accessRights).map((key) => {

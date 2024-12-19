@@ -19,7 +19,7 @@
 
   
 ::-webkit-scrollbar {
-    width: 0; /* Hides vertical scrollbar */
+    width: 8px; /* Hides vertical scrollbar */
     height: 8px; /* Keeps horizontal scrollbar */
   }
   
