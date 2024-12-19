@@ -44,7 +44,7 @@ class FormPage extends Component {
       if (param.includes(':')) {
           return param.split(':')[1].trim();
       } else {
-          return param.split(':').trim();
+          return param.trim();
       }
   })();
     const location = queryParams.get('location')?.trim() || '';
