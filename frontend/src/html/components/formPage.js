@@ -38,7 +38,11 @@ class FormPage extends Component {
     window.scrollTo(0, 0);
     const queryParams = new URLSearchParams(window.location.search);
     const englishName = queryParams.get('engName')?.trim() || '';
-    const chineseName = queryParams.get('chiName')?.split(":")[1].trim() || '';
+    const chineseName = (() => {
+      const param = queryParams.get('chiName') || '';
+      const delimiter = param.includes(':' ? ':' : null);
+      return delimiter ? param.split(delimiter)[1].trim() : '';
+  })();
     const location = queryParams.get('location')?.trim() || '';
     const price = queryParams.get('price')?.trim() || '';
     const type = queryParams.get('type')?.trim() || '';
