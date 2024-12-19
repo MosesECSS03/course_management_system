@@ -44,7 +44,7 @@
     
       // Perform the submit action here, e.g., API call
       try {
-        const response = await axios.post(
+        /*const response = await axios.post(
           'http://localhost:3001/courseregistration', 
           { 
             purpose: 'updateRemarks', 
@@ -52,8 +52,8 @@
             remarks: remark, 
             staff: this.props.userName 
           }
-        );
-        /*const response = await axios.post(
+        );*/
+        const response = await axios.post(
           'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
           { 
             purpose: 'updateRemarks', 
@@ -61,7 +61,7 @@
             remarks: remark, 
             staff: this.props.userName 
           }
-        );*/
+        );
     
         console.log("handleSubmit:", response.data);
         if (response.data.result.success === true) {
@@ -116,14 +116,14 @@
 
     fetchCourseRegistrations = async (language) => {
       try {
-        /*const response = await axios.post(
+        const response = await axios.post(
           'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
           { purpose: 'retrieve' }
-        );*/
-        const response = await axios.post(
+        );
+        /*const response = await axios.post(
           'http://localhost:3001/courseregistration', 
           { purpose: 'retrieve' }
-        );
+        );*/
 
         console.log("Course Registration:", response);
     
@@ -420,7 +420,7 @@
 
     updateDatabaseForRegistrationPayment = async (value, id, page, item) => {
       console.log(value, id);
-     /*return axios
+     return axios
         .post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           console.log("Update Database", response);
@@ -437,8 +437,8 @@
               this.receiptGenerator(item, value)
             }
           }
-        })*/
-      return axios
+        })
+      /*return axios
         .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           if(response.data.result ===  true)
@@ -454,7 +454,7 @@
                 this.receiptGenerator(item, value)
               }
             }
-        })
+        })*/
         .catch(error => {
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
@@ -464,15 +464,15 @@
     updateWooCommerceForRegistrationPayment = async (value, id, page, item) =>
     {
       console.log("WooCommerce", value, page,id);
-      //axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', {page: page, status: value })
-      axios.post('http://localhost:3002/update_stock/', { type: 'update', page: page, status: value })
+      axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', {page: page, status: value })
+      //axios.post('http://localhost:3002/update_stock/', { type: 'update', page: page, status: value })
         .then(response => {
           console.log("Update Woo Commerce", response.data);
           if(response.data.success ===  true)
           {
             console.log(this.props);
-            //axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
-            axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
+            //axios.post('http://localhost:3001/courseregistration', { purpose: 'updatePayment', page: page, registration_id: id, staff: this.props.userName, status: value}).then(response => {
               if(response.data.result ===  true)
               {
                 //this.props.createAccountPopupMessage(true, response.data.message, response.data.message);
@@ -557,15 +557,15 @@
       
       
           try {
-            /*const response = await axios.post(
+            const response = await axios.post(
               'https://moses-ecss-backend.azurewebsites.net/receipt',
               { purpose: 'getReceiptNo', courseLocation }
-            );*/
+            );
 
-            const response = await axios.post(
+            /*const response = await axios.post(
               'http://localhost:3001/receipt',
               { purpose: 'getReceiptNo', courseLocation }
-            );
+            );*/
       
             if (response?.data?.result?.success) {
               console.log("ReceiptNumber", response.data.result.receiptNumber);
@@ -584,8 +584,8 @@
         {
             console.log("RowData:", rowData);
             const pdfResponse = await axios.post(
-              //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
-              'http://localhost:3001/courseregistration',
+              'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+              //'http://localhost:3001/courseregistration',
               { purpose: 'receipt', rowData, staff: this.props.userName, receiptNo: receiptNo, status: status },
               { responseType: 'blob' }
             );
@@ -615,8 +615,8 @@
         const createReceiptInDatabase = async (receiptNo, registration_id, url) => {
           try {
             const receiptCreationResponse = await axios.post(
-             // 'https://moses-ecss-backend.azurewebsites.net/receipt',
-             'http://localhost:3001/receipt',
+             'https://moses-ecss-backend.azurewebsites.net/receipt',
+             //'http://localhost:3001/receipt',
               { purpose: 'createReceipt', receiptNo, registration_id, url, staff: this.props.userName }
             );
             console.log("Receipt Created:", receiptCreationResponse.data);

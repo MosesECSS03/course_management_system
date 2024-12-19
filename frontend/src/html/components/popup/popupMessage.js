@@ -458,15 +458,15 @@ class Popup extends Component {
 
     try {
       // Send the updated participant data to the backend
-      const response = await axios.post('http://localhost:3001/courseregistration', {
-        purpose: "updateEntry",
-        entry: participant
-      });
-
-      /*const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {
+      /*const response = await axios.post('http://localhost:3001/courseregistration', {
         purpose: "updateEntry",
         entry: participant
       });*/
+
+      const response = await axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {
+        purpose: "updateEntry",
+        entry: participant
+      });
 
       // Check the response data
       if (response.data.result === true) {
