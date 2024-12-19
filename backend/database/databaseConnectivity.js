@@ -328,8 +328,10 @@ class DatabaseConnectivity {
     
                 // Define the update object conditionally based on status
                 let update = null;
-    
-                if (status === "Paid") {
+                
+                console.log("Update Payment Official Use:", status);
+                if (status === "Paid" || status === "Generate SkillsFuture Invoice") {
+                    console.log("OK");
                     update = {
                         $set: {
                             "official.name": name,
@@ -406,24 +408,31 @@ class DatabaseConnectivity {
         }
     }
 
-    async updateRegistrationEntry(dbname, id, name, nric, contactNumber, email, postalCode) {
+    async updateRegistrationEntry(dbname, participantDetails) {
         var db = this.client.db(dbname); // return the db object ok
         try {
             if (db) {
                 var tableName = "Registration Forms";
                 var table = db.collection(tableName);
+
+                console.log("Participants Details:", participantDetails);
     
                 // Use updateOne to update a single document
-                const filter = { _id: new ObjectId(id) };
+                const filter = { _id: new ObjectId(participantDetails.id) };
     
                 // Define the update object conditionally based on status
                 var update = {
                             $set: {
-                                "participant.name": name,
-                                "participant.nric": nric,
-                                "participant.contactNumber": contactNumber,
-                                "participant.email": email,
-                                "participant.postalCode": postalCode
+                                "participant.name": participantDetails.name,
+                                "participant.nric": participantDetails.nric,
+                                "participant.residentialStatus": participantDetails.residentialStatus,
+                                "participant.race": participantDetails.race,
+                                "participant.gender": participantDetails.gender,
+                                "participant.contactNumber": participantDetails.contactNumber,
+                                "participant.email": participantDetails.email,
+                                "participant.postalCode": participantDetails.postalCode,
+                                "participant.educationLevel": participantDetails.educationLevel,
+                                "participant.workStatus": participantDetails.workStatus
                             }
                         };
     

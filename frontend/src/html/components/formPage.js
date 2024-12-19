@@ -37,8 +37,18 @@ class FormPage extends Component {
   componentDidMount() {
     window.scrollTo(0, 0);
     const queryParams = new URLSearchParams(window.location.search);
+    console.log("QueryParams:", queryParams);
     const englishName = queryParams.get('engName')?.trim() || '';
-    const chineseName = queryParams.get('chiName')?.split(":")[1].trim() || '';
+    console.log("English:", englishName);
+    const param = queryParams.get('chiName');
+    var chineseName = "";
+    if (param.includes('Protected')) {
+      chineseName = param.split(':')[1].trim();
+    } 
+    else
+    {
+      chineseName =  param.trim();
+    }
     const location = queryParams.get('location')?.trim() || '';
     const price = queryParams.get('price')?.trim() || '';
     const type = queryParams.get('type')?.trim() || '';

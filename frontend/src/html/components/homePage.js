@@ -96,7 +96,8 @@
         item: '',
         isInactive: false,
         refreshKey: 0,
-        invoiceVisibility: false
+        invoiceVisibility: false,
+        dashboard: false
       };
   
       // Set the initial state
@@ -330,11 +331,11 @@
      localStorage.removeItem('myComponentState');
     }
 
-    toggleHomeComponent = async () => 
+    toggleDashboardComponent = async () => 
     {
         try 
         {
-          console.log("Home Page");
+          console.log("Dashboard Page");
             this.setState({ resetSearch: true, }, () => {
               this.setState({ resetSearch: false });
             });
@@ -348,6 +349,7 @@
               accountType: null,
               createAccount: false,
               invoiceVisibility: false,
+              dashboard: true,
               isPopupOpen: true,
               popupMessage: "Loading Dashboard",
               popupType: "loading",
@@ -640,8 +642,8 @@
   goBackHome = async() =>
   {
     console.log("Logout");
-    var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
-    //var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
+    var response = await axios.post(`http://localhost:3001/login`, { "purpose": "logout", "accountId": this.props.location.state?.accountId});
     if(response.data.message.message === "Logout successful")
     {
       this.props.auth.logout();
@@ -774,7 +776,7 @@
     {
       this.setState({
         isPopupOpen: true,
-        popupMessage: "Generating Invoice Number For SkillsFuture Payment",
+        popupMessage: "Generating Invoice For SkillsFuture Payment",
         popupType: "loading",
       });
     }
@@ -782,7 +784,7 @@
     render() 
     {
       const userName = this.props.location.state?.name || 'User';
-      const { item,isDropdownOpen, isReceiptVisible, invoiceVisibility, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
+      const { item,isDropdownOpen, isReceiptVisible, invoiceVisibility, dashboard, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
 
       return (
         <>
@@ -820,7 +822,7 @@
               >
                 <SideBarContent
                   accountId = {this.props.location.state?.accountId}
-                  toggleHomeComponent = {this.toggleHomeComponent}
+                  toggleDashboardComponent = {this.toggleDashboardComponent}
                   toggleAccountsComponent = {this.toggleAccountsComponent}
                   toggleCourseComponent = {this.toggleCourseComponent}
                   toggleRegistrationPaymentComponent = {this.toggleRegistrationPaymentComponent}
@@ -830,7 +832,7 @@
               </div>
               <div className="main-content">
               {
-                accountType === null && courseType === null && isRegistrationPaymentVisible === false && createAccount === false && invoiceVisibility === false &&
+                accountType === null && courseType === null && isRegistrationPaymentVisible === false && createAccount === false && invoiceVisibility === false && dashboard === true &&
                 (
                   <>
                   <div className="dashboard-section">

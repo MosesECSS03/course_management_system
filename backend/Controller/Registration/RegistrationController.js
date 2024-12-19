@@ -184,7 +184,7 @@ class RegistrationController {
         }    
     }
 
-    async updateEntry(id, name, nric, contactNumber, email, postalCode)
+    async updateEntry(participantDetails)
     {
         try {
             // Connect to the database
@@ -194,7 +194,7 @@ class RegistrationController {
             if(result === "Connected to MongoDB Atlas!")
             {
                 var databaseName = "Courses-Management-System"; 
-                var connectedDatabase = await this.databaseConnectivity.updateRegistrationEntry(databaseName, id, name, nric, contactNumber, email, postalCode);  
+                var connectedDatabase = await this.databaseConnectivity.updateRegistrationEntry(databaseName, participantDetails);  
                 return connectedDatabase.acknowledged;
                 //console.log(connectedDatabase);
             }
