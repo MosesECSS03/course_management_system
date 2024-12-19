@@ -40,8 +40,12 @@ class FormPage extends Component {
     const englishName = queryParams.get('engName')?.trim() || '';
     const chineseName = (() => {
       const param = queryParams.get('chiName') || '';
-      const delimiter = param.includes(':' ? ':' : null);
-      return delimiter ? param.split(delimiter)[1].trim() : '';
+  
+      if (param.includes(':')) {
+          return param.split(':')[1].trim();
+      } else {
+          return param.split(':').trim();
+      }
   })();
     const location = queryParams.get('location')?.trim() || '';
     const price = queryParams.get('price')?.trim() || '';
