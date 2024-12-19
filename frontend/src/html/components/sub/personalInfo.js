@@ -167,7 +167,7 @@ handleBackspace = (event) => {
     const latestYear = currentYear - 50; // 50 years before the current year
   
     // Assume earliestYear comes from an external source, such as input, settings, etc.
-    let earliestYear = 1800; // You can make this dynamic
+    let earliestYear = 1934; // You can make this dynamic
 
     // Generate the years in ascending order, from earliestYear to latestYear
     const years = Array.from({ length: latestYear - earliestYear + 1 }, (_, i) => earliestYear + i);
