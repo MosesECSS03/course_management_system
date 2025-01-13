@@ -113,3 +113,21 @@
     box-sizing: border-box; /* Ensure padding does not affect width */
   }
 }
+
+/* Style for expanded rows */
+.expanded-row {
+  background-color: #f9f9f9;
+}
+
+.expanded-content {
+  padding: 20px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  text-align: left;
+}
+
+/* Change row color on hover */
+.course-table tr:hover {
+  cursor: pointer;
+  background-color: #e6f7ff;
+}
