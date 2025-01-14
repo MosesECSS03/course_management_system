@@ -25,6 +25,9 @@
         remarks: "", // Remarks for each row
 =======
         remarks: {}, // Remarks for each row
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         expandedRows: []
       };
@@ -77,8 +80,6 @@
     handleSubmit = async (id, index) => {
       const remark = this.state.remarks[index];
       console.log("handleRemarks:", id, remark);
->>>>>>> Stashed changes
-    
   
     toggleRow = (rowIndex) => {
       this.setState((prevState) => {
@@ -992,7 +993,11 @@
                       <th style={{ width: '0.02%' }}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                       <th style={{ width: '0.1%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
+=======
+                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
+>>>>>>> Stashed changes
 =======
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
 >>>>>>> Stashed changes
@@ -1015,6 +1020,7 @@
                           <td>{index + 1}</td>
                           <td>{item.participant.name}</td>
                           <td style={{ width: '0.005%' }}>{item.participant.contactNumber}</td>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                           <td style={{ width: '0.005%' }}>
                             {!hideAllCells && (
@@ -1062,6 +1068,8 @@
                                 padding: "0.5rem",
                                 fontSize: "0.75rem",
 =======
+=======
+>>>>>>> Stashed changes
                           <td style={{ width: '0.005%' }}>{item.status}</td>
                           <td>{item.official?.receiptNo}</td>
                           <td>
@@ -1073,11 +1081,15 @@
                                 width: "80%",
                                 padding: "0.5rem",
                                 fontSize: "1rem",
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                                 border: "1px solid #ccc",
                                 borderRadius: "4px", // Optional rounded corners
                               }}
                             />
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                             <br/>
                           <button
@@ -1096,6 +1108,9 @@
                             Submit
                           </button>
                         </td>
+=======
+                          </td>
+>>>>>>> Stashed changes
 =======
                           </td>
 >>>>>>> Stashed changes
