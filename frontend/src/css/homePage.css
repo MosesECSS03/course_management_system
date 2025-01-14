@@ -158,12 +158,20 @@
   }
 
 
-  .account-section, .courses-section
+  .account-section
   {
     grid-row: 3; /* Botom section */
     z-index: 0;
     margin-left: -8.5rem;
     margin-top: -20rem;
+  }
+
+  .courses-section
+  {
+    grid-row: 3; /* Botom section */
+    z-index: 0;
+    margin-left: -8.5rem;
+    margin-top: -33rem;
   }
 
   .receipt-section

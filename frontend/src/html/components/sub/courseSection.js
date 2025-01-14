@@ -1,6 +1,6 @@
   import React, { Component } from 'react';
   import axios from 'axios';
-  import '../../../css/sub/course.css';
+  import '../../../css/sub/courseSection.css';
 
   class CoursesSection extends Component {
     constructor(props) {
@@ -14,7 +14,7 @@
         clearTable: false,
         currentPage: 1, // Add this
         entriesPerPage: 10, // Add 
-        expandedRows: [] // Track expanded rows
+        expandedRow: null// Track expanded rows
       };
       this.tableRef = React.createRef();
     }
@@ -325,20 +325,31 @@
       //console.log("Today Date:", startDateTime < new Date());
       console.log("Start Date:", startDate, year, month, day, startTime, startHours);
 
-      if(vacancy === 0)
-      {
-        var status = "Full";
+      var status;
+
+      var startDate = new Date(startDateTime);
+      var endDate = new Date(endDateTime);
+      var currentDate = new Date();
+      
+      // If no vacancies, the course is "Full" regardless of the date
+      if (vacancy === 0) {
+        status = "Full"; // Always "Full" if there are no vacancies
+      } else if (vacancy > 0) {
+        // If the course is available (future course)
+        if (currentDate < startDate) {
+          status = "Available";
+        }
+        // If the course has ended
+        else if (currentDate >= endDate) {
+          status = "Ended";
+        }
+        else
+        {
+          status = "Ongoing"
+        }
       }
-      else if (startDateTime > new Date()) 
-      {
-        var status = "Available";
-      } 
-      else if (startDateTime <= new Date() && endDateTime >= new Date()) {
-        var status = "Ongoing";
-      } 
-      else if (endDateTime < new Date()) {
-        var status ="Ended";
-      } 
+      
+      console.log("Status:", status);
 
       return { noOfLesson, language, vacancies: vacanciesMatch, startDate, endDate, startTime, endTime, status };
     }
@@ -421,157 +432,168 @@
       return `${day} ${month} ${year}`; // Combine into the desired format
     }
 
-  // Toggle the expanded state of a row
-  handleRowToggle = (index) => {
-    this.setState((prevState) => {
-      const { expandedRows } = prevState;
-      if (expandedRows.includes(index)) {
-        return { expandedRows: expandedRows.filter((i) => i !== index) };
-      } else {
-        return { expandedRows: [...expandedRows, index] };
-      }
-    });
-  };
+    handleRowToggle(index) {
+      // Toggle the expanded row based on the index
+      this.setState({
+        expandedRow: this.state.expandedRow === index ? null : index, // If the clicked row is already expanded, collapse it; else, expand it.
+      });
+    }
 
-    render() {
-      const { hideAllCells, clearTable, currentPage, entriesPerPage,expandedRows } = this.state;
-      const paginatedCourses = this.getPaginatedCourses(); // Get paginated courses
-
-      return (
-        <div className="nsa-course-container">
-          <div className="nsa-course-heading">
-            <h1>
-              {this.props.language === "zh"
-                ? this.props.courseType === "NSA"
-                  ? "NSA 课程"
-                  : "ILP 课程"
-                : this.props.courseType === "NSA"
-                ? "NSA Course"
-                : "ILP Course"}
-            </h1>
-            <div className="table-wrapper" ref={this.tableRef}>
-              {clearTable ? (
-                ""
-              ) : (
-                <table className="course-table">
-                  <thead>
-                    <tr>
-                      <th>{this.props.language === "zh" ? "课程 ID" : "Course ID"}</th>
-                      <th>{this.props.language === "zh" ? "课程名称" : "Course Name"}</th>
-                      <th>{this.props.language === "zh" ? "中心位置" : "Centre Location"}</th>
-                      <th>{this.props.language === "zh" ? "课程价格" : "Course Price"}</th>
-                      <th>{this.props.language === "zh" ? "课时数量" : "No Of Lessons"}</th>
-                      <th>{this.props.language === "zh" ? "空位" : "Vacancies"}</th>
-                      <th>{this.props.language === "zh" ? "状态" : "Status"}</th>
-                      <th>{this.props.language === "zh" ? "开始日期" : "Course Duration"}</th>
-                      <th>{this.props.language === "zh" ? "开始时间" : "Course Timing"}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedCourses.map((course, index) => {
-                      var nameDetails = this.courseNameAndDetails(course.name);
-                      var courseDetails = this.getSelectedDetails(course.short_description, course.stock_quantity);
-                      var coursePrice = parseFloat(course.regular_price);
-                      const isExpanded = expandedRows.includes(index);
+  render() {
+    const { hideAllCells, clearTable, currentPage, entriesPerPage, expandedRow} = this.state;
+    const paginatedCourses = this.getPaginatedCourses(); // Get paginated courses 
   
-                      return (
-                        <React.Fragment key={index}>
-                          <tr
-                            onClick={() => this.handleRowToggle(index)}
-                            className={isExpanded ? "expanded" : ""}
-                          >
-                            <td>{!hideAllCells && course.id}</td>
-                            <td>
-                              {!hideAllCells &&
-                                (this.props.language === "zh"
-                                  ? nameDetails.chiName
-                                  : nameDetails.engName)}
+    return (
+      <div className="nsa-course-container">
+        <div className="nsa-course-heading">
+          <h1>
+            {this.props.language === "zh"
+              ? `${this.props.courseType === "NSA" ? "NSA 课程" : "ILP 课程"}`
+              : `${this.props.courseType === "NSA" ? "NSA Course" : "ILP Course"}`}
+          </h1>
+          <div className="table-wrapper" ref={this.tableRef}>
+            {!clearTable && (
+              <table className="course-table modern-style">
+                <thead>
+                  <tr>
+                    {[
+                      { en: "Course ID", zh: "课程 ID" },
+                      { en: "Course Name", zh: "课程名称" },
+                      { en: "Centre Location", zh: "中心位置" },
+                      { en: "Vacancies", zh: "空位" },
+                      { en: "Status", zh: "状态" },
+                      { en: "Course Duration", zh: "开始日期" },
+                      { en: "Course Timing", zh: "开始时间" },
+                    ].map((header, index) => (
+                      <th key={index}>
+                        {this.props.language === "zh" ? header.zh : header.en}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedCourses.map((course, index) => {
+                    const nameDetails = this.courseNameAndDetails(course.name);
+                    const courseDetails = this.getSelectedDetails(course.short_description, course.stock_quantity);
+                    const coursePrice = parseFloat(course.regular_price);
+                    const isExpanded = expandedRow === index;
+  
+                    const location =
+                      nameDetails.location === "Pasir Ris West Wellness Centre"
+                        ? "PRW"
+                        : nameDetails.location === "Tampines 253 Centre"
+                        ? "253"
+                        : nameDetails.location === "CT Hub"
+                        ? "CTH"
+                        : nameDetails.location;
+  
+                    const courseMainDetails = [
+                      course.id,
+                      this.props.language === "zh" ? nameDetails.chiName : nameDetails.engName,
+                      location,
+                      `${course.stock_quantity}/${parseInt(courseDetails.vacancies)}`,
+                      this.props.language === "zh"
+                        ? this.formatStatusToChinese(courseDetails.status)
+                        : courseDetails.status,
+                      this.props.language === "zh"
+                        ? this.formatDateToChinese(courseDetails.startDate)
+                        : `${this.shorternMonth(courseDetails.startDate)} - ${this.shorternMonth(courseDetails.endDate)}`,
+                      this.props.language === "zh"
+                        ? this.formatTimeToChinese(courseDetails.startTime)
+                        : `${courseDetails.startTime} - ${courseDetails.endTime}`,
+                    ];
+  
+                    const expandedDetails = [
+                      {
+                        label: this.props.language === "zh" ? "课程价格:" : "Course Price:",
+                        value:
+                          coursePrice <= 0
+                            ? this.props.language === "zh"
+                              ? "免费"
+                              : "Free"
+                            : `$${coursePrice.toFixed(2)}`,
+                      },
+                      {
+                        label: this.props.language === "zh" ? "讲师：" : "No. of Lesson(s):",
+                        value: parseInt(courseDetails.noOfLesson),
+                      },
+                    ];
+  
+                    // Get the status and apply styles
+                    const status = this.props.language === "zh"
+                      ? this.formatStatusToChinese(courseDetails.status)
+                      : courseDetails.status;
+
+                      const getStatusBackgroundColor = (status) => {
+                        switch (status) {
+                          case "Available":
+                            return "#4CAF50"; // Green
+                          case "Full":
+                            return "#f44336"; // Red
+                          case "Ongoing":
+                            return "#ff9800"; // Orange
+                          case "Ended":
+                            return "#000000"; // Black
+                          default:
+                            return "#ff9800"; // Default Orange for other cases
+                        }
+                      };
+  
+                    const statusStyles = {
+                      backgroundColor: getStatusBackgroundColor(status),
+                      color: "#fff",
+                      padding: "0.2rem 0.5rem",
+                      borderRadius: "0.3rem",
+                      fontWeight: "bold",
+                      fontSize: "0.8rem", // Smaller font size
+                    };
+  
+                    return (
+                      <React.Fragment key={index}>
+                        <tr
+                          onClick={() => this.handleRowToggle(index)}
+                          className={`main-row ${isExpanded ? "expanded" : ""}`}
+                        >
+                          {courseMainDetails.map((detail, cellIndex) => (
+                            <td key={cellIndex}>
+                              {cellIndex === 4 ? (
+                                <span style={statusStyles}>
+                                  {status}
+                                </span>
+                              ) : (
+                                !hideAllCells && detail
+                              )}
                             </td>
-                            <td>
-                              {!hideAllCells &&
-                                (nameDetails.location === "Pasir Ris West Wellness Centre"
-                                  ? "PRW"
-                                  : nameDetails.location === "Tampines 253 Centre"
-                                  ? "253"
-                                  : nameDetails.location === "CT Hub"
-                                  ? "CTH"
-                                  : nameDetails.location)}
-                            </td>
-                            <td>
-                              {!hideAllCells &&
-                                (coursePrice <= 0
-                                  ? this.props.language !== "zh"
-                                    ? "Free"
-                                    : "免费"
-                                  : `$${coursePrice.toFixed(2)}`)}
-                            </td>
-                            <td>{!hideAllCells && parseInt(courseDetails.noOfLesson)}</td>
-                            <td>
-                              {!hideAllCells &&
-                                `${course.stock_quantity}/${parseInt(courseDetails.vacancies)}`}
-                            </td>
-                            <td>
-                              {!hideAllCells &&
-                                (this.props.language === "zh"
-                                  ? this.formatStatusToChinese(courseDetails.status)
-                                  : courseDetails.status)}
-                            </td>
-                            <td>
-                              {!hideAllCells &&
-                                (this.props.language === "zh"
-                                  ? this.formatDateToChinese(courseDetails.startDate)
-                                  : `${this.shorternMonth(courseDetails.startDate)} - ${this.shorternMonth(courseDetails.endDate)}`)}
-                            </td>
-                            <td>
-                              {!hideAllCells &&
-                                (this.props.language === "zh"
-                                  ? this.formatTimeToChinese(courseDetails.startTime)
-                                  : `${courseDetails.startTime} - ${courseDetails.endTime}`)}
+                          ))}
+                        </tr>
+  
+                        {isExpanded && (
+                          <tr className="expanded-row">
+                            <td colSpan="7">
+                              <div className="expanded-content">
+                                <h3>
+                                  {this.props.language === "zh" ? "课程详情" : "More Information"}
+                                </h3>
+                                {expandedDetails.map((detail, detailIndex) => (
+                                  <p key={detailIndex}>
+                                    <strong>{detail.label}</strong> {detail.value}
+                                  </p>
+                                ))}
+                              </div>
                             </td>
                           </tr>
-  
-                          {isExpanded && (
-                            <tr className="expanded-row">
-                              <td colSpan="9">
-                                {/* Full course details */}
-                                <div className="expanded-content">
-                                  <h3>{this.props.language === "zh" ? "课程详情" : "Course Details"}</h3>
-                                  <p>
-                                    <strong>{this.props.language === "zh" ? "描述：" : "Description:"} </strong>
-                                    {courseDetails.description}
-                                  </p>
-                                  <p>
-                                    <strong>{this.props.language === "zh" ? "讲师：" : "Instructor:"} </strong>
-                                    {courseDetails.instructor}
-                                  </p>
-                                  <p>
-                                    <strong>{this.props.language === "zh" ? "课程要求：" : "Course Requirements:"} </strong>
-                                    {courseDetails.requirements}
-                                  </p>
-                                  <p>
-                                    <strong>{this.props.language === "zh" ? "课程目标：" : "Course Goals:"} </strong>
-                                    {courseDetails.goals}
-                                  </p>
-                                  <p>
-                                    <strong>{this.props.language === "zh" ? "学习资源：" : "Learning Resources:"} </strong>
-                                    {courseDetails.learningResources}
-                                  </p>
-                                  {/* Add more course details as needed */}
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
-      );
-    }
-  }
+      </div>
+    );
+  }  
+}
 
 export default CoursesSection;

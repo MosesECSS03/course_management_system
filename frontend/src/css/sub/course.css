@@ -114,20 +114,21 @@
   }
 }
 
-/* Style for expanded rows */
 .expanded-row {
-  background-color: #f9f9f9;
+  position: relative; /* Ensure it can have a z-index */
+  z-index: 1; /* Place it above other rows */
+  background-color: #ffffff; /* Optional: Background color for better visibility */
 }
 
-.expanded-content {
-  padding: 20px;
-  background-color: #f1f1f1;
-  border-radius: 5px;
-  text-align: left;
+/* Style for the expanded content inside the expanded row */
+.expanded-row .expanded-content {
+  padding: 1rem; /* Add padding for better readability */
+  background-color: #f9f9f9; /* Optional: Light background for contrast */
+  z-index: 1; /* Ensure the content inherits the z-index of the parent row */
+  height : 100%;
 }
 
-/* Change row color on hover */
-.course-table tr:hover {
+.course-table tbody tr:hover {
   cursor: pointer;
   background-color: #e6f7ff;
 }

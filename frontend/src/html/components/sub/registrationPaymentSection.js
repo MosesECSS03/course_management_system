@@ -21,7 +21,11 @@
         originalData: [],
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
+<<<<<<< Updated upstream
         remarks: "", // Remarks for each row
+=======
+        remarks: {}, // Remarks for each row
+>>>>>>> Stashed changes
         expandedRows: []
       };
       this.tableRef = React.createRef();
@@ -49,6 +53,31 @@
         },
       }));
     };
+<<<<<<< Updated upstream
+=======
+  
+    toggleRow = (rowIndex) => {
+      this.setState((prevState) => {
+        const expandedRows = [...prevState.expandedRows];
+        const rowIndexPosition = expandedRows.indexOf(rowIndex);
+    
+        if (rowIndexPosition > -1) {
+          // Row is already expanded, so remove it
+          expandedRows.splice(rowIndexPosition, 1);
+        } else {
+          // Row is not expanded, so add it
+          expandedRows.push(rowIndex);
+        }
+    
+        return { expandedRows };
+      });
+    };
+
+    
+    handleSubmit = async (id, index) => {
+      const remark = this.state.remarks[index];
+      console.log("handleRemarks:", id, remark);
+>>>>>>> Stashed changes
     
   
     toggleRow = (rowIndex) => {
@@ -962,7 +991,11 @@
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
                       <th style={{ width: '0.02%' }}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
+<<<<<<< Updated upstream
                       <th style={{ width: '0.1%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
+=======
+                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
+>>>>>>> Stashed changes
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
                       <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
                       <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
@@ -982,6 +1015,7 @@
                           <td>{index + 1}</td>
                           <td>{item.participant.name}</td>
                           <td style={{ width: '0.005%' }}>{item.participant.contactNumber}</td>
+<<<<<<< Updated upstream
                           <td style={{ width: '0.005%' }}>
                             {!hideAllCells && (
                               <div className="input-container" style={{ position: 'relative' }}>
@@ -1027,10 +1061,24 @@
                                 width: "80%",
                                 padding: "0.5rem",
                                 fontSize: "0.75rem",
+=======
+                          <td style={{ width: '0.005%' }}>{item.status}</td>
+                          <td>{item.official?.receiptNo}</td>
+                          <td>
+                          <input
+                              type="text"
+                              value={item.official?.remarks[index] || item.official?.remarks || ""}
+                              onChange={(e) => this.handleRemarksChange(index, e.target.value)}
+                              style={{
+                                width: "80%",
+                                padding: "0.5rem",
+                                fontSize: "1rem",
+>>>>>>> Stashed changes
                                 border: "1px solid #ccc",
                                 borderRadius: "4px", // Optional rounded corners
                               }}
                             />
+<<<<<<< Updated upstream
                             <br/>
                           <button
                             onClick={(e) => {
@@ -1048,6 +1096,9 @@
                             Submit
                           </button>
                         </td>
+=======
+                          </td>
+>>>>>>> Stashed changes
                           <td>
                             <button onClick={() => this.handleEdit(item, index)}>Edit</button>
                           </td>
