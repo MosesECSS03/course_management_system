@@ -72,9 +72,9 @@
     handleSubmit = async (id, remark) => {
       console.log("Id:", id);
       console.log("Remarks:", remark);
-      //console.log("handleRemarks:", id, remark);
+      console.log("handleRemarks:", id, remark);
     
-      //this.props.updateRemarksPopup();
+      this.props.updateRemarksPopup();
     
       // Perform the submit action here, e.g., API call
       try {
@@ -98,14 +98,14 @@
         );*/
     
         console.log("handleSubmit:", response.data);
-        /*if (response.data.result.success === true) {
+        if (response.data.result.success === true) {
           this.props.closePopup();
           this.refreshChild();
         } else {
           // Handle unsuccessful submission if needed
           this.props.closePopup();
           this.refreshChild();
-        }*/
+        }
       } catch (error) {
         console.error('Error during submission:', error);
         this.props.closePopup();
@@ -445,7 +445,6 @@
       this.setState(prevState => ({
         filteredSuggestions,
         dropdownVisible: {
-          ...prevState.dropdownVisible,
           [index]: false, // Hide dropdown after selection
         },
       }));
@@ -956,7 +955,7 @@
                     <tr>
                       <th></th>
                       <th colSpan="2">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
-                      <th colSpan="5">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
+                      <th colSpan="5" >{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
                     </tr>
                     <tr>
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
@@ -965,7 +964,7 @@
                       <th style={{ width: '0.1%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
                       <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
-                      <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
+                      <th style={{ width: '0.25%' }}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1035,10 +1034,11 @@
                           <button
                             onClick={(e) => {
                               e.stopPropagation();  // Prevent event bubbling
-                              this.handleSubmit(item._id, remarks);  // Call handleSubmit
+                              this.handleSubmit(item._id, remarks[index]);  // Call handleSubmit
                             }}
                             style={{
-                              width: "85%",
+                              width: "50%",
+                              marginTop: "1%",
                               padding: "0.5rem",
                               fontSize: "1rem",
                               border: "1px solid #ccc",
@@ -1049,7 +1049,14 @@
                           </button>
                         </td>
                           <td>
-                            <button onClick={() => this.handleEdit(item, index)}>Edit</button>
+                            <button onClick={() => this.handleEdit(item, index)} style={{
+                              width: "20%",
+                              marginTop: "1%",
+                              padding: "0.5rem",
+                              fontSize: "1rem",
+                              border: "1px solid #ccc",
+                              borderRadius: "4px", // Optional rounded corners
+                            }}>Edit</button>
                           </td>
                         </tr>
                         {expandedRows.includes(index) && (

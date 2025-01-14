@@ -380,6 +380,7 @@ class DatabaseConnectivity {
                     update = {
                             $set: {
                                 "course.payment": newPaymentMethod,
+                                "status": "Pending",
                                 "official.remarks": remarks,
                                 "official.receiptNo": "",
                                 "official.name": staff,
