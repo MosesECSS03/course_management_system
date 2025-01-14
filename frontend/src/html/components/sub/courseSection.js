@@ -284,10 +284,10 @@
 
       var noOfLesson = array.find(item => item.toLowerCase().includes("lesson")).split("<br />")[1].replace(/\n|<b>|<\/b>/g, "").match(/\d+/);  // Extracts the first sequence of digits
 
-      // If you want a number, you can parse it:
-      if (noOfLesson) {
-        noOfLesson = parseInt(noOfLesson[0], 10);  // Converts the matched number string to an integer
-      }
+        // If you want a number, you can parse it:
+        if (noOfLesson) {
+          noOfLesson = parseInt(noOfLesson[0], 10);  // Converts the matched number string to an integer
+        }
       console.log("No. of Lesson:", noOfLesson);
       var language = array.flatMap(item => item.replace(/\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("language")).split("<br />").pop().trim();
       var vacancies = array.flatMap(item => item.replace(/\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("vacancy")).split("<br />").pop().trim().split("/")[2];
