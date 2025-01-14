@@ -21,14 +21,7 @@
         originalData: [],
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
-<<<<<<< Updated upstream
         remarks: "", // Remarks for each row
-=======
-        remarks: {}, // Remarks for each row
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
         expandedRows: []
       };
       this.tableRef = React.createRef();
@@ -56,30 +49,7 @@
         },
       }));
     };
-<<<<<<< Updated upstream
-=======
-  
-    toggleRow = (rowIndex) => {
-      this.setState((prevState) => {
-        const expandedRows = [...prevState.expandedRows];
-        const rowIndexPosition = expandedRows.indexOf(rowIndex);
     
-        if (rowIndexPosition > -1) {
-          // Row is already expanded, so remove it
-          expandedRows.splice(rowIndexPosition, 1);
-        } else {
-          // Row is not expanded, so add it
-          expandedRows.push(rowIndex);
-        }
-    
-        return { expandedRows };
-      });
-    };
-
-    
-    handleSubmit = async (id, index) => {
-      const remark = this.state.remarks[index];
-      console.log("handleRemarks:", id, remark);
   
     toggleRow = (rowIndex) => {
       this.setState((prevState) => {
@@ -992,15 +962,7 @@
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
                       <th style={{ width: '0.02%' }}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
                       <th style={{ width: '0.1%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
-=======
-                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
->>>>>>> Stashed changes
-=======
-                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
->>>>>>> Stashed changes
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
                       <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
                       <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
@@ -1020,8 +982,6 @@
                           <td>{index + 1}</td>
                           <td>{item.participant.name}</td>
                           <td style={{ width: '0.005%' }}>{item.participant.contactNumber}</td>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
                           <td style={{ width: '0.005%' }}>
                             {!hideAllCells && (
                               <div className="input-container" style={{ position: 'relative' }}>
@@ -1059,7 +1019,7 @@
                           <td>
                             <input
                               type="text"
-                              value={remarks[index]} // Retrieve the value from state based on unique id
+                              value={remarks} // Retrieve the value from state based on unique id
                               onChange={(e) => this.handleRemarksChange(e, index)} 
                               onClick={(e) => e.stopPropagation()} // Prevent the click event from propagating to parent elements
                               onFocus={(e) => e.stopPropagation()} // Prevent the focus event from propagating to parent elements 
@@ -1067,35 +1027,15 @@
                                 width: "80%",
                                 padding: "0.5rem",
                                 fontSize: "0.75rem",
-=======
-=======
->>>>>>> Stashed changes
-                          <td style={{ width: '0.005%' }}>{item.status}</td>
-                          <td>{item.official?.receiptNo}</td>
-                          <td>
-                          <input
-                              type="text"
-                              value={item.official?.remarks[index] || item.official?.remarks || ""}
-                              onChange={(e) => this.handleRemarksChange(index, e.target.value)}
-                              style={{
-                                width: "80%",
-                                padding: "0.5rem",
-                                fontSize: "1rem",
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
                                 border: "1px solid #ccc",
                                 borderRadius: "4px", // Optional rounded corners
                               }}
                             />
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
                             <br/>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();  // Prevent event bubbling
-                              this.handleSubmit(item._id, remarks[index]);  // Call handleSubmit
+                              this.handleSubmit(item._id, remarks);  // Call handleSubmit
                             }}
                             style={{
                               width: "85%",
@@ -1108,12 +1048,6 @@
                             Submit
                           </button>
                         </td>
-=======
-                          </td>
->>>>>>> Stashed changes
-=======
-                          </td>
->>>>>>> Stashed changes
                           <td>
                             <button onClick={() => this.handleEdit(item, index)}>Edit</button>
                           </td>
