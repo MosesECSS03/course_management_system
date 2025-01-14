@@ -21,30 +21,64 @@
         originalData: [],
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
-        remarks: {}, // Remarks for each row
+        remarks: "", // Remarks for each row
+        expandedRows: []
       };
       this.tableRef = React.createRef();
     }
 
-    handleInputChange1 = (e, id) => {
+    /*handleRemarksChange = (e) => {
       const { value } = e.target;
+      console.log("Value Remarks:", value);
+    
+      // Update the remarks state based on the index
+      this.setState({
+        remarks: value
+      });
+    };*/
+
+    handleRemarksChange = (e, index) => {
+      const { value } = e.target;
+      console.log("Value Remarks:", value);
+    
+      // Update the specific remark using the item's unique ID as the key
       this.setState((prevState) => ({
         remarks: {
-          ...prevState.remarks,
-          [id]: value, // Use item._id as key
+          ...prevState.remarks, // Retain previous remarks for other items
+          [index]: value, // Update the remark for the specific item
         },
       }));
     };
-  
-    handleSubmit = async (id, index) => {
-      const remark = this.state.remarks[index];
-      console.log("handleRemarks:", id, remark);
     
-      this.props.updateRemarksPopup();
+  
+    toggleRow = (rowIndex) => {
+      this.setState((prevState) => {
+        const expandedRows = [...prevState.expandedRows];
+        const rowIndexPosition = expandedRows.indexOf(rowIndex);
+    
+        if (rowIndexPosition > -1) {
+          // Row is already expanded, so remove it
+          expandedRows.splice(rowIndexPosition, 1);
+        } else {
+          // Row is not expanded, so add it
+          expandedRows.push(rowIndex);
+        }
+    
+        return { expandedRows };
+      });
+    };
+
+    
+    handleSubmit = async (id, remark) => {
+      console.log("Id:", id);
+      console.log("Remarks:", remark);
+      //console.log("handleRemarks:", id, remark);
+    
+      //this.props.updateRemarksPopup();
     
       // Perform the submit action here, e.g., API call
       try {
-        const response = await axios.post(
+       const response = await axios.post(
           'http://localhost:3001/courseregistration', 
           { 
             purpose: 'updateRemarks', 
@@ -64,14 +98,14 @@
         );*/
     
         console.log("handleSubmit:", response.data);
-        if (response.data.result.success === true) {
+        /*if (response.data.result.success === true) {
           this.props.closePopup();
           this.refreshChild();
         } else {
           // Handle unsuccessful submission if needed
           this.props.closePopup();
           this.refreshChild();
-        }
+        }*/
       } catch (error) {
         console.error('Error during submission:', error);
         this.props.closePopup();
@@ -209,6 +243,7 @@
       const inputValues1 = {};
       data.forEach((item, index) => {
         inputValues1[index] = item.official.remarks; // Use item.status or default to "Pending"
+        console.log("Current Remarks: ", item.official.remarks)
       });
 
       this.setState({
@@ -422,7 +457,7 @@
       console.log(value, id);
      return axios
         //.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', { purpose: 'update', id: id, status: value })
-        .post('https://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
+        .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
         .then(response => {
           console.log("Update Database", response);
           if(response.data.result ===  true)
@@ -439,23 +474,6 @@
             }
           }
         })
-      /*return axios
-        .post('http://localhost:3001/courseregistration', { purpose: 'update', id: id, status: value })
-        .then(response => {
-          if(response.data.result ===  true)
-            {
-              if(value === "Paid" || value === "SkillsFuture Done")
-              {
-                this.updateWooCommerceForRegistrationPayment(value, id, page, item);
-              }
-              else if(value === "Generate SkillsFuture Invoice")
-              {
-                //Generate Invoice Number 
-                console.log("SkillsFuture Invoice Generating", "Item:", item, "Value:", value); 
-                this.receiptGenerator(item, value)
-              }
-            }
-        })*/
         .catch(error => {
           console.error('Error fetching course registrations:', error);
           return []; // Return an empty array in case of error
@@ -917,155 +935,169 @@
   };
   
     render() {
-      const { isDisabled, remarks, hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex } = this.state;
+      const { isDisabled, remarks, hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex, expandedRows} = this.state;
       const paginatedDetails = this.getPaginatedDetails();
       return (
         <>
-        <div className="registration-payment-container">
-          <div className="registration-payment-heading">
-            <h1>{this.props.language === 'zh' ? '报名与支付' : 'Registration And Payment'}</h1>
-            <div className="button-row3">
-              <button onClick={() => this.saveData(paginatedDetails)}>Save Data</button>             
-              <div className="file-input-wrapper">
-                <input type="file" id="fileInput" accept=".xlsx, .xls" className="file-input" />
-                <label htmlFor="fileInput" className="custom-file-input">Select File</label>
-              </div>            
-              <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
-            </div>
-            <div className="table-wrapper" style={{marginLeft: '8%', height: '40vh'}}>
-            <table style={{borderCollapse: 'collapse', width: '300%'}} ref={this.tableRef}>
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th colSpan="2">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
-                    <th colSpan="5">{this.props.language === 'zh' ? '课程' : 'Courses'}</th>
-                    <th colSpan="6">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
-                  </tr>
-                  <tr>
-                   <th style={{width: '0.01%'}}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
-                    <th style={{width: '0.02%'}}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '课程名' : 'Name'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '地点' : 'Location'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '时长' : 'Duration'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '支付方式' : 'Payment Method'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Staff Name'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Date Received'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Time Received'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
-                    <th style={{width: '1%'}}>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
-                    <th style={{width: '0.2%'}}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedDetails.map((item, index) => (
-                    <tr key={index}>
-                       <td>{index+1}</td>
-                      <td >{item.participant.name}</td>
-                      <td>{item.participant.contactNumber}</td>
-                      <td>
-                      {item.course.courseEngName.includes('Protected: ')
-                        ? item.course.courseEngName.replace('<br />Protected: ', '')
-                        : item.course.courseEngName}
-                      </td>
-                      <td>{item.course.courseLocation}</td>
-                      <td>{item.course.courseDuration}</td>
-                      <td>{item.course.payment}</td>
-                      <td>
-                      {
-                      !hideAllCells && (
-                          <div className="input-container" style={{ position: 'relative' }}>
+          <div className="registration-payment-container">
+            <div className="registration-payment-heading">
+              <h1>{this.props.language === 'zh' ? '报名与支付' : 'Registration And Payment'}</h1>
+              <div className="button-row3">
+                <button onClick={() => this.saveData(paginatedDetails)}>Save Data</button>
+                <div className="file-input-wrapper">
+                  <input type="file" id="fileInput" accept=".xlsx, .xls" className="file-input" />
+                  <label htmlFor="fileInput" className="custom-file-input">Select File</label>
+                </div>
+                <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
+              </div>
+              <div className="table-wrapper" style={{ marginLeft: '8%', height: '40vh' }}>
+                <table style={{ borderCollapse: 'collapse', width: '150%'}} ref={this.tableRef}>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th colSpan="2">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
+                      <th colSpan="5">{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
+                    </tr>
+                    <tr>
+                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
+                      <th style={{ width: '0.02%' }}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
+                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
+                      <th style={{ width: '0.1%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
+                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
+                      <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
+                      <th style={{ width: '0.2%' }}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedDetails.map((item, index) => (
+                      <React.Fragment key={index}>
+                        <tr
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevents the event from bubbling up
+                            this.toggleRow(index); // Your toggle logic
+                          }}
+                          className={expandedRows.includes(index) ? 'expanded' : ''}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <td>{index + 1}</td>
+                          <td>{item.participant.name}</td>
+                          <td style={{ width: '0.005%' }}>{item.participant.contactNumber}</td>
+                          <td style={{ width: '0.005%' }}>
+                            {!hideAllCells && (
+                              <div className="input-container" style={{ position: 'relative' }}>
+                                <input
+                                  type="text"
+                                  value={this.state.inputValues[index] || ''}
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // Prevent row expansion when clicking on the input
+                                    this.handleInputChange(e, index); // Handle input change for specific row
+                                  }}
+                                  onFocus={() => this.handleFocus(index, item.course.payment)} // Focus handler
+                                  onBlur={() => this.handleBlur(index)} // Blur handler
+                                />
+                                {this.state.dropdownVisible[index] && this.state.filteredSuggestions.length > 0 && (
+                                  <ul className="suggestions-list">
+                                    {this.state.filteredSuggestions.map((suggestion, idx) => (
+                                      <li
+                                        key={idx}
+                                        onMouseDown={(event) => {
+                                          event.stopPropagation(); // Prevent event bubbling
+                                          var coursePage = `${item.course.courseChiName}<br />${item.course.courseEngName}<br />(${item.course.courseLocation})`;
+                                          coursePage = coursePage.replace(/–/g, '-'); // Replace dash with a regular dash
+                                          this.handleSuggestionClick(index, suggestion, item._id, coursePage, item);
+                                        }}
+                                      >
+                                        {suggestion}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            )}
+                          </td>
+                          <td>{item.official?.receiptNo}</td>
+                          <td>
                             <input
                               type="text"
-                              value={this.state.inputValues[index]} // Use index-specific value from inputValues
-                              onChange={(e) => this.handleInputChange(e, index)} // Pass index for specific input
-                              onFocus={() => this.handleFocus(index, item.course.payment)} // Pass index to focus handler
-                              onBlur={() => this.handleBlur(index)} // Pass index to blur handler
-                              placeholder="Type here..."
+                              value={remarks[index]} // Retrieve the value from state based on unique id
+                              onChange={(e) => this.handleRemarksChange(e, index)} 
+                              onClick={(e) => e.stopPropagation()} // Prevent the click event from propagating to parent elements
+                              onFocus={(e) => e.stopPropagation()} // Prevent the focus event from propagating to parent elements 
+                              style={{
+                                width: "80%",
+                                padding: "0.5rem",
+                                fontSize: "0.75rem",
+                                border: "1px solid #ccc",
+                                borderRadius: "4px", // Optional rounded corners
+                              }}
                             />
-                            {this.state.dropdownVisible[index] && this.state.filteredSuggestions.length > 0 && (
-                              <ul className="suggestions-list">
-                                {this.state.filteredSuggestions.map((suggestion, idx) => (
-                                  <li
-                                    key={idx}
-                                    onMouseDown={(event) => {
-                                      event.stopPropagation();
-                                      var coursePage = `${item.course.courseChiName}<br />${item.course.courseEngName}<br />(${item.course.courseLocation})`;
-                                      coursePage = coursePage.replace(/–/g, "-");
-                                      this.handleSuggestionClick(index, suggestion, item._id, coursePage, item);
-                                    }}
-                                  >
-                                    {suggestion}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
+                            <br/>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();  // Prevent event bubbling
+                              this.handleSubmit(item._id, remarks[index]);  // Call handleSubmit
+                            }}
+                            style={{
+                              width: "85%",
+                              padding: "0.5rem",
+                              fontSize: "1rem",
+                              border: "1px solid #ccc",
+                              borderRadius: "4px", // Optional rounded corners
+                            }}
+                          >
+                            Submit
+                          </button>
+                        </td>
+                          <td>
+                            <button onClick={() => this.handleEdit(item, index)}>Edit</button>
+                          </td>
+                        </tr>
+                        {expandedRows.includes(index) && (
+                            <tr>
+                            <td colSpan="6">
+                              <div>
+                                <p>
+                                  <strong>Course Name:</strong>{" "}
+                                  {item.course?.courseEngName?.includes("Protected: ")
+                                    ? item.course.courseEngName.replace("<br />Protected: ", "")
+                                    : item.course?.courseEngName || "N/A"}
+                                </p>
+                                <p>
+                                  <strong>Course Location:</strong> {item.course?.courseLocation || "N/A"}
+                                </p>
+                                <p>
+                                  <strong>Course Duration:</strong> {item.course?.courseDuration || "N/A"}
+                                </p>
+                                <p>
+                                  <strong>Payment Method:</strong> {item.course?.payment || "N/A"}
+                                </p>
+                                <hr/>
+                                <p>
+                                  <strong>Staff Name:</strong>
+                                  {item.official?.name}
+                                </p>
+                                <p>
+                                  <strong>Date Received:</strong>
+                                  {item.official?.date}
+                                </p>
+                                <p>
+                                  <strong>Time Received:</strong>
+                                  {item.official?.time}
+                                </p>
+                              </div>
+                            </td>
+                          </tr>
                         )}
-
-                      </td>
-                      <td>{item.official?.name}</td>
-                      <td>{item.official?.date}</td>                      
-                      <td>{item.official?.time}</td>
-                      <td>{item.official?.receiptNo}</td>                      
-                      <td style={{ width: '20vw', padding: '0', overflow: 'hidden' }}>
-                      <input
-                          type="text"
-                          value={this.state.remarks[index]}
-                          maxLength={1000}
-                          onChange={(e) => this.handleInputChange1(e, index)}
-                          style={{
-                            width: '70%',
-                            padding: '0.5rem',
-                            border: '1px solid #ccc',
-                            boxSizing: 'border-box',
-                            whiteSpace: 'nowrap',
-                            marginTop: '0.5em'
-                          }}
-                        />
-                        <br/>
-                        <button
-                          onClick={() => this.handleSubmit(item._id, index)}
-                          style={{
-                            marginTop: '0.5rem',
-                            padding: '0.5rem',
-                            color: '#fff',
-                            border: 'none',
-                            marginBottom: '0.5em',
-                            width:"fit-content"
-                          }}
-                        >
-                          Submit
-                        </button>
-                        {this.state.errorMessage && <div className="error-message1">{this.state.errorMessage}</div>}
-                      </td>
-                      <td>
-                      <button
-                          onClick={() => this.handleEdit(item, index)}
-                          style={{
-                            marginTop: '0.5rem',
-                            padding: '0.5rem',
-                            color: '#fff',
-                            border: 'none',
-                            marginBottom: '0.5em',
-                            marginLeft: '2em',
-                            width: '50%'
-                          }}
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
-      </>
-      );
-    }
+        </>
+      )
   }
+}
 
-  export default RegistrationPaymentSection;
+export default RegistrationPaymentSection;
