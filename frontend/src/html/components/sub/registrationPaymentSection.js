@@ -1019,7 +1019,7 @@
                           <td>
                             <input
                               type="text"
-                              value={remarks} // Retrieve the value from state based on unique id
+                              value={remarks[index]} // Retrieve the value from state based on unique id
                               onChange={(e) => this.handleRemarksChange(e, index)} 
                               onClick={(e) => e.stopPropagation()} // Prevent the click event from propagating to parent elements
                               onFocus={(e) => e.stopPropagation()} // Prevent the focus event from propagating to parent elements 
