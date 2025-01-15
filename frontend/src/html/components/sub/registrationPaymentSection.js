@@ -972,12 +972,12 @@
                 <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
               </div>
               <div className="table-wrapper" style={{ marginLeft: '8%', height: '40vh'}}>
-                <table style={{ borderCollapse: 'collapse', width: '150%'}} ref={this.tableRef}>
+                <table style={{ borderCollapse: 'collapse', width: '100%'}} ref={this.tableRef}>
                   <thead>
                     <tr>
                       <th></th>
                       <th colSpan="2">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
-                      <th colSpan="5" >{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
+                      <th colSpan="2" >{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
                     </tr>
                     <tr>
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
@@ -985,8 +985,6 @@
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
                       <th style={{ width: '0.04%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
                       <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
-                      <th style={{ width: '0.04%' }}>{this.props.language === 'zh' ? '' : 'Remarks'}</th>
-                      <th style={{ width: '0.02%' }}>{this.props.language === 'zh' ? '' : 'Update/Edit'}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1069,49 +1067,6 @@
                             )}
                           </td>
                           <td>{item.official?.receiptNo}</td>
-                          <td>
-                            <input
-                              type="text"
-                              value={remarks[index]} // Retrieve the value from state based on unique id
-                              onChange={(e) => this.handleRemarksChange(e, index)} 
-                              onClick={(e) => e.stopPropagation()} // Prevent the click event from propagating to parent elements
-                              onFocus={(e) => e.stopPropagation()} // Prevent the focus event from propagating to parent elements 
-                              style={{
-                                width: "80%",
-                                padding: "0.5rem",
-                                fontSize: "0.75rem",
-                                border: "1px solid #ccc",
-                                borderRadius: "4px", // Optional rounded corners
-                              }}
-                            />
-                            <br/>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();  // Prevent event bubbling
-                              this.handleSubmit(item._id, remarks[index]);  // Call handleSubmit
-                            }}
-                            style={{
-                              width: "fit-content",
-                              marginTop: "1%",
-                              padding: "0.5rem",
-                              fontSize: "1rem",
-                              border: "1px solid #ccc",
-                              borderRadius: "4px", // Optional rounded corners
-                            }}
-                          >
-                            Submit
-                          </button>
-                        </td>
-                          <td>
-                            <button onClick={() => this.handleEdit(item, index)} style={{
-                              width: "100%",
-                              marginTop: "1rem",
-                              padding: "0.5rem",
-                              fontSize: "1rem",
-                              border: "1px solid #ccc",
-                              borderRadius: "4px", // Optional rounded corners
-                            }}>Edit</button>
-                          </td>
                         </tr>
                         {expandedRow === index  && (
                             <tr>
@@ -1144,6 +1099,51 @@
                                 <p>
                                   <strong>Time Received: </strong>
                                   {item.official?.time}
+                                </p>
+                                <p>
+                                  <strong>Remarks: </strong>
+                                  <input
+                                      type="text"
+                                      value={remarks[index]} // Retrieve the value from state based on unique id
+                                      onChange={(e) => this.handleRemarksChange(e, index)} 
+                                      onClick={(e) => e.stopPropagation()} // Prevent the click event from propagating to parent elements
+                                      onFocus={(e) => e.stopPropagation()} // Prevent the focus event from propagating to parent elements 
+                                      style={{
+                                        width: "40%",
+                                        padding: "0.5rem",
+                                        fontSize: "0.75rem",
+                                        border: "1px solid #ccc",
+                                        borderRadius: "4px", // Optional rounded corners
+                                      }}
+                                    />
+                                    <br/>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();  // Prevent event bubbling
+                                      this.handleSubmit(item._id, remarks[index]);  // Call handleSubmit
+                                    }}
+                                    style={{
+                                      width: "fit-content",
+                                      marginTop: "1%",
+                                      padding: "0.5rem",
+                                      fontSize: "1rem",
+                                      border: "1px solid #ccc",
+                                      borderRadius: "4px", // Optional rounded corners
+                                    }}
+                                  >
+                                    Submit
+                                  </button>
+                                </p>
+                                <p>
+                                  <strong>Update/Edit: </strong>
+                                  <button onClick={() => this.handleEdit(item, index)} style={{
+                                    width: "20%",
+                                    marginTop: "1rem",
+                                    padding: "0.5rem",
+                                    fontSize: "1rem",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px", // Optional rounded corners
+                                  }}>Edit</button>
                                 </p>
                               </div>
                             </td>
