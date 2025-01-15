@@ -184,7 +184,7 @@ class PdfGenerator {
         
     
 
-    async addBody(doc, dataArray, currentPage, totalPages, name, receiptNo) 
+    async addBody(doc, array, currentPage, totalPages, name, receiptNo) 
     {
         const leftMargin = 2.54 * 28.35; // 2.54 cm to points
         const rightMargin = 15.93; // Right margin in points
@@ -212,7 +212,7 @@ class PdfGenerator {
 
         var receiptText = "";
 
-        if(receiptNo.split("-")[0].trim() !== "SFC")
+        if(array[0].course.payment === "Cash" || array[0].course.payment === "PayNow")
         {
             receiptText = `Receipt No   : ${receiptNo}`;
         }
@@ -267,7 +267,7 @@ class PdfGenerator {
         
         doc.moveDown(1);
          // Add a new line before adding the date text
-         const participantName = `Name            : ${dataArray[0].participant.name}`;
+         const participantName = `Name            : ${array[0].participant.name}`;
  
          // Add the date on a new line
          doc.font(fontPathTimesRegular).fontSize(12).text(participantName, leftMargin, doc.y, {
@@ -276,7 +276,7 @@ class PdfGenerator {
 
          doc.moveDown(1);
 
-         this.createTable(doc, dataArray);
+         this.createTable(doc, array);
 
          console.log(name);
         var staffName = `Issue By: ${name}`;
@@ -287,7 +287,7 @@ class PdfGenerator {
         doc.moveDown(5);
     }
 
-    async createTable(doc, dataArray) 
+    async createTable(doc, array) 
     {
         const fontPathBold = path.join(__dirname, '../../fonts/ARIALBD.TTF'); // Path to your bold font file
         const fontPathRegular = path.join(__dirname, '../../fonts/ARIAL.TTF'); // Path to your regular font file
@@ -350,7 +350,7 @@ class PdfGenerator {
 
         let totalAmount = 0; 
 
-        dataArray.forEach((item, index) => {
+        array.forEach((item, index) => {
             // Add row content for each entry
             doc.text(index + 1, columnPositions.serial+15, currentY+12); // Serial number
             doc.text(`${item.course.courseEngName} (${item.course.courseLocation})\n${item.course.courseDuration}`, columnPositions.description + 15, currentY+6); // Description
@@ -452,7 +452,7 @@ class PdfGenerator {
             .stroke(color);
     }
 
-    async addContent(doc, dataArray, name, receiptNo) {
+    async addContent(doc, array, name, receiptNo) {
         console.log("Add Content:", name);
         
         // Initial header addition for the first page
@@ -462,7 +462,7 @@ class PdfGenerator {
         let totalPages = 1; // Initialize total pages
     
         // Add body content for the first page
-        await this.addBody(doc, dataArray, currentPage, totalPages, name, receiptNo);
+        await this.addBody(doc, array, currentPage, totalPages, name, receiptNo);
     
         // Example of adding content that might create new pages
         for (let i = 0; i < 5; i++) { // Simulate adding content that spans multiple pages
@@ -476,7 +476,7 @@ class PdfGenerator {
                 await this.addHeader(doc); 
     
                 // Add body content to the new page
-                await this.addBody(doc, dataArray, currentPage, totalPages, name, receiptNo);
+                await this.addBody(doc, array, currentPage, totalPages, name, receiptNo);
             }
             
             // Optionally add footer if needed (after body content)
@@ -868,7 +868,8 @@ class PdfGenerator {
     doc.moveDown(3);
 }
     
-    async generateReceipt(res, dataArray, name, receiptNo) {
+    async generateReceipt(res, array, name, receiptNo) {
+        console.log(array, name, receiptNo);
         return new Promise((resolve, reject) => {
             try {
                 console.log("Staff Name:", name);
@@ -901,7 +902,7 @@ class PdfGenerator {
                 doc.pipe(res);
                 
                 // Ensure addContent is called correctly with await
-                this.addContent(doc, dataArray, name, receiptNo)
+                this.addContent(doc, array, name, receiptNo)
                     .then(() => {
                         // Finalize the document
                         doc.end();

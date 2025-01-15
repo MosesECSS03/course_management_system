@@ -84,7 +84,7 @@ class RegistrationController {
                 var databaseName = "Courses-Management-System";
                 var connectedDatabase = await this.databaseConnectivity.updateInDatabase(databaseName, id, newStatus);  
                 return connectedDatabase.acknowledged;
-                //console.log(connectedDatabase);
+                //console.log("Update Participant",connectedDatabase);
             }
         } 
         catch (error) 
@@ -111,8 +111,8 @@ class RegistrationController {
             {
                 var databaseName = "Courses-Management-System";
                 var connectedDatabase = await this.databaseConnectivity.updateReceiptNumberData(databaseName, id, receiptNo);  
-                return connectedDatabase.acknowledged;
-                //console.log(connectedDatabase);
+                //return connectedDatabase.acknowledged;
+                console.log(connectedDatabase);
             }
         } 
         catch (error) 
@@ -140,7 +140,7 @@ class RegistrationController {
                 var databaseName = "Courses-Management-System"; 
                 var connectedDatabase = await this.databaseConnectivity.updatePaymentOfficialUse(databaseName, id, name, date, time, status);  
                 return connectedDatabase.acknowledged;
-                //console.log(connectedDatabase);
+                //console.log("Updated Official Use:", connectedDatabase);
             }
         } 
         catch (error) 

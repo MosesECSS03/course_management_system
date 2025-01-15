@@ -334,6 +334,7 @@ class DatabaseConnectivity {
                     console.log("OK");
                     update = {
                         $set: {
+                            "status": status,
                             "official.name": name,
                             "official.date": date,
                             "official.time": time
@@ -342,11 +343,11 @@ class DatabaseConnectivity {
                 } else {
                     update = {
                         $set: {
-                            "official.name": "",
+                            "status": status,
+                            "official.receiptNo": "",
                             "official.date": "",
                             "official.time": "",
                             "official.receiptNo": "",
-                            "official.remarks": ""
                         }
                     };
                 }

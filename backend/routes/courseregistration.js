@@ -76,15 +76,8 @@ router.post('/', async function(req, res, next)
         var date = currentDateTime.date;
         var time = currentDateTime.time;
         var controller = new RegistrationController();
-        if(status === "Paid")
-        {
-            const message = await controller.updateOfficialUse(id, name, date, time, status);
-            return res.json({"result": message}); 
-        }
-        else
-        {
-            return res.json({"result": true}); 
-        }
+        const message = await controller.updateOfficialUse(id, name, date, time, status);
+        return res.json({"result": message});
         // After the PDF is sent, you can send a confirmation response if necessary
         //res.json({ message }); // Send confirmation response
     }
@@ -92,17 +85,21 @@ router.post('/', async function(req, res, next)
     {
         console.log("Receipt body:", req.body); 
         var controller = new RegistrationController();
-        var result = await controller.updateReceiptNumber(req.body.rowData._id, req.body.receiptNo);
+        var result = await controller.updateReceiptNumber(req.body.id, req.body.receiptNo);
         console.log("updateReceiptNumber:", result); 
         console.log("Array:", req.body.rowData);
         const currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
-        console.log("Check:", req.body.rowData._id,  req.body.staff, date, time, req.body.status);
-        await controller.updateOfficialUse(req.body.rowData._id, req.body.staff, date, time, req.body.status);
+        console.log("Check:", req.body._id,  req.body.staff, date, time, req.body.status);
+        await controller.updateOfficialUse(req.body._id, req.body.staff, date, time, req.body.status);
         var pdf = new PdfGenerator();
         var array = []
-        array.push(req.body.rowData);
+        array.push({
+            id: req.body.id,
+            participant: req.body.participant,
+            course: req.body.course
+        });
         await pdf.generateReceipt(res, array, req.body.staff, req.body.receiptNo);
     }
     else if(req.body.purpose === "updateRemarks")

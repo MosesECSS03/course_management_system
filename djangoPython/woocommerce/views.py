@@ -787,19 +787,29 @@ def update_stock_react(request):
 
         # Get courseName from the request body and clean it up
         courseName = data.get('page')  # Assuming 'page' is where the course name is stored
+        
+        if courseName:
+            # Format the course name details as a string for logging
+            # Get the course name components
+            chi_name = courseName.get('courseChiName', '')
+            eng_name = courseName.get('courseEngName', '')
+            location = courseName.get('courseLocation', '')
 
-        # Initialize WooCommerce API and fetch the product ID
-        woo_api = WooCommerceAPI()
-        result = woo_api.getProductId(courseName)
-        print("Result:", result['exists'])
+            # Initialize WooCommerce API and fetch the product ID
+            woo_api = WooCommerceAPI()
+            result = woo_api.getProductId(chi_name, eng_name, f"({location})")  # Use the formatted string
+            print("Result:", result)
 
-        if result['exists'] == True:
-            print("Update Product Stocks")
-            status = data.get('status') 
-            productId = result['productId']
-            result2 = woo_api.updateCourseQuantity(productId, status)
+            if result['exist'] == True:
+                print("Update Product Stocks")
+                status = data.get('status') 
+                productId = result['id']
+                result2 = woo_api.updateCourseQuantity(productId, status)
 
-        return JsonResponse({'success': result2})
+                return JsonResponse({'success': result2})
+
+        else:
+            print("No course data found in the 'page' field.")
 
     except Exception as e:
         print("Error:", e)  # Log the error to the console
