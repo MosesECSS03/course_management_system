@@ -14,11 +14,19 @@ class AccountsSection extends Component {
       hideAllCells: false,
       dataFetched: false,
       clearTable: false,
+      expandedRowIndex: null,
       currentPage: 1, // Add this
       entriesPerPage: 10// Add this
     };
     this.tableRef = React.createRef();
   }
+
+  toggleRowExpansion = (index) => {
+    console.log(index);
+    this.setState((prevState) => ({
+      expandedRowIndex: prevState.expandedRowIndex === index ? null : index, // Toggle between expanded and collapsed
+    }));
+  };
 
 
   async fetchAccounts() 
@@ -267,17 +275,40 @@ filterAccessRights()
     }
 }
 
-accountInfo = async(account) =>
-{
-  //console.log("Account Information:", account._id);
-  this.props.edit(account._id)
-}
+  // Account info handler based on index
+  accountInfo = async (index, account, e) => {
+    e.stopPropagation();  // Prevent the click event from propagating to the row
+    console.log("Account Information:", account._id);
+    // Call the edit function, passing the account's ID
+    this.props.edit(account._id);
+  };
 
-accessRightInfo = async(accessRight) =>
-{
+  accessRightInfo = async(accessRight, e) =>
+  {
+    e.stopPropagation();
     console.log("Access Rights  :", accessRight);
     this.props.updateAccessRights(accessRight);
-}
+  }
+
+  getRoleColor = (role) => {
+    switch(role) {
+      case 'Admin':
+        return '#008000'; // Green
+      case 'Sub Admin':
+        return '#0000FF'; // Blue
+      case 'Ops in-charge':
+        return '#FF0000'; // Red
+      case 'NSA in-charge':
+        return '#FFA500'; // Orange
+      case 'Site in-charge':
+        return '#8B4513'; // Brown
+      case 'Finance':
+        return '#000000'; // Black
+      default:
+        return '#808080'; // Gray (default color if role is not recognized)
+    }
+  }
+
 
   render() 
   {
@@ -293,92 +324,253 @@ accessRightInfo = async(accessRight) =>
           <h1>{this.props.language === 'zh' ? (this.props.courseType === 'NSA' ? 'NSA 课程' : 'ILP 课程') : (this.props.accountType === 'Accounts' ? 'Accounts Table' : 'Access Rights Table')}</h1>
           <div className="table-wrapper" ref={this.tableRef}>
             { this.props.accountType === 'Accounts'? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>{this.props.language === 'zh' ? '' : 'Name'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Email'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Account Type'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Date Created'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Time Created'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'First Time Log In'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Date Log In'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Time Log In'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Date Log Out'}</th>
-                    <th>{this.props.language === 'zh' ? '' : 'Time Log Out'}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                {paginatedDetails.map((account, index) => { 
-                      return (
-                        <tr key={index} onClick={() => this.accountInfo(account)}>
-                          <td>{account.name}</td>
-                          <td>{account.email}</td>
-                          <td>{account.role}</td>
-                          <td>{account.date_created}</td>
-                          <td>{account.time_created}</td>
-                          <td>{account.first_time_log_in}</td>
-                          <td>{account.date_log_in}</td>
-                          <td>{account.time_log_in}</td>
-                          <td>{account.date_log_out}</td>
-                          <td>{account.time_log_out}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+              <table className="dashboard-table">
+              <thead>
+                <tr>
+                  <th>{this.props.language === 'zh' ? '' : 'Name'}</th>
+                  <th>{this.props.language === 'zh' ? '' : 'Email'}</th>
+                  <th>{this.props.language === 'zh' ? '' : 'Account Type'}</th>
+                  <th>{this.props.language === 'zh' ? '' : 'Date Created'}</th>
+                  <th>{this.props.language === 'zh' ? '' : 'Time Created'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedDetails.map((account, index) => (
+                  <React.Fragment key={index}>
+                    <tr
+                      onClick={() => this.toggleRowExpansion(index)}
+                      className="table-row"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <td onClick={(e) => this.accountInfo(index, account, e)}>{account.name}</td>
+                      <td>{account.email}</td>
+                      <td style={{
+                        padding: '5px 10px',
+                        borderRadius: '4px',
+                        width: 'auto',
+                        fontWeight: 'bold',
+                        textAlign: 'center',  // Center text horizontally
+                        verticalAlign: 'middle',  // Center text vertically
+                      }}>
+                        <div style={{
+                          backgroundColor: this.getRoleColor(account.role),
+                          color: 'white',
+                          padding: '5px 10px',
+                          borderRadius: '4px',
+                          display: 'inline-block', // Make div wrap around the text
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem',  // Set smaller font size
+                        }}>
+                          {account.role}
+                        </div>
+                      </td>
+                      <td>{account.date_created}</td>
+                      <td>{account.time_created}</td>
+                    </tr>
+                    {this.state.expandedRowIndex === index && (
+                      <tr className="expanded-row">
+                        <td colSpan="5">
+                          <div className="expanded-content">
+                            <p><strong>More Information</strong></p>
+                            <p><strong>First Log In: </strong>{account.first_time_log_in || 'N/A'}</p>
+                            <p><strong>Last Log In: </strong>
+                              <br/><strong>Date: </strong>{account.date_log_in || 'N/A'} 
+                              <br/><strong>Time: </strong>{account.time_log_in || 'N/A'}
+                            </p>
+                            <p><strong>Last Log Out: </strong>
+                              <br/><strong>Date: </strong>{account.date_log_out || 'N/A'} 
+                              <br/><strong>Time: </strong>{account.time_log_out || 'N/A'}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>            
             ): (
-                <table>
-                  <thead>
-                    <tr>
-                      <th colspan="2">{this.props.language === 'zh' ? '' : 'Account Details'}</th>
-                      <th colspan="2">{this.props.language === 'zh' ? '' : 'Accounts'}</th>
-                      <th colspan="5">{this.props.language === 'zh' ? '' : 'Courses'}</th>
-                      <th colspan="3">{this.props.language === 'zh' ? '' : 'Registration And Payment'}</th>
-                      <th colspan="4">{this.props.language === 'zh' ? '' : 'QR Code'}</th>
+<table>
+  <thead>
+    <tr>
+      <th colSpan="2">{this.props.language === 'zh' ? '' : 'Account Details'}</th>
+    </tr>
+    <tr>
+      <th>{this.props.language === 'zh' ? '' : 'Name'}</th>
+      <th>{this.props.language === 'zh' ? '' : 'Role'}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {paginatedDetails1.map((accessRight, index) => {
+      return (
+        <React.Fragment key={index}>
+          <tr onClick={() => this.toggleRowExpansion(index)} style={{ cursor: 'pointer' }}>
+            <td onClick={(e) => this.accessRightInfo(accessRight, e)}>{accessRight["Account Details"]["Name"]}</td>
+            <td style={{
+                        padding: '5px 10px',
+                        borderRadius: '4px',
+                        width: 'auto',
+                        fontWeight: 'bold'
+                      }}>
+                        <div style={{
+                          backgroundColor: this.getRoleColor(accessRight["Account Details"]["Role"]),
+                          color: 'white',
+                          padding: '5px 10px',
+                          borderRadius: '4px',
+                          display: 'inline-block', // Make div wrap around the text
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem',  // Set smaller font size
+                        }}>
+                {accessRight["Account Details"]["Role"]}
+                </div>
+              </td>
+          </tr>
+
+                    {/* Expanded row */}
+                    {this.state.expandedRowIndex === index && (
+                      <tr className="expanded-row">
+                      <td colSpan="14">
+                        <div>
+                          <strong>Access Modules</strong>
+                          <br/>
+                          <br/>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                            <strong>Account Modules | </strong>
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Account Table: </strong> 
+                                {accessRight["Account"]["Account Table"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome checkmark icon
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome cross mark icon
+                                )}
+                              </p>
+                              
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Access Rights Table: </strong> 
+                                {accessRight["Account"]["Access Rights Table"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+                          </div>
+                          <br/>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                            <strong>Courses Modules | </strong>
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Upload Course(s): </strong> 
+                                {accessRight["Courses"]["Upload Courses"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome checkmark icon
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome cross mark icon
+                                )}
+                              </p>
+                              
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>NSA Courses: </strong> 
+                                {accessRight["Courses"]["NSA Courses"]? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>ILP Courses: </strong> 
+                                {accessRight["Courses"]["ILP Courses"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Update Course(s): </strong> 
+                                {accessRight["Courses"]["Update Courses"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Delete Course(s): </strong> 
+                                {accessRight["Courses"]["Delete Courses"]? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+                          </div>
+                          <br/>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                            <strong>Registration | </strong>
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Registration And Payment Table: </strong> 
+                                {accessRight["Registration And Payment"]["Registration And Payment Table"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome checkmark icon
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome cross mark icon
+                                )}
+                              </p>
+                              
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Invoice Table: </strong> 
+                                {accessRight["Registration And Payment"]["Invoice Table"]? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+                          </div>
+                          <br/>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                            <strong>QR Code Modules | </strong>
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>QR Code Creation: </strong> 
+                                {accessRight["QR Code"]["Create QR Code"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome checkmark icon
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i> // Font Awesome cross mark icon
+                                )}
+                              </p>
+                              
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>QR Code Table:</strong> 
+                                {accessRight["QR Code"]["QR Code Table"]? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>Update QR Code: </strong> 
+                                {accessRight["QR Code"]["Update QR Code"] ? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+                              <p style={{ margin: '0', display: 'flex', alignItems: 'center' }}>
+                                <strong>QR Code Deletion: </strong> 
+                                {accessRight["QR Code"]["Delete QR Code"]? (
+                                  <i className="fas fa-check" style={{ color: 'green', fontSize: '20px', marginLeft: '5px' }}></i>
+                                ) : (
+                                  <i className="fas fa-times" style={{ color: 'red', fontSize: '20px', marginLeft: '5px' }}></i>
+                                )}
+                              </p>
+                          </div>
+                        </div>
+                      </td>
                     </tr>
-                    <tr>
-                      <th>{this.props.language === 'zh' ? '' : 'Name'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Role'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Account Table'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Access Rights Table'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Upload Courses'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'NSA Courses'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'ILP Courses'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Update Courses'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Delete Courses'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Registration And Payment Table'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Inovice Table'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Create QR Code'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'QR Code Table'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Update QR Code'}</th>
-                      <th>{this.props.language === 'zh' ? '' : 'Delete QR Code'}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {paginatedDetails1.map((accessRight, index) => { 
-                      return (
-                        <tr key={index} onClick={() => this.accessRightInfo(accessRight)}>
-                          <td>{accessRight["Account Details"]["Name"]}</td> 
-                          <td>{accessRight["Account Details"]["Role"]}</td>
-                          <td><input type="checkbox" checked={accessRight["Account"]["Account Table"]} disabled readOnly/></td> 
-                          <td><input type="checkbox" checked={accessRight["Account"]["Account Table"]} disabled readOnly/></td> 
-                          <td><input type="checkbox" checked={accessRight["Courses"]["Upload Courses"]} disabled readOnly/></td> 
-                          <td><input type="checkbox" checked={accessRight["Courses"]["NSA Courses"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["Courses"]["ILP Courses"]} disabled readOnly/></td> 
-                          <td><input type="checkbox" checked={accessRight["Courses"]["Update Courses"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["Courses"]["Delete Courses"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["Registration And Payment"]["Registration And Payment Table"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["Registration And Payment"]["Invoice Table"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["QR Code"]["Create QR Code"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["QR Code"]["QR Code Table"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["QR Code"]["Update QR Code"]} disabled readOnly/></td>
-                          <td><input type="checkbox" checked={accessRight["QR Code"]["Delete QR Code"]} disabled readOnly/></td>
-                        </tr>
-                      );
-                    })}
-                    </tbody>
-                  </table>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+
                   )}
           </div>
         </div>
