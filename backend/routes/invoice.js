@@ -1,7 +1,7 @@
 
 var express = require('express');
 var router = express.Router();
-var PdfGenerator = require('../Others/Pdf/PdfGenerator');
+//var PdfGenerator = require('../Others/Pdf/PdfGenerator');
 var InvoiceController = require("../Controller/Invoice/InvoiceController")
 
 function getCurrentDateTime() {

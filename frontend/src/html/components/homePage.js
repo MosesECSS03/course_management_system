@@ -469,7 +469,7 @@
     updateRemarksPopup = () => {
       this.setState({
         isPopupOpen: true,
-        popupMessage: "Update Remarks...",
+        popupMessage: "Changing Payment Method...",
         popupType: "loading"
       });
     };
@@ -1001,14 +1001,6 @@
                         showEditPopup = {this.showEditPopup}
                         generateInvoiceNumber = {this.generateInvoiceNumber}
                     />
-                    </div>
-                    <div className="pagination-section">
-                      <Pagination
-                        viewMode = {viewMode}
-                        currentPage={currentPage} 
-                        totalPages={totalPages} 
-                        onPageChange={this.handlePageChange}
-                      />
                     </div>
                   </>}                 
                   {isReceiptVisible && 

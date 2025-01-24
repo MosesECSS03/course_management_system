@@ -156,7 +156,7 @@ class RegistrationController {
         }    
     }
     
-    async updateRemarks(id, remarks, staff, date, time)
+    async updateConfirmationUse(id, name, date, time, status)
     {
         try {
             // Connect to the database
@@ -166,7 +166,37 @@ class RegistrationController {
             if(result === "Connected to MongoDB Atlas!")
             {
                 var databaseName = "Courses-Management-System"; 
-                var connectedDatabase = await this.databaseConnectivity.updatePaymentRemarks(databaseName, id, remarks, staff, date, time);  
+                var connectedDatabase = await this.databaseConnectivity.updateConfirmtionOfficialUse(databaseName, id, name, date, time, status);  
+                return connectedDatabase.acknowledged;
+                //console.log("Updated Official Use:", connectedDatabase);
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error updating user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }
+    
+
+    async updatePaymentMethod(id, newPaymentMethod, staff, date, time)
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System"; 
+                var connectedDatabase = await this.databaseConnectivity.updatePaymentMethod(databaseName, id, newPaymentMethod, staff, date, time);  
+                console.log("connectedDatabase:", connectedDatabase);
                 return connectedDatabase.acknowledged;
                 //console.log(connectedDatabase);
             }

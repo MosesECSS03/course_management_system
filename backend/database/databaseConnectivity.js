@@ -330,7 +330,7 @@ class DatabaseConnectivity {
                 let update = null;
                 
                 console.log("Update Payment Official Use:", status);
-                if (status === "Paid" || status === "Generate SkillsFuture Invoice") {
+                if (status === "Paid" || status === "SkillsFuture Done" || status === "Generating SkillsFuture Invoice") {
                     console.log("OK");
                     update = {
                         $set: {
@@ -348,6 +348,7 @@ class DatabaseConnectivity {
                             "official.date": "",
                             "official.time": "",
                             "official.receiptNo": "",
+                            "official.confirmed": false
                         }
                     };
                 }
@@ -362,9 +363,46 @@ class DatabaseConnectivity {
         }
     }
 
-    async updatePaymentRemarks(dbname, id, remarks, staff, date, time) {
+    async updateConfirmtionOfficialUse(dbname, id, name, date, time, status) {
+        var db = this.client.db(dbname); // return the db object
+        try {
+            if (db) {
+                var tableName = "Registration Forms";
+                var table = db.collection(tableName);
+        
+                // Use updateOne to update a single document
+                const filter = { _id: new ObjectId(id) };
+        
+                // Define the update object conditionally based on status
+                let update = {
+                    $set: {
+                        "official.confirmed": status,
+                        "official.name": name,
+                        "official.date": date,
+                        "official.time": time,
+                        "status": "Pending",
+                        "official.receiptNo": ""
+                    }
+                };
+        
+                // Call updateOne
+                const result = await table.updateOne(filter, update);
+        
+                return result;
+            }
+        } catch (error) {
+            console.log("Error updating database:", error);
+            throw error; // rethrow the error to handle it at the calling function
+        }
+    }
+    
+
+    async updatePaymentMethod(dbname, id, newPaymentMethod, staff, date, time) 
+    {
         var db = this.client.db(dbname); // return the db object ok
         try {
+            console.log("Id:", id);
+            console.log("New Payment Method:", newPaymentMethod);
             if (db) {
                 var tableName = "Registration Forms";
                 var table = db.collection(tableName);
@@ -372,36 +410,20 @@ class DatabaseConnectivity {
                 // Use updateOne to update a single document
                 const filter = { _id: new ObjectId(id) };
     
-                // Define the update object conditionally based on status
-                let update = null;
-                //Remarks: Change Payment From What To What
-                if(remarks.includes("Change") || remarks.includes("Payment"))
-                {
-                    var newPaymentMethod = remarks.split(" ")[5].trim();
-                    update = {
+                var update = {
                             $set: {
                                 "course.payment": newPaymentMethod,
                                 "status": "Pending",
-                                "official.remarks": remarks,
                                 "official.receiptNo": "",
                                 "official.name": staff,
                                 "official.date": date,
                                 "official.time": time,
+                                "official.confirmed": false,
                             }
                         };
-                }
-                else
-                {
-                    update = {
-                        $set: {
-                            "official.remarks": remarks
-                        }
-                    };
-                }
-    
                 // Call updateOne
                 const result = await table.updateOne(filter, update);
-                console.log("Result:", result);
+                //console.log("New Payment Method:", result);
     
                 return result;
             }

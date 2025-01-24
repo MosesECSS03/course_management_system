@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var RegistrationController = require('../Controller/Registration/RegistrationController');
 var ReceiptController = require('../Controller/Receipt/ReceiptController');
-var PdfGenerator = require('../Others/Pdf/PdfGenerator');
+var receiptGenerator = require('../Others/Pdf/receiptGenerator');
+var invoiceGenerator = require('../Others/Pdf/invoiceGenerator');
 
 function getCurrentDateTime() {
     // Create a Date object and adjust for Singapore Standard Time (UTC+8)
@@ -66,61 +67,110 @@ router.post('/', async function(req, res, next)
         var result = await controller.updateParticipant(id, newStatus);
         return res.json({"result": result}); 
     }
-    else if(req.body.purpose === "updatePayment")
+    else if(req.body.purpose === "updatePaymentStatus")
     {
-        console.log("Official Use");
-        var id = req.body.registration_id;  
+        console.log("Official Use", req.body);
+        var id = req.body.id;  
         var name = req.body.staff;
-        var status = req.body.status;
+        var status = req.body.newUpdateStatus;
         const currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
         var controller = new RegistrationController();
         const message = await controller.updateOfficialUse(id, name, date, time, status);
         return res.json({"result": message});
+        //console.log("Message:", message);
         // After the PDF is sent, you can send a confirmation response if necessary
         //res.json({ message }); // Send confirmation response
     }
-    else if(req.body.purpose === "receipt")
+    else if(req.body.purpose === "updateConfirmationStatus")
     {
-        console.log("Receipt body:", req.body); 
-        var controller = new RegistrationController();
-        var result = await controller.updateReceiptNumber(req.body.id, req.body.receiptNo);
-        console.log("updateReceiptNumber:", result); 
-        console.log("Array:", req.body.rowData);
+        console.log("Update Confirmation Status:", req.body);
+        var id = req.body.id;  
+        var name = req.body.staff;
+        var status = req.body.newConfirmation;
         const currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
-        console.log("Check:", req.body._id,  req.body.staff, date, time, req.body.status);
+        var controller = new RegistrationController();
+        const message = await controller.updateConfirmationUse(id, name, date, time, status);
+        //console.log(message);
+        return res.json({"result": message});
+    }
+    else if(req.body.purpose === "addReceiptNumber")
+    {
+        console.log("Receipt body:", req.body); 
+                
+        // Initialize the controller
+        var controller = new RegistrationController();
+
+        // Update the receipt number
+        var result = await controller.updateReceiptNumber(req.body.id, req.body.receiptNo);
+        console.log("updateReceiptNumber:", result); 
+
+        // Logging the row data from the request
+        console.log("Array:", req.body.rowData);
+
+        // Get current date and time
+        const currentDateTime = getCurrentDateTime();
+        var date = currentDateTime.date;
+        var time = currentDateTime.time;
+
+        console.log("Check:", req.body._id, req.body.staff, date, time, req.body.status);
+
+        // Update the official use details
         await controller.updateOfficialUse(req.body._id, req.body.staff, date, time, req.body.status);
-        var pdf = new PdfGenerator();
+
+        // Return the result message
+        return res.json({ "result": "Success" }); // Replace "Success" with a proper message if needed
+    }
+    else if(req.body.purpose === "receipt")
+    {
+        console.log(req.body);
+        var receipt = new receiptGenerator();
         var array = []
         array.push({
             id: req.body.id,
             participant: req.body.participant,
             course: req.body.course
         });
-        await pdf.generateReceipt(res, array, req.body.staff, req.body.receiptNo);
+        await receipt.generateReceipt(res, array, req.body.staff, req.body.receiptNo);
     }
-    else if(req.body.purpose === "updateRemarks")
+    else if(req.body.purpose === "addInvoiceNumber")
+        {
+            console.log("Receipt body:", req.body); 
+            var controller = new RegistrationController();
+            var result = await controller.updateReceiptNumber(req.body.id, req.body.receiptNo);
+            console.log("updateReceiptNumber:", result); 
+            console.log("Array:", req.body.rowData);
+            const currentDateTime = getCurrentDateTime();
+            var date = currentDateTime.date;
+            var time = currentDateTime.time;
+            console.log("Check:", req.body._id,  req.body.staff, date, time, req.body.status);
+            await controller.updateOfficialUse(req.body._id, req.body.staff, date, time, req.body.status);
+            return res.json({ "result": "Success" }); 
+        }
+    else if(req.body.purpose === "invoice")
     {
         console.log(req.body);
+        var invoice = new invoiceGenerator();
+        var array = []
+        array.push({
+            id: req.body.id,
+            participant: req.body.participant,
+            course: req.body.course
+        });
+        await invoice.generateInvoice(res, array, req.body.staff, req.body.receiptNo);
+    }
+    else if(req.body.purpose === "updatePaymentMethod")
+    {
+        console.log("updatePaymentMethod:", req.body);
         var controller = new RegistrationController();
         const currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
-        var result = await controller.updateRemarks(req.body.id, req.body.remarks, req.body.staff, date, time);
-        console.log("Update Remarks:". result);
-        var controller1 = new ReceiptController();
-        var result1 = await controller1.deleteReceipt(req.body.id);
-        return res.json({"result": result1}); 
-    }
-    else if(req.body.purpose === "updateEntry")
-    {
-        console.log("Data:", req.body)
-        var controller = new RegistrationController();
-        var result = await controller.updateEntry(req.body.entry);
-        //console.log(result);
+        var result = await controller.updatePaymentMethod(req.body.id, req.body.newUpdatePayment, req.body.staff, date, time);
+        //console.log("Update Remarks:". result);
         return res.json({"result": result}); 
     }
 });

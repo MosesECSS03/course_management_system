@@ -1,11 +1,13 @@
-  import React, { Component } from 'react';
-  import axios from 'axios';
-  import '../../../css/sub/registrationPayment.css';
-  import * as XLSX from 'xlsx';
-  import ExcelJS from 'exceljs';
-  import Popup from '../popup/popupMessage';
+import React, { Component } from 'react';
+import axios from 'axios';
+import '../../../css/sub/registrationPayment.css';
+import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
+import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
+import PaymentMethod from '../dropdownBox/paymentMethod'; 
 
- class RegistrationPaymentSection extends Component {
+class RegistrationPaymentSection extends Component {
     constructor(props) {
       super(props);
       this.state = {
@@ -14,97 +16,26 @@
         isLoading: true,
         inputValues: {},
         dropdownVisible: {}, // Store input values for each row
-        cashPaynowSuggestions: ["Pending", "Paid", "Cancelled"], // General suggestions
-        skillsFutureOptions: ["Pending", "Generate SkillsFuture Invoice", "SkillsFuture Done", "Cancelled"], // SkillsFuture specific options
         filteredSuggestions: {} ,
         focusedInputIndex: null,
         originalData: [],
         currentPage: 1, // Add this
         entriesPerPage: 100, // Add this
         remarks: "", // Remarks for each row
-        expandedRow: null
+        expandedRow: null,
+        rowPosition: null, // To track the position of the clicked row
+        paginatedDetails: [],
+        columnDefs: this.getColumnDefs(),
+        rowData: []
       };
       this.tableRef = React.createRef();
     }
-
-    /*handleRemarksChange = (e) => {
-      const { value } = e.target;
-      console.log("Value Remarks:", value);
-    
-      // Update the remarks state based on the index
-      this.setState({
-        remarks: value
-      });
-    };*/
-
-    handleRemarksChange = (e, index) => {
-      const { value } = e.target;
-      console.log("Value Remarks:", value);
-    
-      // Update the specific remark using the item's unique ID as the key
-      this.setState((prevState) => ({
-        remarks: {
-          ...prevState.remarks, // Retain previous remarks for other items
-          [index]: value, // Update the remark for the specific item
-        },
-      }));
-    };
 
     toggleRow = (index) => {
       this.setState((prevState) => ({
         expandedRow: prevState.expandedRow === index ? null : index,
       }));
     };  
-    
-    handleSubmit = async (id, remark) => {
-      console.log("Id:", id);
-      console.log("Remarks:", remark);
-      console.log("handleRemarks:", id, remark);
-    
-      this.props.updateRemarksPopup();
-    
-      // Perform the submit action here, e.g., API call
-      try {
-       const response = await axios.post(
-          'http://localhost:3001/courseregistration', 
-          { 
-            purpose: 'updateRemarks', 
-            id: id, 
-            remarks: remark, 
-            staff: this.props.userName 
-          }
-        );
-        /*const response = await axios.post(
-          'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
-          { 
-            purpose: 'updateRemarks', 
-            id: id, 
-            remarks: remark, 
-            staff: this.props.userName 
-          }
-        );*/
-    
-        console.log("handleSubmit:", response.data);
-        if (response.data.result.success === true) {
-          this.props.closePopup();
-          this.refreshChild();
-        } else {
-          // Handle unsuccessful submission if needed
-          this.props.closePopup();
-          this.refreshChild();
-        }
-      } catch (error) {
-        console.error('Error during submission:', error);
-        this.props.closePopup();
-        this.refreshChild();
-      }
-    };
-
-    refreshChild = () =>
-    {
-      this.props.refreshChild();
-    }
-    
 
     handleEntriesPerPageChange = (e) => {
       this.setState({
@@ -113,14 +44,7 @@
       });
     }
 
-    getPaginatedDetails() {
-      const { registerationDetails } = this.state;
-      const { currentPage, entriesPerPage } = this.props;
-      const indexOfLastCourse = currentPage * entriesPerPage;
-      const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
-      return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
-    }
-  
+   
 
     convertToChineseDate(dateStr) {
       const monthMap = {
@@ -240,322 +164,208 @@
         inputValues: inputValues,  // Show dropdown for the focused input
         remarks: inputValues1,  // Show dropdown for the focused input
         locations: locations, // Set locations in state
-        names: names
+        names: names,
+        //rowData: data
       });
+      this.getRowData();
       this.props.closePopup();
     }
-    
-    
 
-    async componentDidUpdate(prevProps) {
-      const { selectedLocation, selectedCourseName, searchQuery} = this.props;
-      if (selectedLocation !== prevProps.selectedLocation ||
-        selectedCourseName !== prevProps.selectedCourseName ||
-        searchQuery !== prevProps.searchQuery 
+    componentDidUpdate(prevProps, prevState) {
+      const { selectedLocation, selectedCourseName, searchQuery } = this.props;
+    
+      // Check if any of the filter props have changed
+      if (
+        prevProps.selectedLocation !== selectedLocation ||
+        prevProps.selectedCourseName !== selectedCourseName ||
+        prevProps.searchQuery !== searchQuery
       ) {
+        // Apply filtering and then pagination
         this.filterRegistrationDetails();
       }
+    
+      // If pagination-related state changed, apply pagination
+      if (
+        prevState.currentPage !== this.state.currentPage ||
+        prevState.entriesPerPage !== this.state.entriesPerPage
+      ) {
+        this.applyPagination();
+      }
     }
-
-    filterRegistrationDetails() 
-    {
+    
+    filterRegistrationDetails() {
+      const { originalData } = this.state;
+      const { selectedLocation, selectedCourseName, searchQuery } = this.props;
+    
+      const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
+    
+      // Filter data based on the selected filters
+      const filteredDetails = originalData.filter(data => {
+        const pName = data.participant.name.toLowerCase().trim() || '';
+        const location = data.course.courseLocation.toLowerCase().trim() || '';
+        const courseEngName = data.course.courseEngName.toLowerCase().trim() || '';
+    
+        const matchesLocation = selectedLocation === "All Locations" || location.includes(selectedLocation.toLowerCase().trim());
+        const matchesCourse = selectedCourseName === "All Courses" || courseEngName.includes(selectedCourseName.toLowerCase().trim());
+        const matchesSearchQuery = normalizedSearchQuery
+          ? pName.includes(normalizedSearchQuery) || location.includes(normalizedSearchQuery) || courseEngName.includes(normalizedSearchQuery)
+          : true;
+    
+        return matchesLocation && matchesCourse && matchesSearchQuery;
+      });
+    
+      // Update state with filtered data
+      this.setState({ registerationDetails: filteredDetails }, () => {
+        // After filtering, apply pagination
+        this.applyPagination();
+      });
+    }
+    
+    applyPagination() {
+      const { registerationDetails } = this.state;
+    
+      // Get the paginated details after filtering
+      const paginatedDetails = this.getPaginatedDetails();
+    
+      // Update the rowData based on the paginated details
+      this.updateRowData(paginatedDetails);
+    }
+    
+    getPaginatedDetails() {
+      const { registerationDetails } = this.state;
+      const { currentPage, entriesPerPage } = this.props;
+      
+      // Calculate the index range for pagination
+      const indexOfLastCourse = currentPage * entriesPerPage;
+      const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
+    
+      // Return the paginated slice of the filtered registerationDetails
+      return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
+    }
+    
+    updateRowData(paginatedDetails) {
+      const rowData = paginatedDetails.map((item, index) => ({
+        id: item._id,
+        sn: index + 1,  // Serial number (S/N)
+        name: item.participant.name,  // Participant's name
+        contactNo: item.participant.contactNumber,  // Contact number
+        course: item.course.courseEngName,  // Course English name
+        courseChi: item.course.courseChiName,  // Course Chinese name
+        location: item.course.courseLocation,  // Course location
+        paymentMethod: item.course.payment,  // Payment method
+        confirmed: item.official.confirmed,  // Confirmation status
+        paymentStatus: item.status,  // Payment status
+        recinvNo: item.official.receiptNo,  // Receipt number
+        participantInfo: item.participant,  // Participant details
+        courseInfo: item.course,  // Course details
+        officialInfo: item.official  // Official details
+      }));
+    
+      // Update the state with the newly formatted rowData
+      this.setState({ rowData });
+    }
+    
+    filterRegistrationDetails() {
       const { section } = this.props;
-  
+    
       if (section === "registration") {
-          const { originalData } = this.state;
-          const { selectedLocation, selectedCourseName, searchQuery } = this.props;
-          console.log("Section:", section);
-          console.log("Selected Course Type:", selectedCourseName);
-  
-          // Reset filtered courses to all courses if the search query is empty
-          if (selectedCourseName === "All Courses" && selectedLocation === "All Locations") {
-              this.setState({ registerationDetails: originalData });
-              return;
-          }
-
-          const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
-          console.log("normalizedSearchQuery:", normalizedSearchQuery);
-
-  
-          const filteredDetails = originalData.filter(data => {
-              // Extract participant properties
-              const pName = data.participant.name.toLowerCase().trim() || ""; 
-              const pNric = data.participant.nric.toLowerCase().trim() || ""; 
-              const pRS = data.participant.residentialStatus.toLowerCase().trim() || ""; // Fixed to avoid calling it as a function
-              const pRace = data.participant.race.toLowerCase().trim() || ""; // Assuming race is a string
-              const pGender = data.participant.gender.toLowerCase().trim() || "";
-              const pDateOfBirth = data.participant.dateOfBirth.toLowerCase().trim() || ""; // Ensure correct formatting if needed
-              const pContactNumber = data.participant.contactNumber.toLowerCase().trim() || "";
-              const pEmail = data.participant.email.toLowerCase().trim() || "";
-              const pPostalCode = data.participant.postalCode || "";
-              const pEducationLevel = data.participant.educationLevel.toLowerCase().trim() || "";
-              const pWorkStatus = data.participant.workStatus.toLowerCase().trim() || "";
-
-              // Extract course properties
-              const location = data.course.courseLocation.toLowerCase().trim() || ""; 
-              const type = data.course.courseType.toLowerCase().trim() || "";
-              const courseEngName = data.course.courseEngName.toLowerCase().trim() || "";
-              const duration = data.course.courseDuration.toLowerCase().trim() || "";
-              const payment = data.course.payment.toLowerCase().trim() || "";
-              const agreement = data.agreement.toLowerCase().trim() || "";
-
-              //Extract official properties
-              const status = data.status.toLowerCase().trim() || ""; 
-              console.log("Status:", status)
-              const oName = data.official?.name?.toLowerCase().trim() || "";
-              const oDate = data.official?.date?.toLowerCase().trim() || "";
-              const oTime = data.official?.time?.toLowerCase().trim() || ""
-  
-              // Match 'All Languages' and 'All Locations'
-              const matchesLocation = selectedLocation === "All Locations" || 
-                  selectedLocation === "所有语言" || 
-                  selectedLocation === "" || 
-                  !selectedLocation 
-                  ? true 
-                  : location === selectedLocation.toLowerCase().trim();
-  
-              const matchesNames = selectedCourseName === "All Courses" || 
-                  selectedCourseName === "" || 
-                  selectedCourseName === "" || 
-                  !selectedCourseName
-                  ? true 
-                  : courseEngName === selectedCourseName.toLowerCase().trim();
-              
-              console.log("matchNames:", matchesNames);
-
-              const matchesSearchQuery = normalizedSearchQuery
-                  ? (pName.includes(normalizedSearchQuery) ||
-                     pNric.includes(normalizedSearchQuery) ||
-                     pRS.includes(normalizedSearchQuery) ||
-                     pRace.includes(normalizedSearchQuery) ||
-                     pGender.includes(normalizedSearchQuery) ||
-                     pDateOfBirth.includes(normalizedSearchQuery) ||
-                     pContactNumber.includes(normalizedSearchQuery)||
-                     pEmail.includes(normalizedSearchQuery) ||
-                     pPostalCode.includes(normalizedSearchQuery) ||
-                     pEducationLevel.includes(normalizedSearchQuery) ||
-                     pWorkStatus.includes(normalizedSearchQuery)||  
-                     location.includes(normalizedSearchQuery)||
-                     type.includes(normalizedSearchQuery) ||
-                     courseEngName.includes(normalizedSearchQuery) ||
-                     duration.includes(normalizedSearchQuery) ||
-                     payment.includes(normalizedSearchQuery)||
-                     agreement.includes(normalizedSearchQuery) ||
-                     status.includes(normalizedSearchQuery) ||
-                     oName.includes(normalizedSearchQuery) ||
-                     oDate.includes(normalizedSearchQuery) ||
-                     oTime.includes(normalizedSearchQuery))
-                  : true;
-  
-              return matchesNames && matchesLocation && matchesSearchQuery;
+        const { originalData } = this.state;
+        const { selectedLocation, selectedCourseName, searchQuery } = this.props;
+    
+        // If no filters are applied, reset to original data
+        if (selectedCourseName === "All Courses" && selectedLocation === "All Locations" && !searchQuery) {
+          this.setState({ registerationDetails: originalData });
+          return;
+        }
+    
+        const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
+    
+        // Filter registration details based on selected filters
+        const filteredDetails = originalData.filter(data => {
+          const pName = data.participant.name.toLowerCase().trim() || "";
+          const location = data.course.courseLocation.toLowerCase().trim() || "";
+          const courseEngName = data.course.courseEngName.toLowerCase().trim() || "";
+    
+          // Check if the location or course should not be filtered
+          const matchesLocation = selectedLocation === "All Locations" || location.includes(selectedLocation.toLowerCase().trim());
+          const matchesCourse = selectedCourseName === "All Courses" || courseEngName.includes(selectedCourseName.toLowerCase().trim());
+          
+          // Search query should match participant name, location, or course name
+          const matchesSearchQuery = normalizedSearchQuery
+            ? pName.includes(normalizedSearchQuery) || location.includes(normalizedSearchQuery) || courseEngName.includes(normalizedSearchQuery)
+            : true;
+    
+          return matchesLocation && matchesCourse && matchesSearchQuery;
+        });
+    
+        // Only update registerationDetails if the filtered data has changed
+        if (filteredDetails !== this.state.registerationDetails) {
+          this.setState({ registerationDetails: filteredDetails }, () => {
+            // Once filtering is done, update rowData
+            this.updateRowData(filteredDetails);
           });
-  
-          // If filteredDetails is empty, set registerationDetails to an empty array
-          this.setState({ registerationDetails: filteredDetails.length > 0 ? filteredDetails : [] });
+        }
       }
-  }
-  
-  handleFocus = (index, payment) => {
-    console.log("handleFocus:", index);
-  
-    // Update only the focused row's state
-    this.setState(prevState => ({
-      dropdownVisible: {
-        ...prevState.dropdownVisible, // Retain previous dropdown visibility states
-        [index]: true, // Show dropdown for the focused input
-      },
-      inputValues: {
-        ...prevState.inputValues, // Retain previous input values
-        [index]: "", // Clear the input for the focused row
-      },
-      filteredSuggestions: {
-        ...prevState.filteredSuggestions, // Retain other filtered suggestions
-        [index]: this.getSuggestionsByPaymentType(payment), // Set filtered suggestions for the specific row
-      }
+    }
+x    
+
+  updateRowData(filteredDetails) {
+    const rowData = filteredDetails.map((item, index) => ({
+      id: item._id,
+      sn: index + 1,
+      name: item.participant.name,
+      contactNo: item.participant.contactNumber,
+      course: item.course.courseEngName,
+      courseChi: item.course.courseChiName,
+      location: item.course.courseLocation,
+      paymentMethod: item.course.payment,
+      confirmed: item.official.confirmed,
+      paymentStatus: item.status,
+      recinvNo: item.official.receiptNo,
+      participantInfo: item.participant,
+      courseInfo: item.course,
+      officialInfo: item.official,
     }));
-  };
-  
-  
-    getSuggestionsByPaymentType(payment) {
-      if (payment === "Cash" || payment === "PayNow") {
-        return this.state.cashPaynowSuggestions; // Use Cash/PayNow suggestions
-      } else if (payment === "SkillsFuture") {
-        return this.state.skillsFutureOptions; // Use SkillsFuture suggestions
-      }
-      return []; // Default empty suggestions
+
+    // Update the state with the newly formatted rowData
+    this.setState({ rowData });
+  }
+
+  getPaginatedDetails() {
+      const { registerationDetails } = this.state;
+      const { currentPage, entriesPerPage } = this.props;
+      const indexOfLastCourse = currentPage * entriesPerPage;
+      const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
+      return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
     }
     
     
-    /*handleInputChange = (event, index) => {
-      const value = event.target.value;
+    updateWooCommerceForRegistrationPayment = async (chi, eng, location, updatedStatus) => {
+      try {
+        // Check if the value is "Paid" or "Generate SkillsFuture Invoice"
+        if (updatedStatus === "Paid" || updatedStatus === "SkillsFuture Done" || updatedStatus === "Cancelled") {
+          // Proceed to update WooCommerce stock
+          const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
+            type: 'update', 
+            page: {"courseChiName":chi, "courseEngName":eng, "courseLocation":location}, // Assuming `chi` refers to the course or page
+            status: updatedStatus, // Using updatedStatus directly here
+            location: location, // Added location if needed
+          });
     
-      // Log the index and value for debugging
-      console.log("Index:", index);
-      console.log("Value:", value);
-    
-      // Update only the specific input value
-      this.setState(prevState => ({
-        inputValues: {
-          ...prevState.inputValues,
-          [index]: value, // Store input value by index
-        },
-      }));
-    
-      // Filter suggestions based on the input value
-      const paymentType = this.state.registerationDetails[index]?.course.payment;
-      const filteredSuggestions = this.getSuggestionsByPaymentType(paymentType).filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase())
-      );
-    
-      this.setState(prevState => ({
-        filteredSuggestions,
-        dropdownVisible: {
-          ...prevState.dropdownVisible,
-          [index]: true, // Keep the dropdown visible for the focused input
-        },
-      }));
-    };*/
-
-    handleInputChange = (event, index) => {
-      const value = event.target.value;
-    
-      // Log the index and value for debugging
-      console.log("Index:", index);
-      console.log("Value:", value);
-      console.log("handleInputChange:", index, value);
-    
-      // Update only the specific input value
-      this.setState(prevState => ({
-        inputValues: {
-          ...prevState.inputValues,
-          [index]: value, // Store input value by index
-        },
-      }));
-    
-      // Filter suggestions based on the input value
-      const paymentType = this.state.registerationDetails[index]?.course.payment;
-      const filteredSuggestions = this.getSuggestionsByPaymentType(paymentType).filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase())
-      );
-    
-      // Update the filtered suggestions and dropdown visibility for the specific index
-     this.setState(prevState => ({
-        filteredSuggestions: {
-          ...prevState.filteredSuggestions,
-          [index]: filteredSuggestions, // Store filtered suggestions by index
-        },
-        dropdownVisible: {
-          ...prevState.dropdownVisible,
-          [index]: true, // Keep the dropdown visible for the focused input
-        },
-      }));
-    };
-
-    handleSuggestionClick = (index, value, id, participant, course, official) => {
-      this.props.updatePaymentPopup();
-    
-      // Log the index and value for debugging
-      console.log("Index:", index);
-      console.log("Value:", value);
-      console.log("Course Details:", course);
-    
-      // Update only the specific input value for the clicked suggestion
-      this.setState(prevState => ({
-        inputValues: {
-          ...prevState.inputValues,
-          [index]: value, // Set clicked suggestion as input value for the specific row
-        },
-      }));
-    
-      // Filter suggestions based on the selected suggestion's payment type for the specific row
-      const paymentType = this.state.registerationDetails[index]?.course.payment;
-      const filteredSuggestions = this.getSuggestionsByPaymentType(paymentType).filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase())
-      );
-    
-      // Update filtered suggestions and hide dropdown for the specific row
-      this.setState(prevState => ({
-        filteredSuggestions: {
-          ...prevState.filteredSuggestions, // Keep previous suggestions for other rows
-          [index]: filteredSuggestions, // Update filtered suggestions for the current row
-        },
-        dropdownVisible: {
-          ...prevState.dropdownVisible, // Keep dropdown visibility for other rows
-          [index]: false, // Hide dropdown for the current row after selection
-        },
-      }));
-    
-      // If the selected value is not "Pending" or "Cancelled", update the database
-      console.log("Updated Status:", value);
-      this.updateWooCommerceForRegistrationPayment(value, id, participant,course, official);
-    };
-    
-    updateWooCommerceForRegistrationPayment = async (value, id, participant, course, official) => {
-          console.log("WooCommerce", value, id);
+          console.log("WooCommerce stock update response:", stockResponse.data);
         
-          try {
-            // Update the course registration payment
-            const courseResponse = await axios.post('http://localhost:3001/courseregistration', { 
-              purpose: 'updatePayment', 
-              page: course, 
-              registration_id: id, 
-              staff: this.props.userName, 
-              status: value 
-            });
-        
-            console.log("Course Registration Update response:", courseResponse.data);
-        
-           // Check if the value is "Pending", "Cancelled", or "SkillsFuture Done"
-            if (value === "Pending" || value === "Cancelled" || value === "SkillsFuture Done") {
-              console.log("Status is one of the special values, closing popup and refreshing child.");
-              this.props.closePopup();  // Close the popup
-              this.refreshChild();      // Refresh the child component
-            } else {
-              // Proceed to update WooCommerce stock
-             const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
-                type: 'update', 
-                page: course, 
-                status: value 
-             });
-        
-            console.log("WooCommerce stock update response:", stockResponse.data);
-        
-              // If WooCommerce stock update is successful, generate receipt
-             if (stockResponse.data.success === true) {
-                this.receiptGenerator(id, participant, course, official, value);
-              } else {
-                console.error("Error updating WooCommerce stock:", stockResponse.data);
-              }
-            }
-          } catch (error) {
-            console.error("Error during the update process:", error);
+          // If WooCommerce stock update is successful, generate receipt
+          if (stockResponse.data.success === true) {
+            console.log("Stock updated successfully.");
+            // Call the function to generate receipt or perform other action
+          } else {
+            console.error("Error updating WooCommerce stock:", stockResponse.data);
           }
-        };
-        
-          
-    handleBlur = (index) => {
-      var currentInput = this.state.inputValues[index] || ""; // Get the current input value, default to an empty string
-    
-      // Check if the input is empty
-      if (currentInput === "") {
-        this.setState({
-          inputValues: {
-            ...this.state.inputValues,
-            [index]: "Pending", // Set to "Pending" if empty
-          },
-          dropdownVisible: {
-            ...this.state.dropdownVisible,
-            [index]: false, // Hide the dropdown
-          },
-        });
-      } else {
-        // If input is not empty, just hide the dropdown
-        this.setState(prevState => ({
-          dropdownVisible: {
-            ...prevState.dropdownVisible,
-            [index]: false, // Hide the dropdown
-          },
-        }));
+        } else {
+          console.log("No update needed for the given status.");
+        }
+      } catch (error) {
+        console.error("Error during the update process:", error);
       }
     };
 
@@ -574,51 +384,67 @@
         }))];
       }
 
-      receiptGenerator = async (id, participant, course, official, value) => {
-        console.log("Selected Parameters:", { course, official, value });
-      
-        const generateReceiptNumber = async () => {
-          if (official.receiptNo) {
-            console.log("Using existing receipt number:", official.receiptNo);
-            return official.receiptNo;
+      generateReceiptNumber = async (course, newMethod) => 
+      {
+        const courseLocation = newMethod === "SkillsFuture" ? "ECSS/SFC/" : course.courseLocation;
+        console.log("Course Location:", courseLocation);
+    
+        try {
+          //console.log("Fetching receipt number for location:", courseLocation);
+    
+          const response = await axios.post("http://localhost:3001/receipt", {
+            purpose: "getReceiptNo",
+            courseLocation,
+          });
+    
+          if (response?.data?.result?.success) {
+            console.log("Fetched receipt number:", response.data.result.receiptNumber);
+            return response.data.result.receiptNumber;
+          } else {
+            throw new Error("Failed to fetch receipt number from response");
           }
-      
-          const courseLocation =
-            course.payment === "SkillsFuture" ? "ECSS/SFC/" : course.courseLocation;
-      
-          try {
-            console.log("Fetching receipt number for location:", courseLocation);
-      
-            const response = await axios.post("http://localhost:3001/receipt", {
-              purpose: "getReceiptNo",
-              courseLocation,
-            });
-      
-            if (response?.data?.result?.success) {
-              console.log("Fetched receipt number:", response.data.result.receiptNumber);
-              return response.data.result.receiptNumber;
-            } else {
-              throw new Error("Failed to fetch receipt number from response");
+        } catch (error) {
+          console.error("Error fetching receipt number:", error);
+          throw error;
+        }
+      };
+
+      generatePDFReceipt = async (id, participant, course, receiptNo, status) => {
+        try {
+          const pdfResponse = await axios.post(
+            "http://localhost:3001/courseregistration",
+            {
+              purpose: "addReceiptNumber",
+              id,
+              participant,
+              course,
+              staff: this.props.userName,
+              receiptNo,
+              status,
             }
-          } catch (error) {
-            console.error("Error fetching receipt number:", error);
-            throw error;
-          }
-        };
+          );
+          console.log("generatePDFReceipt:", pdfResponse);
+          return pdfResponse;
+        } catch (error) {
+          console.error("Error generating PDF receipt:", error);
+          throw error;
+        }
+      };
       
-        const generatePDFReceipt = async (id, participant, course, receiptNo, status) => {
-          try {
-      
+    
+      receiptShown = async (participant, course, receiptNo) => 
+      {
+        try {
+          if(course.payment === "Cash" || course.payment === "PayNow")
+          {
             const pdfResponse = await axios.post(
               "http://localhost:3001/courseregistration",
               {
                 purpose: "receipt",
-                id,
                 participant,
                 course,
                 staff: this.props.userName,
                 receiptNo,
-                status,
               },
               { responseType: "blob" }
             );
@@ -638,84 +464,167 @@
       
             console.log("PDF receipt URL:", url);
             return url;
-          } catch (error) {
-            console.error("Error generating PDF receipt:", error);
-            throw error;
           }
-        };
+          else
+          {
+            const pdfResponse = await axios.post(
+            "http://localhost:3001/courseregistration",
+            {
+              purpose: "invoice",
+              participant,
+              course,
+              staff: this.props.userName,
+              receiptNo,
+            },
+            { responseType: "blob" }
+          );
+
+            const contentDisposition = pdfResponse.headers["content-disposition"];
+            const filenameMatch = contentDisposition.match(
+              /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+            );
+            const filename = filenameMatch
+              ? filenameMatch[1].replace(/['"]/g, "")
+              : "unknown.pdf";
+            console.log(`PDF Filename: ${filename}`);
       
-        const createReceiptInDatabase = async (participant, course, receiptNo, registration_id, url) => {
-          try {
-            console.log("Creating receipt in database:", {
+            const blob = new Blob([pdfResponse.data], { type: "application/pdf" });
+            const url = window.URL.createObjectURL(blob);
+            window.open(url, "_blank");
+      
+            console.log("PDF receipt URL:", url);
+            return url;
+        }
+        } catch (error) {
+          console.error("Error generating PDF receipt:", error);
+          throw error;
+        }
+      };
+
+      generatePDFInvoice = async (id, participant, course, receiptNo, status) => {
+        try {
+    
+          const pdfResponse = await axios.post(
+            "http://localhost:3001/courseregistration",
+            {
+              purpose: "addInvoiceNumber",
+              id,
+              participant,
+              course,
+              staff: this.props.userName,
+              receiptNo,
+              status,
+            }
+          );
+          return pdfResponse;
+        } catch (error) {
+          console.error("Error generating PDF receipt:", error);
+          throw error;
+        }
+      };
+    
+      createReceiptInDatabase = async (receiptNo, registration_id, url) => {
+        try {
+          console.log("Creating receipt in database:", {
+            receiptNo,
+            registration_id,
+            url,
+          });
+    
+          const receiptCreationResponse = await axios.post(
+            "http://localhost:3001/receipt",
+            {
+              purpose: "createReceipt",
               receiptNo,
               registration_id,
               url,
-            });
-      
-            const receiptCreationResponse = await axios.post(
-              "http://localhost:3001/receipt",
-              {
-                purpose: "createReceipt",
-                receiptNo,
-                registration_id,
-                url,
-                staff: this.props.userName,
-              }
-            );
-      
-            console.log("Receipt creation response:", receiptCreationResponse.data);
-          } catch (error) {
-            console.error("Error creating receipt in database:", error);
-            throw error;
-          }
-        };
-      
-        console.log("Processing status:", value);
-      
-        if (value === "Paid" || value === "SkillsFuture Done") {
-          this.props.generateReceiptPopup();
-      
-          if (
-            course.payment === "Cash" ||
-            course.payment === "PayNow" ||
-            course.payment === "SkillsFuture"
-          ) {
-            try {
+              staff: this.props.userName,
+            }
+          );
+    
+          console.log("Receipt creation response:", receiptCreationResponse.data);
+        } catch (error) {
+          console.error("Error creating receipt in database:", error);
+          throw error;
+        }
+      };
+    
+
+      receiptGenerator = async (id, participant, course, official, value) => {
+        console.log("Selected Parameters:", { course, official, value });
+    
+        if (value === "Paid") 
+        {
+          if (course.payment === "Cash" || course.payment === "PayNow") 
+          {
+            try 
+            {
               console.log("Generating receipt for course:", course);
       
-              const registration_id = course._id;
-              const receiptNo =
-                official.receiptNo || (await generateReceiptNumber(course));
-      
-              if (value === "Paid") {
-                const url = await generatePDFReceipt(id, participant, course, receiptNo, value);
-                this.props.closePopup();
-                this.refreshChild();
-                await createReceiptInDatabase(participant, course, receiptNo, registration_id, url);
-              }
-      
-            } catch (error) {
+              //const registration_id = id;
+              const receiptNo = await this.generateReceiptNumber(course, course.payment);
+              console.log("Manual Receipt No:", receiptNo);
+              await this.generatePDFReceipt(id, participant, course, receiptNo, value);
+              await this.createReceiptInDatabase(receiptNo,  id, "");  
+            } 
+            catch (error) 
+            {
               console.error("Error during receipt generation:", error);
             }
           }
-        } else if (value === "Generate SkillsFuture Invoice") {
-          this.props.generateInvoiceNumber();
-      
-          if (course.payment === "SkillsFuture") {
+        } 
+        else if (value === "Generating SkillsFuture Invoice") {
             try {
               console.log("Generating SkillsFuture invoice for course:", course);
-      
-              const registration_id = course._id;
-              const receiptNo = await generateReceiptNumber(course);
-              const url = await generatePDFReceipt(id, participant, course, receiptNo, value);
-      
-              await createReceiptInDatabase(participant, course, receiptNo, registration_id, url);
-      
-              this.props.closePopup();
-              this.refreshChild();
+              const invoiceNo = await this.generateReceiptNumber(course);
+              console.log("Invoice No:", invoiceNo);
+              await this.generatePDFInvoice(id, participant, course, invoiceNo, value);  
+              await this.createReceiptInDatabase(invoiceNo,  id, ""); 
             } catch (error) {
               console.error("Error during SkillsFuture invoice generation:", error);
             }
+        }
+      };
+
+      //this.autoReceiptGenerator(id, participantInfo, courseInfo, officialInfo, newValue, "Paid")
+      autoReceiptGenerator = async (id, participant, course, official, newMethod, value) => {
+        console.log("Selected Parameters:", { course, official, newMethod, value });
+    
+        if (newMethod === "Cash" || newMethod === "PayNow") 
+        {
+          if (value === "Paid") 
+          {
+            try 
+            {
+              console.log("Generating receipt for course:", course);
+      
+              const registration_id = id;
+              const receiptNo = await this.generateReceiptNumber(course, newMethod);
+              console.log("Receipt No:", receiptNo);
+              await this.generatePDFReceipt(id, participant, course, receiptNo, value);
+              await this.createReceiptInDatabase(receiptNo,  id, "");    
+            } 
+            catch (error) 
+            {
+              console.error("Error during receipt generation:", error);
+            }
+          }
+        } 
+        else if(newMethod === "SkillsFuture")
+        {
+          try 
+          {
+            console.log("Generating receipt for course:", course);
+    
+            const registration_id = id;
+            const invoiceNo = await this.generateReceiptNumber(course, newMethod);
+            console.log("Invoice No:", invoiceNo);
+            await this.generatePDFReceipt(id, participant, course, invoiceNo, value);
+            await this.createReceiptInDatabase(invoiceNo,  id, "");    
+          } 
+          catch (error) 
+          {
+            console.error("Error during receipt generation:", error);
           }
         }
       };
@@ -953,14 +862,385 @@
       this.refreshChild();
   };
   
+  // Custom Cell Renderer for Slide Button
+  slideButtonRenderer = (params) => {
+    const paymentMethod = params.data.paymentMethod; // Get payment method for the row
+
+    // Return null or empty if the payment method is not 'SkillsFuture'
+    if (paymentMethod !== 'SkillsFuture') {
+      return null;
+    }
+
+    // Otherwise, return JSX for the slide button (checkbox)
+    const checked = params.value;  // Set checkbox state based on the current value of 'confirmed'
+    
+    const handleChange = (event) => {
+      const newValue = event.target.checked;
+      params.api.getRowNode(params.node.id).setDataValue('confirmed', newValue);
+      console.log('Slide button toggled:', newValue);
+    };
+
+    return (
+      <div className="slide-button-container">
+        <input 
+          type="checkbox"
+          className="slide-button"
+          checked={checked}
+          onChange={handleChange}
+        />
+      </div>
+    );
+  };
+
+  // Custom cell renderer for Payment Method with Buttons
+  paymentMethodRenderer = (params) => {
+    const currentPaymentMethod = params.value; // Get the current payment method value
+
+    // List of payment methods
+    const paymentMethods = ['Cash', 'PayNow', 'SkillsFuture'];
+
+    // Handle button click to update the payment method in the row
+    const handleButtonClick = (method) => {
+      params.api.getRowNode(params.node.id).setDataValue('paymentMethod', method);
+      console.log('Payment method changed to:', method);
+    };
+
+    return (
+      <div className="payment-method-buttons-container">
+        {paymentMethods.map((method) => (
+          <button
+            key={method}
+            className={`payment-method-button ${method === currentPaymentMethod ? 'active' : ''}`}
+            onClick={() => handleButtonClick(method)}
+          >
+            {method}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  // Column Definitions
+  getColumnDefs = () => [
+    { headerName: "S/N", field: "sn", width: 100 },
+    { headerName: "Name", field: "name", width: 300 },
+    { headerName: "Contact Number", field: "contactNo", width: 150 },
+    { headerName: "Course Name", field: "course", width: 350 },
+    {
+      headerName: 'Payment Method',
+      field: 'paymentMethod',
+      cellRenderer: this.paymentMethodRenderer,  // Use the custom cell renderer with buttons
+      editable: false,  // Since we're using buttons, no need for cell editor
+      width: 500,
+    },
+    {
+      headerName: 'Confirmation',
+      field: 'confirmed',
+      cellRenderer: this.slideButtonRenderer,  // Use the custom slide button renderer (no parentheses)
+      editable: false,  // Since the slide button is interactive, we don't need the cell to be editable
+      width: 180,
+      // Optionally add cellStyle to hide the column if paymentMethod is not 'SkillsFuture'
+      cellStyle: (params) => {
+        const paymentMethodValue = params.data.paymentMethod;
+        if (paymentMethodValue !== 'SkillsFuture') {
+          return { display: 'none' };  // Hide the cell if paymentMethod is not 'SkillsFuture'
+        }
+        return {};  // No special styling, cell is visible
+      },
+    },    
+    {
+      headerName: "Payment Status",
+      field: "paymentStatus",
+      cellEditor: 'agSelectCellEditor',  // Use a select cell editor
+      cellEditorParams: (params) => {
+        // Check the value of the paymentMethod for the current row
+        const paymentMethod = params.data.paymentMethod;
+    
+        // Define different arrays for SkillsFuture and others
+        const skillsFutureOptions = ['Pending', 'Generating SkillsFuture Invoice', 'SkillsFuture Done', 'Cancelled'];
+        const otherOptions = ['Pending', 'Paid', 'Cancelled'];
+    
+        // Set the appropriate options based on paymentMethod
+        const options = paymentMethod === 'SkillsFuture' ? skillsFutureOptions : otherOptions;
+    
+        // Return the options for the select box
+        return {
+          values: options,  // List of options for the select box
+        };
+      },
+      editable: true,  // Make the cell editable
+      width: 350,
+    },    
+    { headerName: "Receipt/Invoice Number", field: "recinvNo", width: 200 },
+  ];
+
+ /* updatePaginatedDetails = () => {
+    const { rowData } = this.getPaginatedDetails();
+    this.setState({ rowData }); // Update state with the paginated data for the grid
+  };*/
   
-    render() {
-      const { isDisabled, remarks, hideAllCells, registerationDetails, filteredSuggestions, currentInput, showSuggestions, focusedInputIndex, expandedRow} = this.state;
-      const paginatedDetails = this.getPaginatedDetails();
+  getRowData = () => {
+   const paginatedDetails = this.getPaginatedDetails();
   
+    // Assuming paginatedDetails is an array of objects with the necessary fields.
+    const rowData = paginatedDetails.map((item, index) => {
+      return {
+        id: item._id,
+        sn: index + 1,  // Serial number (S/N)
+        name: item.participant.name,  // Replace with the actual field for name
+        contactNo: item.participant.contactNumber,  // Replace with the actual field for contact number
+        course: item.course.courseEngName,  // Replace with the actual field for payment status
+        courseChi: item.course.courseChiName,  // Replace with the actual field for payment status
+        location: item.course.courseLocation,  // Replace with the actual field for payment status
+        paymentMethod: item.course.payment,  // Replace with the actual field for payment method
+        confirmed: item.official.confirmed,  // Replace with the actual field for receipt/invoice number
+        paymentStatus: item.status,  // Replace with the actual field for payment status
+        recinvNo: item.official.receiptNo,  // Replace with the actual field for receipt/invoice number
+        participantInfo: item.participant,
+        courseInfo: item.course,
+        officialInfo: item.official
+      };
+    });
+  
+    // Set the state with the new row data
+    this.setState({rowData });
+  };
+
+  handleValueClick = async (event) =>
+  {
+    console.log("handleValueClick");
+    const columnName = event.colDef.headerName;
+    const receiptInvoice = event.data.recinvNo;
+    const participantInfo = event.data.participantInfo;
+    const courseInfo = event.data.courseInfo;
+
+    try {
+      if (columnName === "Receipt/Invoice Number")
+        {
+          //console.log("Receipt/Invoice Number");
+          await this.receiptShown(participantInfo, courseInfo, receiptInvoice);
+        }
+      }
+      catch (error) {
+        console.error('Error during submission:', error);
+      }
+  }
+
+
+  handleCellClick = async (event) => {
+    const columnName = event.colDef.headerName;
+    const id = event.data.id;
+    const courseName = event.data.course;
+    const courseChiName = event.data.courseChi;
+    const courseLocation = event.data.location;
+    const newValue = event.value;
+    const participantInfo = event.data.participantInfo;
+    const courseInfo = event.data.courseInfo;
+    const officialInfo = event.data.officialInfo;
+    const confirmed = event.data.confirmed;
+    const paymentMethod = event.data.paymentMethod;
+    const paymentStatus = event.data.paymentStatus;
+
+    console.log("Column Name:", columnName);
+
+    try 
+    {
+      if (columnName === "Payment Method") 
+      {
+        await axios.post(
+          'http://localhost:3001/courseregistration', 
+          { 
+            purpose: 'updatePaymentMethod', 
+            id: id, 
+            newUpdatePayment: newValue, 
+            staff: this.props.userName 
+          }
+        );
+        //Automatically Update Status
+        console.log("newPaymentMethod:", newValue);
+        if(newValue === "Cash" || newValue === "PayNow")
+        {
+            const response = await axios.post(
+              'http://localhost:3001/courseregistration', 
+              { 
+                purpose: 'updatePaymentStatus', 
+                id: id, 
+                newUpdateStatus: "Paid", 
+                staff: this.props.userName 
+              });
+            if (response.data.result === true) 
+            {
+                // Define the parallel tasks function
+                const performParallelTasks = async () => {
+                  try {
+                    // Run the two functions in parallel using Promise.all
+                    await Promise.all([
+                      this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, "Paid"),
+                      //console.log("Course Info:", courseInfo)
+                      this.autoReceiptGenerator(id, participantInfo, courseInfo, officialInfo, newValue, "Paid")
+                    ]);
+                    console.log("Updated Successfully");
+                  } catch (error) {
+                    console.error("Error occurred during parallel task execution:", error);
+                  }
+              };
+              await performParallelTasks();
+            } 
+        }
+        this.refreshChild();  
+      }
+      else if (columnName === "Confirmation") 
+      {
+        console.log('Cell clicked', event);
+        const response = await axios.post(
+            'http://localhost:3001/courseregistration', 
+            { 
+              purpose: 'updateConfirmationStatus', 
+              id: id, 
+              newConfirmation: newValue, 
+              staff: this.props.userName 
+            }
+          );
+       console.log(`${columnName}: ${newValue}`);
+       if(paymentMethod === "SkillsFuture" && newValue === true)
+       {
+          if (response.data.result === true) 
+          {
+            console.log("Auto Generate SkillsFuture Invoice");
+            // Define the parallel tasks function
+            const response = await axios.post(
+              'http://localhost:3001/courseregistration', 
+              { 
+                purpose: 'updatePaymentStatus', 
+                id: id, 
+                newUpdateStatus: "Generating SkillsFuture Invoice", 
+                staff: this.props.userName 
+              }
+            );
+
+            if (response.data.result === true) 
+              {
+                  // Define the parallel tasks function
+                  const performParallelTasks = async () => {
+                    try {
+                      // Run the two functions in parallel using Promise.all
+                      await Promise.all([
+                        this.autoReceiptGenerator(id, participantInfo, courseInfo, officialInfo, paymentMethod, "Generating SkillsFuture Invoice")
+                      ]);
+                      console.log("Updated Successfully");
+                    } catch (error) {
+                      console.error("Error occurred during parallel task execution:", error);
+                    }
+                };
+                await performParallelTasks();
+              } 
+          }
+       }
+       this.refreshChild();  
+      }
+      else if (columnName === "Payment Status") 
+      {
+        console.log('Cell clicked', event);
+          const response = await axios.post(
+            'http://localhost:3001/courseregistration', 
+            { 
+              purpose: 'updatePaymentStatus', 
+              id: id, 
+              newUpdateStatus: newValue, 
+              staff: this.props.userName 
+            }
+          );
+          console.log("Response for Payment Status1:", response);
+          if (response.data.result === true) 
+          {
+            console.log("New Payment Status:", newValue);
+            if(paymentMethod === "Cash" || paymentMethod === "PayNow")
+            {
+              console.log("Update Payment Status Success1");
+                if(newValue === "Cancelled")
+                {
+                  const performParallelTasks = async () => {
+                    try {
+                      // Run the two functions in parallel using Promise.all
+                      await Promise.all([
+                        this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
+                      ]);
+                      console.log("Both tasks completed successfully.");
+                    } catch (error) {
+                      console.error("Error occurred during parallel task execution:", error);
+                    }};
+                    await performParallelTasks();
+                } 
+              else
+              {
+                // Define the parallel tasks function
+                const performParallelTasks = async () => {
+                  try {
+                    // Run the two functions in parallel using Promise.all
+                    await Promise.all([
+                      this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
+                      this.receiptGenerator(id, participantInfo, courseInfo, officialInfo, newValue),
+                    ]);
+                    console.log("Both tasks completed successfully.");
+                  } catch (error) {
+                    console.error("Error occurred during parallel task execution:", error);
+                  }};
+                  await performParallelTasks();
+                }
+          }
+          else if(paymentMethod === "SkillsFuture")
+          {
+            if(newValue === "SkillsFuture Done")
+            {
+              const performParallelTasks = async () => {
+                try {
+                  // Run the two functions in parallel using Promise.all
+                  await Promise.all([
+                    this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
+                  ]);
+                  console.log("Both tasks completed successfully.");
+                } catch (error) {
+                  console.error("Error occurred during parallel task execution:", error);
+                }};
+                await performParallelTasks();
+            }
+            else if(newValue === "Cancelled")
+              {
+                console.log("Cancelled Participants");
+                const performParallelTasks = async () => {
+                  try {
+                    // Run the two functions in parallel using Promise.all
+                    await Promise.all([
+                      this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
+                    ]);
+                    console.log("Both tasks completed successfully.");
+                  } catch (error) {
+                    console.error("Error occurred during parallel task execution:", error);
+                  }};
+                  await performParallelTasks();
+              } 
+          }
+        }
+        this.refreshChild(); 
+      }
+    } catch (error) {
+      console.error('Error during submission:', error);
+      this.props.closePopup();
+    }
+  };
+  
+   refreshChild = () =>
+   {
+     this.props.refreshChild();
+   }
+  
+    render()
+    {
+      ModuleRegistry.registerModules([AllCommunityModule]);
+      var paginatedDetails = this.state.registerationDetails;
       return (
         <>
-          <div className="registration-payment-container">
+          <div className="registration-payment-container" >
             <div className="registration-payment-heading">
               <h1>{this.props.language === 'zh' ? '报名与支付' : 'Registration And Payment'}</h1>
               <div className="button-row3">
@@ -971,188 +1251,21 @@
                 </div>
                 <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
               </div>
-              <div className="table-wrapper" style={{ marginLeft: '8%', height: '40vh'}}>
-                <table style={{ borderCollapse: 'collapse', width: '100%'}} ref={this.tableRef}>
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th colSpan="2">{this.props.language === 'zh' ? '参与者' : 'Participants'}</th>
-                      <th colSpan="2" >{this.props.language === 'zh' ? '' : 'For Official Uses'}</th>
-                    </tr>
-                    <tr>
-                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'S/N'}</th>
-                      <th style={{ width: '0.001%' }}>{this.props.language === 'zh' ? '名字' : 'Name'}</th>
-                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Contact Number'}</th>
-                      <th style={{ width: '0.04%' }}>{this.props.language === 'zh' ? '支付' : 'Payment Status'}</th>
-                      <th style={{ width: '0.01%' }}>{this.props.language === 'zh' ? '' : 'Receipt/Invoice Number'}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedDetails.map((item, index) => (
-                      <React.Fragment key={index}>
-                        <tr
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevents event bubbling
-                            this.toggleRow(index);
-                          }}
-                          className={expandedRow === index ? 'expanded' : ''}
-                        >
-                          <td>{index + 1}</td>
-                          <td>{item.participant.name}</td>
-                          <td style={{ width: '0.005%' }}>{item.participant.contactNumber}</td>
-                          <td>
-                            {!hideAllCells && (
-                              <div className="input-container" style={{ position: 'relative', width: '75%' }}>
-                                <input
-                                  type="text"
-                                  value={this.state.inputValues[index] || ''} // Ensure value is specific to the row
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Prevent row expansion when clicking on the input
-                                    console.log("OnChange:", e);
-                                    this.handleInputChange(e, index); // Handle input change for specific row
-                                  }}
-                                   onFocus={() => this.handleFocus(index, item.course.payment)} // Focus handler for specific row
-                                  onBlur={() => this.handleBlur(index)} // Blur handler for specific row 
-                                  style={{
-                                    backgroundColor:
-                                        item.status === 'Pending' ? '#ffa500' :  // Orange (Pending)
-                                        item.status === 'Paid' ? '#28a745' :  // Green (Paid)
-                                        item.status === 'Cancelled' ? '#dc3545' :  // Red (Cancelled)
-                                        item.status === 'Generate SkillsFuture Invoice' ? '#0000FF' :  // Blue (SkillsFuture)
-                                        item.status=== 'SkillsFuture Done' ? '#28a745' :  // Green (SkillsFuture Done)
-                                      '#f8f9fa', // Default background
-                                    color: 'white',
-                                    fontWeight: 'bold',
-                                    fontSize: '0.875rem',
-                                    padding: '0.25rem',
-                                    borderRadius: '0.375rem',
-                                    outline: 'none',
-                                    width: '15rem',
-                                    textAlign: 'center',
-                                    height: 'fit-content',
-                                  }}
-                                />
-                                  {this.state.dropdownVisible[index] && Array.isArray(this.state.filteredSuggestions[index]) && this.state.filteredSuggestions[index].length > 0 && (
-                                    <ul className="suggestions-list" style={{
-                                      listStyleType: 'none',
-                                      padding: '0',
-                                      margin: '0',
-                                      maxHeight: '150px',
-                                      overflowY: 'auto',
-                                      backgroundColor: 'white',
-                                      borderRadius: '0.375rem',
-                                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
-                                    }}>
-                                      {this.state.filteredSuggestions[index].map((suggestion, idx) => (
-                                        <li
-                                          key={idx}
-                                          onMouseDown={(event) => {
-                                            event.stopPropagation(); // Prevent event bubbling
-                                            this.handleSuggestionClick(index, suggestion, item._id, item.participant, item.course, item.official); // Handle suggestion click
-                                          }}
-                                          style={{
-                                            padding: '0.5rem',
-                                            cursor: 'pointer',
-                                            transition: 'background-color 0.2s ease',
-                                          }}
-                                          onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f1f1'} // Hover effect
-                                          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'} // Reset hover
-                                        >
-                                          {suggestion}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  )}
-                              </div>
-                            )}
-                          </td>
-                          <td>{item.official?.receiptNo}</td>
-                        </tr>
-                        {expandedRow === index  && (
-                            <tr>
-                            <td colSpan="7">
-                              <div>
-                                <p>
-                                  <strong>Course Name: </strong>{" "}
-                                  {item.course?.courseEngName?.includes("Protected: ")
-                                    ? item.course.courseEngName.replace("<br />Protected: ", "")
-                                    : item.course?.courseEngName || "N/A"}
-                                </p>
-                                <p>
-                                  <strong>Course Location: </strong> {item.course?.courseLocation || "N/A"}
-                                </p>
-                                <p>
-                                  <strong>Course Duration: </strong> {item.course?.courseDuration || "N/A"}
-                                </p>
-                                <p>
-                                  <strong>Payment Method: </strong> {item.course?.payment || "N/A"}
-                                </p>
-                                <hr/>
-                                <p>
-                                  <strong>Staff Name: </strong>
-                                  {item.official?.name}
-                                </p>
-                                <p>
-                                  <strong>Date Received: </strong>
-                                  {item.official?.date}
-                                </p>
-                                <p>
-                                  <strong>Time Received: </strong>
-                                  {item.official?.time}
-                                </p>
-                                <p>
-                                  <strong>Remarks: </strong>
-                                  <input
-                                      type="text"
-                                      value={remarks[index]} // Retrieve the value from state based on unique id
-                                      onChange={(e) => this.handleRemarksChange(e, index)} 
-                                      onClick={(e) => e.stopPropagation()} // Prevent the click event from propagating to parent elements
-                                      onFocus={(e) => e.stopPropagation()} // Prevent the focus event from propagating to parent elements 
-                                      style={{
-                                        width: "40%",
-                                        padding: "0.5rem",
-                                        fontSize: "0.75rem",
-                                        border: "1px solid #ccc",
-                                        borderRadius: "4px", // Optional rounded corners
-                                      }}
-                                    />
-                                    <br/>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();  // Prevent event bubbling
-                                      this.handleSubmit(item._id, remarks[index]);  // Call handleSubmit
-                                    }}
-                                    style={{
-                                      width: "fit-content",
-                                      marginTop: "1%",
-                                      padding: "0.5rem",
-                                      fontSize: "1rem",
-                                      border: "1px solid #ccc",
-                                      borderRadius: "4px", // Optional rounded corners
-                                    }}
-                                  >
-                                    Submit
-                                  </button>
-                                </p>
-                                <p>
-                                  <strong>Update/Edit: </strong>
-                                  <button onClick={() => this.handleEdit(item, index)} style={{
-                                    width: "20%",
-                                    marginTop: "1rem",
-                                    padding: "0.5rem",
-                                    fontSize: "1rem",
-                                    border: "1px solid #ccc",
-                                    borderRadius: "4px", // Optional rounded corners
-                                  }}>Edit</button>
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid-container">
+              <AgGridReact
+                  columnDefs={this.state.columnDefs}
+                  rowData={this.state.rowData}
+                  domLayout="normal"
+                  paginationPageSize={10}
+                  sortable={true}
+                  statusBar={false}
+                  pagination={true}
+                  defaultColDef={{
+                    resizable: true, // Make columns resizable
+                  }}
+                  onCellValueChanged={this.handleCellClick} // Handle cell click event
+                  onCellClicked={this.handleValueClick} // Handle cell click event
+              />
               </div>
             </div>
           </div>

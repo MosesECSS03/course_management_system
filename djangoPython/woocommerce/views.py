@@ -806,6 +806,8 @@ def update_stock_react(request):
                 productId = result['id']
                 result2 = woo_api.updateCourseQuantity(productId, status)
 
+                print(status)
+
                 return JsonResponse({'success': result2})
 
         else:

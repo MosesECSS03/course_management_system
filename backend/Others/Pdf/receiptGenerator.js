@@ -3,7 +3,7 @@ const axios = require('axios');
 const sharp = require('sharp'); // Import sharp for image processing
 const path = require('path');
 
-class PdfGenerator {
+class receiptGenerator {
     constructor() {}
     
     getCurrentDateTime() {
@@ -981,4 +981,4 @@ class PdfGenerator {
     }
 }    
 
-module.exports = PdfGenerator;
+module.exports = receiptGenerator;

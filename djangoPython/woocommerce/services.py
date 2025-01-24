@@ -188,17 +188,23 @@ class WooCommerceAPI:
 
             print("Current:", product['stock_quantity'])
             print(f"Status is {status}")
-
+            
             if vacancies_match < new_stock_quantity:
-                new_stock_quantity = vacancies_match  # Decrease stock to match vacancy if needed
-            elif vacancies_match >= new_stock_quantity and new_stock_quantity > 0:
+                # Decrease stock to match vacancy if needed
+                new_stock_quantity = vacancies_match
+            elif vacancies_match >= new_stock_quantity and new_stock_quantity >= 0:
                 if status == "Cancelled":
+                    print("Increase")
                     new_stock_quantity += 1  # Increase stock by 1 if cancelled
                 elif status == "Paid":
                     print("Decrease")
                     new_stock_quantity -= 1  # Decrease stock by 1 if paid
-            elif new_stock_quantity <= 0:
-                new_stock_quantity = 0
+                elif status == "SkillsFuture Done":
+                    print("Decrease")
+                    new_stock_quantity -= 1  # Decrease stock by 1 if SkillsFuture Done
+            if new_stock_quantity < 0:
+                new_stock_quantity = 0  # Ensure stock doesn't fall below 0
+
 
             # Prepare data for updating the product stock
             update_data = {

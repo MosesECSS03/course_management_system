@@ -114,3 +114,115 @@
 .file-input {
   display: none; /* Keep the actual file input hidden */
 }
+
+.grid-container {
+  width: 80vw;  /* Full width of the parent */
+  height: 50vh;  /* Set a fixed height or use 100% if you want it to fill the remaining space */
+  display: block;  /* Ensure that the grid takes up the expected space */
+  overflow: auto;  /* Scrollbars will appear if the content overflows */
+  box-sizing: border-box;  /* Includes padding and border in the element's total width and height */
+  margin-left: 5%;
+}
+
+.ag-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1 !important;
+  background: white; /* Ensure header has a background */
+}
+
+/* Container for the slide button */
+.slide-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style for the slider checkbox */
+.slide-button {
+  width: 50px;
+  height: 25px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #ddd;
+  outline: none;
+  border-radius: 25px;
+  transition: background-color 0.3s;
+  cursor: pointer;
+  position: relative;
+}
+
+/* The circle inside the slider */
+.slide-button::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: white;
+  transition: transform 0.3s;
+}
+
+/* When checked, change the background color and move the circle */
+.slide-button:checked {
+  background-color: #4CAF50; /* Green when checked */
+}
+
+/* Move the circle to the right when checked */
+.slide-button:checked::before {
+  transform: translateX(25px); /* Move the circle to the right */
+}
+
+/* Optional: Style for the checkbox when it's not checked */
+.slide-button:focus {
+  outline: none;
+}
+
+/* Container to hold the payment method buttons */
+.payment-method-buttons-container {
+  display: flex;
+  justify-content: space-around;
+  width: auto;  /* Container width adjusts to its content */
+  flex-wrap: wrap;  /* Allow wrapping if needed */
+  margin-top: 0.25rem;
+}
+
+/* Style for each button */
+.payment-method-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: auto;  /* Set width to auto for each button */
+  display: inline-block;  /* Ensure buttons behave inline */
+}
+
+/* Highlight the selected payment method */
+.payment-method-button.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* On hover, change background color */
+.payment-method-button:hover {
+  background-color: #ddd;
+}
+
+/* Custom styles for the select box */
+.ag-cell-editor-select {
+  background-color: #f8f9fa; /* Light background for the select box */
+  border: 1px solid #ccc; /* Border color */
+  padding: 5px;
+  font-size: 14px;
+}
+
+/* Custom styles for the options inside the select */
+.ag-select-option {
+  padding: 5px;
+  font-size: 14px;
+}
