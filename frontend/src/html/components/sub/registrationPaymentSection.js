@@ -392,8 +392,12 @@ x
     
         try {
           //console.log("Fetching receipt number for location:", courseLocation);
-    
-          const response = await axios.post("https://moses-ecss-backend.azurewebsites.net//receipt", {
+         /* const response = await axios.post("http://localhost:3001/receipt", {
+            purpose: "getReceiptNo",
+            courseLocation,
+          });*/
+
+          const response = await axios.post("https://moses-ecss-backend.azurewebsites.net/receipt", {
             purpose: "getReceiptNo",
             courseLocation,
           });
