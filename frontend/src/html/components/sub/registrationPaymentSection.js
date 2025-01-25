@@ -1320,7 +1320,7 @@ class RegistrationPaymentSection extends Component {
       }));
 
       // Update the row data with the filtered results
-      this.setState({rowData})
+      this.setState({registerationDetails:rowData, rowData})
       //this.updateRowData(filteredDetails);
     }
   }
