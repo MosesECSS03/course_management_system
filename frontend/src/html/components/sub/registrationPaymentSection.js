@@ -1008,9 +1008,10 @@ x
         officialInfo: item.official
       };
     });
+    console.log("All Rows Data:", rowData);
   
     // Set the state with the new row data
-    this.setState({rowData });
+    //this.setState({rowData });
   };
 
   handleValueClick = async (event) =>
