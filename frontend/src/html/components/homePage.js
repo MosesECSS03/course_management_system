@@ -532,9 +532,9 @@
         this.setState((prevState) => ({
             courseType: "",
             isRegistrationPaymentVisible: !prevState.isRegistrationPaymentVisible, // Toggle visibility
-            //isPopupOpen: true,
-           // popupMessage: "Loading In Progress",
-            //popupType: "loading",
+            isPopupOpen: true,
+            popupMessage: "Loading In Progress",
+            popupType: "loading",
             sidebarVisible: false,
             section: "registration",
             accountType: null,
@@ -1002,14 +1002,6 @@
                         entriesPerPage={this.state.entriesPerPage} // Pass entries per page
                         userName = {userName}
                     />
-                    </div>
-                    <div className="pagination-section">
-                      <Pagination
-                        viewMode = {viewMode}
-                        currentPage={currentPage} 
-                        totalPages={totalPages} 
-                        onPageChange={this.handlePageChange}
-                      />
                     </div>
                   </>} 
                   {invoiceVisibility && 

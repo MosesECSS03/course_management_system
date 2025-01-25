@@ -168,6 +168,7 @@ class RegistrationPaymentSection extends Component {
         //rowData: data
       });
       this.getRowData();
+      this.props.closePopup();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -983,13 +984,9 @@ x
     { headerName: "Receipt/Invoice Number", field: "recinvNo", width: 200 },
   ];
 
- /* updatePaginatedDetails = () => {
-    const { rowData } = this.getPaginatedDetails();
-    this.setState({ rowData }); // Update state with the paginated data for the grid
-  };*/
-  
   getRowData = () => {
    const paginatedDetails = this.getPaginatedDetails();
+   console.log("Hi")
   
     // Assuming paginatedDetails is an array of objects with the necessary fields.
     const rowData = paginatedDetails.map((item, index) => {
