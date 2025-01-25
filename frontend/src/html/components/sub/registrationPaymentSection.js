@@ -514,7 +514,7 @@ x
     
           const pdfResponse = await axios.post(
             //"http://localhost:3001/courseregistration",
-            "https://moses-ecss-backend.azurewebsites.net//courseregistration",
+            "https://moses-ecss-backend.azurewebsites.net/courseregistration",
             {
               purpose: "addInvoiceNumber",
               id,

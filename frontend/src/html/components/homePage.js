@@ -20,44 +20,7 @@
   class HomePage extends Component {
     constructor(props) {
       super(props);
-     /*this.state = {
-        submenuVisible: null,
-        language: 'en',
-        courseType: null,
-        isPopupOpen: false,
-        popupMessage: '',
-        popupType: '',
-        sidebarVisible: false,
-        locations: [],
-        languages: [],
-        types: [],
-        selectedCourseLanguage: '',
-        selectedCourseLocation: '',
-        selectedCourseType: '',
-        courseSearchQuery: '',
-        selectedRegPaymentLanguage: '',
-        selectedRegPaymentLocation: '',
-        regPaymentSearchQuery: '',
-        resetSearch: false,
-        currentPage: 1,
-        entriesPerPage: 100000000000,
-        totalPages: 1,
-        nofCourses: 0,
-        noofDetails: 0,
-        nofAccounts: 0,
-        viewMode: 'full',
-        isRegistrationPaymentVisible: false,
-        section: '',
-        accountType: null,
-        roles: [],
-        createAccount: false,
-        displayedName: "",
-        isDropdownOpen: false,
-        isReceiptVisible: false,
-        item: "",
-        isInactive: false,
-        refreshKey: 0
-      };*/
+
       const savedState = localStorage.getItem('myComponentState');
        var initialState = savedState ? JSON.parse(savedState) : {
         submenuVisible: null,

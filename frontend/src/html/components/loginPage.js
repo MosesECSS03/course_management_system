@@ -65,68 +65,7 @@ class LoginPage extends Component {
     }
     return '';
   };
-
-/*handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission (page reload)
-    const { email, password } = this.state;
-
-    const emailError = this.validateEmail(email);
-    const passwordError = this.validatePassword(password);
-
-    if (emailError || passwordError) {
-      this.setState({ emailError, passwordError });
-      return;
-    }
-
-    // Clear error messages and handle login logic here
-    this.setState({ emailError: '', passwordError: '' });
-
-    // Replace with your API endpoint and payload
-    var response = await axios.post('http://localhost:3001/login', {
-      "email":email,
-      "password":password
-    });
-
-      if (response.data.message.message === "Login successful") 
-      {
-        //this.props.history.push('/home');  
-        this.setState({
-          isPopupOpen: true,
-          popupMessage: response.data.message.message,
-          popupType: "success-message",
-        });
-        setTimeout(() => {
-          this.setState({ isPopupOpen: false});
-          //console.log(response.data.message.details);
-          if(response.data.message.details.first_time_log_in === "Yes")
-          {
-            this.setState({
-              isPopupOpen: true,
-              popupMessage: response.data.message.message,
-              popupType: "change-password",
-              accountId: response.data.message.details._id,
-              name: response.data.message.details.name
-            });
-          }
-          else
-          {
-            this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}}); 
-          }
-      }, 5000);
-      } 
-      else 
-      {
-        this.setState({
-          isPopupOpen: true,
-          popupMessage: "Login Failure",
-          popupType: "error-message",
-        });
-        setTimeout(() => {
-          this.setState({ isPopupOpen: false, name: '', email: '', password: '', role: ''});
-      }, 5000);
-      }
-  };*/
-
+  
   handleSubmit = async (e) => {
     e.preventDefault();
     var { email, password } = this.state;
