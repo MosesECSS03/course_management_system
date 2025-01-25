@@ -226,6 +226,7 @@ class RegistrationPaymentSection extends Component {
     
       // Get the paginated details after filtering
       const paginatedDetails = this.getPaginatedDetails();
+      console.log("Paginated Details Displayed:", paginatedDetails);
     
       // Update the rowData based on the paginated details
       this.updateRowData(paginatedDetails);
