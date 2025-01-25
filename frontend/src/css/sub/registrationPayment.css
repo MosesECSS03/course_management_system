@@ -116,7 +116,7 @@
 }
 
 .grid-container {
-  width: 80vw;  /* Full width of the parent */
+  width: 89vw;  /* Full width of the parent */
   height: 50vh;  /* Set a fixed height or use 100% if you want it to fill the remaining space */
   display: block;  /* Ensure that the grid takes up the expected space */
   overflow: auto;  /* Scrollbars will appear if the content overflows */

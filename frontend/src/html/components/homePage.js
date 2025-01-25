@@ -724,14 +724,14 @@
         popupType: "loading",
       });
     }
-    
+
     showUpdatePopup = async(item)=>
     {
       console.log("Selected:", item);
       this.setState({
         isPopupOpen: true,
         popupMessage: item,
-        popupType: "edit"
+        popupType: "loading",
       });
     }
 
@@ -931,15 +931,6 @@
                         passSelectedValueToParent={this.handleRegPaymentSelectFromChild}
                         passSearchedValueToParent={this.handleRegPaymentSearchFromChild}
                         item={item}
-                      />
-                    </div>
-                    <div className="view-toggle-section">
-                      <ViewToggle
-                        language={language}
-                        viewMode={viewMode}
-                        onToggleView={this.toggleViewMode}
-                        onEntriesPerPageChange={this.handleEntriesPerPageChange}  
-                        getTotalNumber= {noofDetails}
                       />
                     </div>
                     <div className="registration-payment-section">
