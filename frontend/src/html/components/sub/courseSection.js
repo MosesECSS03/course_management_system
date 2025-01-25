@@ -110,7 +110,6 @@
         
           const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
 
-        
           const filteredCourses = courses.filter(course => {
             const nameDetails = this.courseNameAndDetails(course.name);
             const courseDetails = this.getSelectedDetails(course.short_description);

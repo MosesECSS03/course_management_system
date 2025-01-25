@@ -566,7 +566,14 @@
               //viewMode: "full"
           }));
       }
-  } 
+  }
+  
+  onResetSearch = () =>
+  {
+    this.setState({ resetSearch: true, }, () => {
+      this.setState({ resetSearch: false });
+    });
+  }
 
   logOut = async() =>
   {   
@@ -954,6 +961,7 @@
                         warningPopUpMessage = {this.warningPopUpMessage}
                         showUpdatePopup = {this.showUpdatePopup}
                         generateInvoiceNumber = {this.generateInvoiceNumber}
+                        onResetSearch = {this.onResetSearch}
                     />
                     </div>
                   </>}                 

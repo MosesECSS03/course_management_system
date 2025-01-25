@@ -129,6 +129,7 @@ class RegistrationPaymentSection extends Component {
     }
 
     async componentDidMount() { 
+     // this.props.onResetSearch();
       const { language } = this.props;
       const data = await this.fetchCourseRegistrations(language);
       console.log('All Courses Registration:  ', data);
@@ -167,21 +168,7 @@ class RegistrationPaymentSection extends Component {
       this.props.closePopup();
     }
 
-    componentDidUpdate(prevProps, prevState) {
-      const { selectedLocation, selectedCourseName, searchQuery } = this.props;
-    
-      // Check if any of the filter props have changed
-      if (
-        prevProps.selectedLocation !== selectedLocation ||
-        prevProps.selectedCourseName !== selectedCourseName ||
-        prevProps.searchQuery !== searchQuery
-      ) {
-        // Apply filtering and then pagination
-        this.filterRegistrationDetails();
-      }
-    }
-
-    updateRowData(paginatedDetails) {
+    /*updateRowData(paginatedDetails) {
       const rowData = paginatedDetails.map((item, index) => ({
         id: item._id,
         sn: index + 1,  // Serial number (S/N)
@@ -198,73 +185,13 @@ class RegistrationPaymentSection extends Component {
         courseInfo: item.course,  // Course details
         officialInfo: item.official  // Official details
       }));
-    
+      
+      this.props.onResetSearch();
       // Update the state with the newly formatted rowData
-      this.setState({ rowData });
-    }
+      console.log("Row Datawe:", rowData);
+      //this.setState({ rowData });
+    }*/
     
-
-          filterRegistrationDetails() {
-            const { section } = this.props;
-          
-            if (section === "registration") {
-              const { originalData } = this.state;
-              console.log("Original Data:", originalData);
-              const { selectedLocation, selectedCourseName, searchQuery } = this.props;
-          
-              // Normalize the search query
-              const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
-          
-              // If no filters are applied, return original data
-              if (selectedCourseName === "All Courses" && selectedLocation === "All Locations" && !searchQuery) {
-                this.setState({ registerationDetails: originalData }, () => {
-                  this.updateRowData(originalData); // Update table with original data
-                });
-                return;
-              }
-          
-              // Start with a copy of the original data
-              let filteredDetails = originalData; 
-          
-              // Apply the location filter if necessary
-              if (selectedLocation !== "All Locations") {
-                filteredDetails = filteredDetails.filter(data => {
-                  const location = data.course.courseLocation.toLowerCase().trim() || "";
-                  return location.includes(selectedLocation.toLowerCase().trim());
-                });
-              }
-          
-              // Apply the course name filter if necessary
-              if (selectedCourseName !== "All Courses") {
-                filteredDetails = filteredDetails.filter(data => {
-                  const courseEngName = data.course.courseEngName.toLowerCase().trim() || "";
-                  return courseEngName.includes(selectedCourseName.toLowerCase().trim());
-                });
-              }
-          
-              // Apply the search query filter if necessary
-              if (normalizedSearchQuery) {
-                filteredDetails = filteredDetails.filter(data => {
-                  const pName = data.participant.name.toLowerCase().trim() || "";
-                  const location = data.course.courseLocation.toLowerCase().trim() || "";
-                  const courseEngName = data.course.courseEngName.toLowerCase().trim() || "";
-                  return pName.includes(normalizedSearchQuery) || location.includes(normalizedSearchQuery) || courseEngName.includes(normalizedSearchQuery);
-                });
-              }
-          
-              console.log("Filtered Details:", filteredDetails);
-          
-              // Only update registrationDetails if the filtered data has changed
-              if (filteredDetails.length !== this.state.registerationDetails.length) {
-                this.setState({ registerationDetails: filteredDetails }, () => {
-                  this.updateRowData(filteredDetails); // Update the table with filtered data
-                });
-                return;
-              } else {
-                console.log("No change in filtered data, skipping update.");
-              }
-            }
-          }
           
     updateWooCommerceForRegistrationPayment = async (chi, eng, location, updatedStatus) => {
       try {
@@ -1225,7 +1152,179 @@ class RegistrationPaymentSection extends Component {
    {
      this.props.refreshChild();
    }
+
+   /*filterRegistrationDetails() {
+    const { section, selectedLocation, selectedCourseName, searchQuery } = this.props;
   
+    if (section === "registration") {
+      const { originalData } = this.state;
+  
+      console.log("Original Data:", originalData);
+      console.log("Filters Applied:", { selectedLocation, selectedCourseName, searchQuery });
+  
+      // Normalize the search query
+      const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
+  
+      // Define filter conditions
+      const filters = {
+        location: selectedLocation !== "All Locations" ? selectedLocation : null,
+        courseName: selectedCourseName !== "All Courses" ? selectedCourseName : null,
+        searchQuery: normalizedSearchQuery || null,
+      };
+  
+      // Apply all active filters in a single pass
+      const filteredDetails = originalData.filter(data => {
+        // Check location filter
+        const matchesLocation = filters.location
+          ? data.course.courseLocation === filters.location
+          : true;
+  
+        // Check course name filter
+        const matchesCourseName = filters.courseName
+          ? data.course.courseEngName === filters.courseName
+          : true;
+  
+        // Check search query filter
+        const matchesSearchQuery = filters.searchQuery
+          ? [
+              (data.participant.name || "").toLowerCase(),
+              (data.course.courseLocation || "").toLowerCase(),
+              (data.course.courseEngName || "").toLowerCase(),
+            ].some(field => field.includes(filters.searchQuery))
+          : true;
+  
+        // Return true if all active filters match
+        return matchesLocation && matchesCourseName && matchesSearchQuery;
+      });
+  
+      // Log filtered results
+      console.log("Filtered Details:", filteredDetails);
+  
+      // Update the row data with the filtered results
+      this.updateRowData(filteredDetails);
+    }
+  }*/
+
+ // componentDidUpdate is called after the component has updated (re-rendered)
+  componentDidUpdate(prevProps, prevState) {
+    const { selectedLocation, selectedCourseName, searchQuery } = this.props;
+
+    // Check if the relevant props have changed
+    if (
+      selectedLocation !== prevProps.selectedLocation ||
+      selectedCourseName !== prevProps.selectedCourseName ||
+      searchQuery !== prevProps.searchQuery
+    ) {
+      // Call the filter method when relevant props change
+      this.filterRegistrationDetails();
+    }
+
+    // Log for debugging
+    //console.log("Component did update, current props:", this.props);
+    //console.log("Previous props:", prevProps);
+    //console.log("Current state:", this.state);
+  }
+
+
+  filterRegistrationDetails() {
+    const { section, selectedLocation, selectedCourseName, searchQuery } = this.props;
+    console.log("Section:", section);
+
+    if (section === "registration") {
+      const { originalData } = this.state;
+
+      console.log("Original Data:", originalData);
+      console.log("Filters Applied:", { selectedLocation, selectedCourseName, searchQuery });
+
+      if (
+        (selectedLocation === "All Locations" || !selectedLocation) &&
+        (selectedCourseName === "All Courses" || !selectedCourseName) &&
+        (!searchQuery || searchQuery.trim() === "")
+      ) {
+        const rowData = originalData.map((item, index) => ({
+          id: item._id,
+          sn: index + 1,  // Serial number (S/N)
+          name: item.participant.name,  // Participant's name
+          contactNo: item.participant.contactNumber,  // Contact number
+          course: item.course.courseEngName,  // Course English name
+          courseChi: item.course.courseChiName,  // Course Chinese name
+          location: item.course.courseLocation,  // Course location
+          paymentMethod: item.course.payment,  // Payment method
+          confirmed: item.official.confirmed,  // Confirmation status
+          paymentStatus: item.status,  // Payment status
+          recinvNo: item.official.receiptNo,  // Receipt number
+          participantInfo: item.participant,  // Participant details
+          courseInfo: item.course,  // Course details
+          officialInfo: item.official  // Official details
+        }));
+  
+        // Update the row data with the filtered results
+        this.setState({rowData})
+        return;
+      }
+
+      // Normalize the search query
+      const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
+
+      // Define filter conditions
+      const filters = {
+        location: selectedLocation !== "All Locations" ? selectedLocation : null,
+        courseName: selectedCourseName !== "All Courses" ? selectedCourseName : null,
+        searchQuery: normalizedSearchQuery || null,
+      };
+
+
+    // Apply filters step by step
+    let filteredDetails = originalData;
+
+    // Apply location filter
+    if (filters.location) {
+      filteredDetails = filteredDetails.filter(data => data.course?.courseLocation === filters.location);
+    }
+
+    // Apply course name filter
+    if (filters.courseName) {
+      filteredDetails = filteredDetails.filter(data => data.course?.courseEngName === filters.courseName);
+    }
+
+    // Apply search query filter
+    if (filters.searchQuery) {
+      filteredDetails = filteredDetails.filter(data => {
+        return [
+          (data.participant?.name || "").toLowerCase(),
+          (data.course?.courseLocation || "").toLowerCase(),
+          (data.course?.courseEngName || "").toLowerCase(),
+        ].some(field => field.includes(filters.searchQuery));
+      });
+    }
+
+
+      // Log filtered results
+      console.log("Filtered Details:", filteredDetails);
+
+      const rowData = filteredDetails.map((item, index) => ({
+        id: item._id,
+        sn: index + 1,  // Serial number (S/N)
+        name: item.participant.name,  // Participant's name
+        contactNo: item.participant.contactNumber,  // Contact number
+        course: item.course.courseEngName,  // Course English name
+        courseChi: item.course.courseChiName,  // Course Chinese name
+        location: item.course.courseLocation,  // Course location
+        paymentMethod: item.course.payment,  // Payment method
+        confirmed: item.official.confirmed,  // Confirmation status
+        paymentStatus: item.status,  // Payment status
+        recinvNo: item.official.receiptNo,  // Receipt number
+        participantInfo: item.participant,  // Participant details
+        courseInfo: item.course,  // Course details
+        officialInfo: item.official  // Official details
+      }));
+
+      // Update the row data with the filtered results
+      this.setState({rowData})
+      //this.updateRowData(filteredDetails);
+    }
+  }
+
     render()
     {
       ModuleRegistry.registerModules([AllCommunityModule]);
@@ -1257,7 +1356,7 @@ class RegistrationPaymentSection extends Component {
                     resizable: true, // Make columns resizable
                   }}
                   onCellValueChanged={this.onCellValueChanged} // Handle cell click event
-                  onCellClicked={this.handleValueClick} // Handle cell click event
+                  onCellClicked={this.handleValueClick} // Handle cell click even
               />
               </div>
                {/* Render custom <div> below the expanded row */}
