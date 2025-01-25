@@ -225,6 +225,7 @@ class RegistrationPaymentSection extends Component {
     
         // Filter registration details based on selected filters
         const filteredDetails = originalData.filter(data => {
+          console.log("Data Filtered:", data);
           const pName = data.participant.name.toLowerCase().trim() || "";
           const location = data.course.courseLocation.toLowerCase().trim() || "";
           const courseEngName = data.course.courseEngName.toLowerCase().trim() || "";
@@ -232,7 +233,6 @@ class RegistrationPaymentSection extends Component {
           // Check if the location or course should not be filtered
           const matchesLocation = selectedLocation === "All Locations" || location.includes(selectedLocation.toLowerCase().trim());
           const matchesCourse = selectedCourseName === "All Courses" || courseEngName.includes(selectedCourseName.toLowerCase().trim());
-          
           // Search query should match participant name, location, or course name
           const matchesSearchQuery = normalizedSearchQuery
             ? pName.includes(normalizedSearchQuery) || location.includes(normalizedSearchQuery) || courseEngName.includes(normalizedSearchQuery)
@@ -241,6 +241,7 @@ class RegistrationPaymentSection extends Component {
           return matchesLocation && matchesCourse && matchesSearchQuery;
         });
     
+        console.log("Filtered Details:", filteredDetails)
         // Only update registerationDetails if the filtered data has changed
         if (filteredDetails !== this.state.registerationDetails) {
           this.setState({ registerationDetails: filteredDetails }, () => {
