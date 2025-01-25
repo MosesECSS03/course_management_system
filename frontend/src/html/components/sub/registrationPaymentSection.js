@@ -976,6 +976,7 @@ class RegistrationPaymentSection extends Component {
 
     try 
     {
+      this.props.showUpdatePopup("Updating in progress... Please wait ...")
       if (columnName === "Payment Method") 
       {
         await axios.post(
@@ -1020,6 +1021,7 @@ class RegistrationPaymentSection extends Component {
               await performParallelTasks();
             } 
         }
+        this.props.closePopup();
         this.refreshChild();  
       }
       else if (columnName === "Confirmation") 
@@ -1071,6 +1073,7 @@ class RegistrationPaymentSection extends Component {
               } 
           }
        }
+       this.props.closePopup();
        this.refreshChild();  
       }
       else if (columnName === "Payment Status") 
@@ -1157,6 +1160,7 @@ class RegistrationPaymentSection extends Component {
               } 
           }
         }
+        this.props.closePopup();
         this.refreshChild(); 
       }
     } catch (error) {
