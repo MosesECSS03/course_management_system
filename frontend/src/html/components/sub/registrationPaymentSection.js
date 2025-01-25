@@ -168,7 +168,6 @@ class RegistrationPaymentSection extends Component {
         //rowData: data
       });
       this.getRowData();
-      this.props.closePopup();
     }
 
     componentDidUpdate(prevProps, prevState) {

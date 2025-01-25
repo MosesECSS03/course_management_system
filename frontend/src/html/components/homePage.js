@@ -532,9 +532,9 @@
         this.setState((prevState) => ({
             courseType: "",
             isRegistrationPaymentVisible: !prevState.isRegistrationPaymentVisible, // Toggle visibility
-            isPopupOpen: true,
-            popupMessage: "Loading In Progress",
-            popupType: "loading",
+            //isPopupOpen: true,
+           // popupMessage: "Loading In Progress",
+            //popupType: "loading",
             sidebarVisible: false,
             section: "registration",
             accountType: null,
