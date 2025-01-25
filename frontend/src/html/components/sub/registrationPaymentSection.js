@@ -184,7 +184,7 @@ class RegistrationPaymentSection extends Component {
         this.filterRegistrationDetails();
       }
     }
-    
+
     updateRowData(paginatedDetails) {
       const rowData = paginatedDetails.map((item, index) => ({
         id: item._id,
@@ -272,15 +272,6 @@ x
     // Update the state with the newly formatted rowData
     this.setState({ rowData });
   }
-
-  getPaginatedDetails() {
-      const { registerationDetails } = this.state;
-      const { currentPage, entriesPerPage } = this.props;
-      const indexOfLastCourse = currentPage * entriesPerPage;
-      const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
-      return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
-    }
-    
     
     updateWooCommerceForRegistrationPayment = async (chi, eng, location, updatedStatus) => {
       try {
@@ -925,6 +916,18 @@ x
     },    
     { headerName: "Receipt/Invoice Number", field: "recinvNo", width: 200 },
   ];
+
+  getPaginatedDetails() {
+    const { registerationDetails } = this.state;
+    const { currentPage, entriesPerPage } = this.props;
+    
+    // Calculate the index range for pagination
+    const indexOfLastCourse = currentPage * entriesPerPage;
+    const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
+  
+    // Return the paginated slice of the filtered registerationDetails
+    return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
+  }
 
   getRowData = () => {
    //const paginatedDetails = this.getPaginatedDetails();
