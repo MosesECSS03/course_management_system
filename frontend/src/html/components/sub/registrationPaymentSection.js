@@ -183,65 +183,6 @@ class RegistrationPaymentSection extends Component {
         // Apply filtering and then pagination
         this.filterRegistrationDetails();
       }
-    
-      // If pagination-related state changed, apply pagination
-      if (
-        prevState.currentPage !== this.state.currentPage ||
-        prevState.entriesPerPage !== this.state.entriesPerPage
-      ) {
-        this.applyPagination();
-      }
-    }
-    
-    filterRegistrationDetails() {
-      const { originalData } = this.state;
-      const { selectedLocation, selectedCourseName, searchQuery } = this.props;
-    
-      const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
-    
-      // Filter data based on the selected filters
-      const filteredDetails = originalData.filter(data => {
-        const pName = data.participant.name.toLowerCase().trim() || '';
-        const location = data.course.courseLocation.toLowerCase().trim() || '';
-        const courseEngName = data.course.courseEngName.toLowerCase().trim() || '';
-    
-        const matchesLocation = selectedLocation === "All Locations" || location.includes(selectedLocation.toLowerCase().trim());
-        const matchesCourse = selectedCourseName === "All Courses" || courseEngName.includes(selectedCourseName.toLowerCase().trim());
-        const matchesSearchQuery = normalizedSearchQuery
-          ? pName.includes(normalizedSearchQuery) || location.includes(normalizedSearchQuery) || courseEngName.includes(normalizedSearchQuery)
-          : true;
-    
-        return matchesLocation && matchesCourse && matchesSearchQuery;
-      });
-    
-      // Update state with filtered data
-      this.setState({ registerationDetails: filteredDetails }, () => {
-        // After filtering, apply pagination
-        this.applyPagination();
-      });
-    }
-    
-    applyPagination() {
-      const { registerationDetails } = this.state;
-    
-      // Get the paginated details after filtering
-      const paginatedDetails = this.getPaginatedDetails();
-      console.log("Paginated Details Displayed:", paginatedDetails);
-    
-      // Update the rowData based on the paginated details
-      this.updateRowData(paginatedDetails);
-    }
-    
-    getPaginatedDetails() {
-      const { registerationDetails } = this.state;
-      const { currentPage, entriesPerPage } = this.props;
-      
-      // Calculate the index range for pagination
-      const indexOfLastCourse = currentPage * entriesPerPage;
-      const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
-    
-      // Return the paginated slice of the filtered registerationDetails
-      return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
     }
     
     updateRowData(paginatedDetails) {
