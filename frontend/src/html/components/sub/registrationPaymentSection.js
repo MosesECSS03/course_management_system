@@ -212,6 +212,7 @@ class RegistrationPaymentSection extends Component {
     
       if (section === "registration") {
         const { originalData } = this.state;
+        console.log(originalData);
         const { selectedLocation, selectedCourseName, searchQuery } = this.props;
     
         // If no filters are applied, reset to original data
@@ -249,29 +250,6 @@ class RegistrationPaymentSection extends Component {
         }
       }
     }
-x    
-
-  updateRowData(filteredDetails) {
-    const rowData = filteredDetails.map((item, index) => ({
-      id: item._id,
-      sn: index + 1,
-      name: item.participant.name,
-      contactNo: item.participant.contactNumber,
-      course: item.course.courseEngName,
-      courseChi: item.course.courseChiName,
-      location: item.course.courseLocation,
-      paymentMethod: item.course.payment,
-      confirmed: item.official.confirmed,
-      paymentStatus: item.status,
-      recinvNo: item.official.receiptNo,
-      participantInfo: item.participant,
-      courseInfo: item.course,
-      officialInfo: item.official,
-    }));
-
-    // Update the state with the newly formatted rowData
-    this.setState({ rowData });
-  }
     
     updateWooCommerceForRegistrationPayment = async (chi, eng, location, updatedStatus) => {
       try {
@@ -955,7 +933,7 @@ x
     console.log("All Rows Data:", rowData);
   
     // Set the state with the new row data
-    //this.setState({rowData });
+    this.setState({rowData });
   };
 
   handleValueClick = async (event) =>
