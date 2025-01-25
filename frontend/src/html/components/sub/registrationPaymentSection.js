@@ -135,7 +135,7 @@ class RegistrationPaymentSection extends Component {
     async componentDidMount() { 
       const { language } = this.props;
       const data = await this.fetchCourseRegistrations(language);
-      console.log('Data:', data);
+      console.log('All Courses Registration:  ', data);
       var locations = await this.getAllLocations(data);
       var names = await this.getAllNames(data);
       this.props.passDataToParent(locations, names);
