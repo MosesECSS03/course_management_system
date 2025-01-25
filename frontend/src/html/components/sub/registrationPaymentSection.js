@@ -167,7 +167,7 @@ class RegistrationPaymentSection extends Component {
         names: names,
         //rowData: data
       });
-      this.getRowData();
+      this.getRowData(data);
       this.props.closePopup();
     }
 
@@ -929,10 +929,9 @@ x
     return registerationDetails.slice(indexOfFirstCourse, indexOfLastCourse);
   }
 
-  getRowData = () => {
+  getRowData = (registerationDetails) => {
    //const paginatedDetails = this.getPaginatedDetails();
    //console.log("Hi")
-   var {registerationDetails} = this.state;
   
     // Assuming paginatedDetails is an array of objects with the necessary fields.
     const rowData = registerationDetails.map((item, index) => {
