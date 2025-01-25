@@ -1250,6 +1250,7 @@ x
     {
       ModuleRegistry.registerModules([AllCommunityModule]);
       var paginatedDetails = this.state.registerationDetails;
+      console.log("Rows Data:", this.state.rowData);
       return (
         <>
           <div className="registration-payment-container" >
