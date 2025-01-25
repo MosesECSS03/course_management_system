@@ -986,11 +986,12 @@ x
   ];
 
   getRowData = () => {
-   const paginatedDetails = this.getPaginatedDetails();
-   console.log("Hi")
+   //const paginatedDetails = this.getPaginatedDetails();
+   //console.log("Hi")
+   var {registerationDetails} = this.state;
   
     // Assuming paginatedDetails is an array of objects with the necessary fields.
-    const rowData = paginatedDetails.map((item, index) => {
+    const rowData = registerationDetails.map((item, index) => {
       return {
         id: item._id,
         sn: index + 1,  // Serial number (S/N)
