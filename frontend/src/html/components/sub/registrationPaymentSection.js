@@ -168,29 +168,12 @@ class RegistrationPaymentSection extends Component {
       this.props.closePopup();
     }
 
-    /*updateRowData(paginatedDetails) {
-      const rowData = paginatedDetails.map((item, index) => ({
-        id: item._id,
-        sn: index + 1,  // Serial number (S/N)
-        name: item.participant.name,  // Participant's name
-        contactNo: item.participant.contactNumber,  // Contact number
-        course: item.course.courseEngName,  // Course English name
-        courseChi: item.course.courseChiName,  // Course Chinese name
-        location: item.course.courseLocation,  // Course location
-        paymentMethod: item.course.payment,  // Payment method
-        confirmed: item.official.confirmed,  // Confirmation status
-        paymentStatus: item.status,  // Payment status
-        recinvNo: item.official.receiptNo,  // Receipt number
-        participantInfo: item.participant,  // Participant details
-        courseInfo: item.course,  // Course details
-        officialInfo: item.official  // Official details
-      }));
-      
+    updateRowData(paginatedDetails) {
       this.props.onResetSearch();
       // Update the state with the newly formatted rowData
-      console.log("Row Datawe:", rowData);
-      //this.setState({ rowData });
-    }*/
+      //console.log("Row Datawe:", rowData);
+      this.setState({filterRegistrationDetails: paginatedDetails});
+    }
     
           
     updateWooCommerceForRegistrationPayment = async (chi, eng, location, updatedStatus) => {
@@ -1259,7 +1242,8 @@ class RegistrationPaymentSection extends Component {
         }));
   
         // Update the row data with the filtered results
-        this.setState({rowData})
+        this.setState({rowData});
+        this.updateRowData(filteredDetails);
         return;
       }
 
@@ -1320,8 +1304,8 @@ class RegistrationPaymentSection extends Component {
       }));
 
       // Update the row data with the filtered results
-      this.setState({registerationDetails:rowData, rowData})
-      //this.updateRowData(filteredDetails);
+      this.setState({rowData})
+      this.updateRowData(filteredDetails);
     }
   }
 
