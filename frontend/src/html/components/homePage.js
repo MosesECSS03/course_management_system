@@ -724,8 +724,8 @@
         popupType: "loading",
       });
     }
-
-    showEditPopup = async(item)=>
+    
+    showUpdatePopup = async(item)=>
     {
       console.log("Selected:", item);
       this.setState({
@@ -961,7 +961,7 @@
                         updatePaymentPopup = {this.updatePaymentPopup}
                         updateRemarksPopup = {this.updateRemarksPopup}
                         warningPopUpMessage = {this.warningPopUpMessage}
-                        showEditPopup = {this.showEditPopup}
+                        showUpdatePopup = {this.showUpdatePopup}
                         generateInvoiceNumber = {this.generateInvoiceNumber}
                     />
                     </div>
