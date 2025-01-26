@@ -86,6 +86,7 @@
                role: value
               });
             }else if (name === 'searchQuery') {
+              console.log(name, value);
               this.props.passSearchedValueToParent(value);
             }
           });

@@ -197,6 +197,7 @@
 
 
     searchResultFromChild = async (value) => {
+     
       //console.log("Search Result:", value);
       this.setState({
         searchQuery: value

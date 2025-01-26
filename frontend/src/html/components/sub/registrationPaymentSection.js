@@ -169,10 +169,10 @@ class RegistrationPaymentSection extends Component {
     }
 
     updateRowData(paginatedDetails) {
-      this.props.onResetSearch();
+     // this.props.onResetSearch();
       // Update the state with the newly formatted rowData
       //console.log("Row Datawe:", rowData);
-      this.setState({filterRegistrationDetails: paginatedDetails});
+      this.setState({registerationDetails: paginatedDetails});
     }
     
           
@@ -643,45 +643,45 @@ class RegistrationPaymentSection extends Component {
   
           // Populate cells with data from `detail`
           sourceSheet.getCell(`A${rowIndex}`).value = rowIndex - startRow + 1;
-          sourceSheet.getCell(`B${rowIndex}`).value = detail.participantInfo.name;
-          sourceSheet.getCell(`C${rowIndex}`).value = detail.participantInfo.nric;
-          sourceSheet.getCell(`D${rowIndex}`).value = detail.participantInfo.residentialStatus.substring(0, 2);
+          sourceSheet.getCell(`B${rowIndex}`).value = detail.participant.name;
+          sourceSheet.getCell(`C${rowIndex}`).value = detail.participant.nric;
+          sourceSheet.getCell(`D${rowIndex}`).value = detail.participant.residentialStatus.substring(0, 2);
   
-          const [day, month, year] = detail.participantInfo.dateOfBirth.split("/");
+          const [day, month, year] = detail.participant.dateOfBirth.split("/");
           sourceSheet.getCell(`E${rowIndex}`).value = day.trim();
           sourceSheet.getCell(`F${rowIndex}`).value = month.trim();
           sourceSheet.getCell(`G${rowIndex}`).value = year.trim();
   
-          sourceSheet.getCell(`H${rowIndex}`).value = detail.participantInfo.gender.split(" ")[0];
-          sourceSheet.getCell(`I${rowIndex}`).value = detail.participantInfo.race.split(" ")[0];
-          sourceSheet.getCell(`J${rowIndex}`).value = detail.participantInfo.contactNumber;
-          sourceSheet.getCell(`K${rowIndex}`).value = detail.participantInfo.email;
-          sourceSheet.getCell(`L${rowIndex}`).value = detail.participantInfo.postalCode;
+          sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender.split(" ")[0];
+          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.split(" ")[0];
+          sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
+          sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
+          sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
   
-          const educationParts = detail.participantInfo.educationLevel.split(" ");
+          const educationParts = detail.participant.educationLevel.split(" ");
           if (educationParts.length === 3) {
             sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0] + " " + educationParts[1];
           } else {
             sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0];
           }
   
-          const workParts = detail.participantInfo.workStatus.split(" ");
+          const workParts = detail.participant.workStatus.split(" ");
           if (workParts.length === 3) {
             sourceSheet.getCell(`N${rowIndex}`).value = workParts[0] + " " + workParts[1];
           } else {
             sourceSheet.getCell(`N${rowIndex}`).value = workParts[0];
           }
   
-          sourceSheet.getCell(`O${rowIndex}`).value = detail.courseInfo.courseEngName.split("–")[0].trim();
+          sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName.split("–")[0].trim();
   
-          const [startDate, endDate] = detail.courseInfo.courseDuration.split(" - ");
+          const [startDate, endDate] = detail.course.courseDuration.split(" - ");
           console.log("Duration LOP:", startDate, this.convertDateFormat1(startDate), endDate, this.convertDateFormat1(endDate));
           sourceSheet.getCell(`P${rowIndex}`).value = this.convertDateFormat1(startDate);
           sourceSheet.getCell(`Q${rowIndex}`).value = this.convertDateFormat1(endDate);
   
-          sourceSheet.getCell(`R${rowIndex}`).value = detail.courseInfo.coursePrice;
-          sourceSheet.getCell(`S${rowIndex}`).value = detail.courseInfo.payment === "SkillsFuture" ? "SFC" : detail.courseInfo.payment;
-          sourceSheet.getCell(`V${rowIndex}`).value = detail.officialInfo.receiptNo;
+          sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
+          sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "SkillsFuture" ? "SFC" : detail.course.payment;
+          sourceSheet.getCell(`V${rowIndex}`).value = detail.official.receiptNo;
   
           // Copy styles from the original row
           originalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
@@ -858,7 +858,7 @@ class RegistrationPaymentSection extends Component {
     console.log("All Rows Data:", rowData);
   
     // Set the state with the new row data
-    this.setState({rowData });
+    this.setState({registerationDetails: rowData, rowData });
   };
 
   handleValueClick = async (event) =>
@@ -1181,7 +1181,7 @@ class RegistrationPaymentSection extends Component {
       if (
         (selectedLocation === "All Locations" || !selectedLocation) &&
         (selectedCourseName === "All Courses" || !selectedCourseName) &&
-        (!searchQuery || searchQuery.trim() === "")
+        (!searchQuery)
       ) {
         const rowData = originalData.map((item, index) => ({
           id: item._id,
@@ -1202,6 +1202,7 @@ class RegistrationPaymentSection extends Component {
   
         // Update the row data with the filtered results
         this.setState({rowData});
+        //this.setState({registerationDetails: rowData});
         this.updateRowData(rowData);
         return;
       }
@@ -1271,8 +1272,8 @@ class RegistrationPaymentSection extends Component {
     render()
     {
       ModuleRegistry.registerModules([AllCommunityModule]);
-      var paginatedDetails =  this.state.filterRegistrationDetails;
-      console.log("Rows Data:", this.state.filterRegistrationDetails);
+      var paginatedDetails =  this.state.registerationDetails;
+      console.log("Rows Data:", this.state.registerationDetails);
       return (
         <>
           <div className="registration-payment-container" >
@@ -1284,7 +1285,7 @@ class RegistrationPaymentSection extends Component {
                   <input type="file" id="fileInput" accept=".xlsx, .xls" className="file-input" />
                   <label htmlFor="fileInput" className="custom-file-input">Select File</label>
                 </div>
-                <button onClick={() => this.exportToLOP(this.state.rowData)}>Export To LOP</button>
+                <button onClick={() => this.exportToLOP(paginatedDetails)}>Export To LOP</button>
               </div>
               <div className="grid-container">
               <AgGridReact
