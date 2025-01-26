@@ -31,31 +31,26 @@ h2 {
     flex-direction: column; /* Ensure elements stack vertically */
 }
 
-/* Button Container */
 .button-container {
     display: flex;
-    flex-direction: column; /* Stack buttons vertically on smaller screens */
-    gap: 10px; /* Add space between buttons */
+    flex-direction: row; /* Keep buttons in a row */
+    justify-content: space-between; /* Space them evenly */
     margin: 20px 0; /* Vertical spacing */
-    max-width: 95%; /* Match form's width */
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 100%; /* Ensure it doesn’t exceed the container width */
+    padding: 10px; /* Padding for better touch targets */
+    background-color: transparent; /* Ensure it doesn’t blend with the background */
+    position: relative; /* Ensure it stays within the parent container */
 }
 
+/* Buttons within the container */
 .button-container button {
-    padding: 10px 20px;
-    font-size: 1.5em; /* Adjust font size for smaller screens */
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 100%; /* Make buttons full width */
-}
-
-.button-container button:hover {
-    background-color: #0056b3;
+    flex: 0 1 auto; /* Allow buttons to have their natural width without stretching */
+    margin: 0 5px; /* Space between buttons */
+    font-size: 1rem; /* Adjust font size */
+    padding: 10px; /* Ensure adequate touch area */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #007bff; /* Background color */
+    width: fit-content;
 }
 
 .button-container button:disabled {
@@ -71,26 +66,6 @@ h2 {
     margin-top: 8px;
 }
 
-/* Media Query for Devices up to 768px */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 1.8rem; /* Smaller header size */
-    }
-
-    .form-container {
-        padding: 15px; /* Reduce padding */
-        max-width: 90%; /* Further reduce width */
-    }
-
-    .button-container button {
-        font-size: 1.2em; /* Adjust button font size */
-        padding: 10px; /* Ensure buttons remain tappable */
-    }
-
-    .error-message, .error-message3 {
-        font-size: 1rem; /* Further reduce error font size */
-    }
-}
 
 /* Media Query for Devices up to 480px */
 @media (max-width: 480px) {
@@ -105,43 +80,8 @@ h2 {
 
     .button-container {
         gap: 8px; /* Reduce gap */
+
     }/* Ensure the button container is visible and responsive */
-    
-.button-container {
-    display: flex;
-    flex-direction: row; /* By default, buttons are in a row */
-    justify-content: space-between; /* Space them out properly */
-    margin: 20px 0; /* Add vertical spacing */
-    max-width: 100%; /* Ensure it doesn’t exceed the container width */
-    padding: 10px; /* Add padding for better touch targets */
-    background-color: transparent; /* Optional: Ensure it doesn't blend with the background */
-    position: relative; /* Ensure it stays within the parent container */
-}
-
-/* Buttons within the container */
-.button-container button {
-    flex: 1; /* Make buttons take equal space */
-    margin: 0 5px; /* Add space between buttons */
-    font-size: 1rem; /* Adjust font size for readability */
-    padding: 10px; /* Ensure adequate touch area */
-    border-radius: 5px; /* Rounded corners */
-}
-
-/* Media Query for Devices up to 768px */
-@media (max-width: 768px) {
-    .button-container {
-        flex-direction: column; /* Stack buttons vertically */
-        gap: 10px; /* Add spacing between buttons */
-    }
-
-    .button-container button {
-        font-size: 0.9rem; /* Adjust font size for smaller screens */
-        padding: 8px; /* Reduce padding */
-    }
-}
-
-/* Media Query for Devices up to 480px */
-@media (max-width: 480px) {
     .button-container {
         flex-direction: column; /* Stack buttons vertically */
         align-items: center; /* Center align buttons */
@@ -152,9 +92,7 @@ h2 {
         font-size: 0.8rem; /* Smaller font size for compact devices */
         padding: 6px; /* Compact padding */
     }
-}
-
-
+    
     .button-container button {
         font-size: 1em; /* Smaller button font size */
         padding: 8px;
@@ -163,4 +101,28 @@ h2 {
     .error-message, .error-message3 {
         font-size: 0.9rem; /* Smallest error font size */
     }
+
+    .button-container {
+        display: flex;
+        flex-direction: column; /* Keep buttons in a row */
+        justify-content: space-between; /* Space them evenly */
+        margin: 20px 0; /* Vertical spacing */
+        max-width: 100%; /* Ensure it doesn’t exceed the container width */
+        padding: 10px; /* Padding for better touch targets */
+        background-color: transparent; /* Ensure it doesn’t blend with the background */
+        position: relative; /* Ensure it stays within the parent container */
+    }
+    
+
+    /* Buttons within the container */
+    .button-container button {
+        flex: 0 1 auto; /* Allow buttons to have their natural width without stretching */
+        margin: 0 5px; /* Space between buttons */
+        font-size: 1rem; /* Adjust font size */
+        padding: 10px; /* Ensure adequate touch area */
+        border-radius: 5px; /* Rounded corners */
+        background-color: #007bff; /* Background color */
+        width: 100%;
+    }
+
 }
