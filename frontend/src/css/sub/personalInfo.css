@@ -155,6 +155,11 @@
   .day-picker {
       font-size: 1.1rem;
   }
+
+  .calendar-popup
+  {
+    width: 70%;
+  }
 }
 
 /* For smaller screens up to 480px (mobile phones) */
@@ -207,5 +212,9 @@
   /* Day Picker font size adjustments */
   .day-picker {
       font-size: 0.9rem;
+  }
+  .calendar-popup
+  {
+    width: 40%;
   }
 }
