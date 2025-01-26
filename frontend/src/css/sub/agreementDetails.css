@@ -5,6 +5,7 @@
   border-radius: 0.5rem; /* Optional: rounds the corners */
   margin-bottom: 1rem; /* Space between sections */
   background-color: #f9f9f9; /* Light background for better visibility */
+  height: 100vh;
 }
 
 /* Input Group */
