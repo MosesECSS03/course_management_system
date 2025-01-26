@@ -1131,8 +1131,8 @@ class RegistrationPaymentSection extends Component {
         {
           console.log("Updated Particulars:", event.colDef.field, newValue);
           const response = await axios.post(
-            'http://localhost:3001/courseregistration', 
-            //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+            //'http://localhost:3001/courseregistration', 
+            'https://moses-ecss-backend.azurewebsites.net/courseregistration',
             { 
               purpose: 'edit', 
               id: id, 
