@@ -875,7 +875,6 @@ class RegistrationPaymentSection extends Component {
     try {
       if(columnName === "S/N")
         {
-          
           // Optional: Handle additional logic here if necessary
           console.log("Cell clicked", event);
           // Check if clicked on a row and handle expansion
@@ -890,8 +889,10 @@ class RegistrationPaymentSection extends Component {
         }
         else if (columnName === "Receipt/Invoice Number")
         {
-          //console.log("Receipt/Invoice Number");
+          this.props.showUpdatePopup("In Progress... Please wait...");
+          console.log("Receipt/Invoice Number");
           await this.receiptShown(participantInfo, courseInfo, receiptInvoice);
+          this.props.closePopup();
         }
       }
       catch (error) {
@@ -940,7 +941,7 @@ class RegistrationPaymentSection extends Component {
     {
         if (columnName === "Payment Method") 
         {
-          this.props.showUpdatePopup("Updating in progress... Please wait ...")
+          this.props.showUpdatePopup("Updating in progress... Please wait ...");
           await axios.post(
             //'http://localhost:3001/courseregistration', 
             'https://moses-ecss-backend.azurewebsites.net/courseregistration',
