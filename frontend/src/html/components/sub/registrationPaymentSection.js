@@ -643,45 +643,45 @@ class RegistrationPaymentSection extends Component {
   
           // Populate cells with data from `detail`
           sourceSheet.getCell(`A${rowIndex}`).value = rowIndex - startRow + 1;
-          sourceSheet.getCell(`B${rowIndex}`).value = detail.participant.name;
-          sourceSheet.getCell(`C${rowIndex}`).value = detail.participant.nric;
-          sourceSheet.getCell(`D${rowIndex}`).value = detail.participant.residentialStatus.substring(0, 2);
+          sourceSheet.getCell(`B${rowIndex}`).value = detail.participantInfo.name;
+          sourceSheet.getCell(`C${rowIndex}`).value = detail.participantInfo.nric;
+          sourceSheet.getCell(`D${rowIndex}`).value = detail.participantInfo.residentialStatus.substring(0, 2);
   
-          const [day, month, year] = detail.participant.dateOfBirth.split("/");
+          const [day, month, year] = detail.participantInfo.dateOfBirth.split("/");
           sourceSheet.getCell(`E${rowIndex}`).value = day.trim();
           sourceSheet.getCell(`F${rowIndex}`).value = month.trim();
           sourceSheet.getCell(`G${rowIndex}`).value = year.trim();
   
-          sourceSheet.getCell(`H${rowIndex}`).value = detail.participant.gender.split(" ")[0];
-          sourceSheet.getCell(`I${rowIndex}`).value = detail.participant.race.split(" ")[0];
-          sourceSheet.getCell(`J${rowIndex}`).value = detail.participant.contactNumber;
-          sourceSheet.getCell(`K${rowIndex}`).value = detail.participant.email;
-          sourceSheet.getCell(`L${rowIndex}`).value = detail.participant.postalCode;
+          sourceSheet.getCell(`H${rowIndex}`).value = detail.participantInfo.gender.split(" ")[0];
+          sourceSheet.getCell(`I${rowIndex}`).value = detail.participantInfo.race.split(" ")[0];
+          sourceSheet.getCell(`J${rowIndex}`).value = detail.participantInfo.contactNumber;
+          sourceSheet.getCell(`K${rowIndex}`).value = detail.participantInfo.email;
+          sourceSheet.getCell(`L${rowIndex}`).value = detail.participantInfo.postalCode;
   
-          const educationParts = detail.participant.educationLevel.split(" ");
+          const educationParts = detail.participantInfo.educationLevel.split(" ");
           if (educationParts.length === 3) {
             sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0] + " " + educationParts[1];
           } else {
             sourceSheet.getCell(`M${rowIndex}`).value = educationParts[0];
           }
   
-          const workParts = detail.participant.workStatus.split(" ");
+          const workParts = detail.participantInfo.workStatus.split(" ");
           if (workParts.length === 3) {
             sourceSheet.getCell(`N${rowIndex}`).value = workParts[0] + " " + workParts[1];
           } else {
             sourceSheet.getCell(`N${rowIndex}`).value = workParts[0];
           }
   
-          sourceSheet.getCell(`O${rowIndex}`).value = detail.course.courseEngName.split("–")[0].trim();
+          sourceSheet.getCell(`O${rowIndex}`).value = detail.courseInfo.courseEngName.split("–")[0].trim();
   
-          const [startDate, endDate] = detail.course.courseDuration.split(" - ");
+          const [startDate, endDate] = detail.courseInfo.courseDuration.split(" - ");
           console.log("Duration LOP:", startDate, this.convertDateFormat1(startDate), endDate, this.convertDateFormat1(endDate));
           sourceSheet.getCell(`P${rowIndex}`).value = this.convertDateFormat1(startDate);
           sourceSheet.getCell(`Q${rowIndex}`).value = this.convertDateFormat1(endDate);
   
-          sourceSheet.getCell(`R${rowIndex}`).value = detail.course.coursePrice;
-          sourceSheet.getCell(`S${rowIndex}`).value = detail.course.payment === "SkillsFuture" ? "SFC" : detail.course.payment;
-          sourceSheet.getCell(`V${rowIndex}`).value = detail.official.receiptNo;
+          sourceSheet.getCell(`R${rowIndex}`).value = detail.courseInfo.coursePrice;
+          sourceSheet.getCell(`S${rowIndex}`).value = detail.courseInfo.payment === "SkillsFuture" ? "SFC" : detail.courseInfo.payment;
+          sourceSheet.getCell(`V${rowIndex}`).value = detail.officialInfo.receiptNo;
   
           // Copy styles from the original row
           originalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
