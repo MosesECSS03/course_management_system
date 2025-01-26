@@ -5,6 +5,7 @@
   margin-bottom: 1rem; /* Space between sections */
   background-color: #f9f9f9; /* Light background for better visibility */
   box-sizing: border-box; /* Ensure padding does not affect overall width */
+  height: 100vh;
 }
 
 .input-group {

@@ -160,6 +160,12 @@
   {
     width: 70%;
   }
+
+  .personal-info-input
+  {
+    width: 60%; 
+    font-size: 1.2rem;
+  }
 }
 
 /* For smaller screens up to 480px (mobile phones) */
@@ -215,6 +221,12 @@
   }
   .calendar-popup
   {
-    width: 40%;
+    width: 70%; 
+  }
+  
+  .personal-info-input
+  {
+    width: 60%; 
+    font-size: 1.2rem;
   }
 }
