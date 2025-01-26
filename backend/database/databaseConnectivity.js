@@ -286,6 +286,36 @@ class DatabaseConnectivity {
         }
     }
 
+                
+    async updateParticipantParticulars(dbname, id, field, editedParticulars) {
+        console.log("Update Request:", id, field, editedParticulars);
+        var db = this.client.db(dbname); // Return the db object
+        try {
+            if (db) {
+                const tableName = "Registration Forms";
+                const table = db.collection(tableName);
+                
+                // Use updateOne to update a single document
+                const filter = { _id: new ObjectId(id) };
+    
+                // Dynamically construct the update object with dot notation
+                const update = {
+                    $set: {
+                        [`participant.${field}`]: editedParticulars, // Use bracket notation for dynamic field
+                    },
+                };
+    
+                // Call updateOne
+                const result = await table.updateOne(filter, update);
+                console.log("Update Result:", result);
+                return result;
+            }
+        } catch (error) {
+            console.error("Error updating database:", error);
+        }
+    }
+    
+
     async updateReceiptNumberData(dbname, id, receiptNumber) {
         console.log("Parameters:", dbname, id, receiptNumber);
         var db = this.client.db(dbname); // return the db object

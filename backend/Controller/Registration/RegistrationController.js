@@ -100,6 +100,34 @@ class RegistrationController {
         }    
     }
 
+    async updateParticipantParticulars(id, field, editedParticulars) 
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System";
+                var connectedDatabase = await this.databaseConnectivity.updateParticipantParticulars(databaseName, id, field, editedParticulars);  
+                return connectedDatabase.acknowledged;
+                //console.log("Update Participant Particulars:",connectedDatabase);
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error updating user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }
+
     async updateReceiptNumber(id, receiptNo) 
     {
         try {

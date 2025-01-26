@@ -67,6 +67,17 @@ router.post('/', async function(req, res, next)
         var result = await controller.updateParticipant(id, newStatus);
         return res.json({"result": result}); 
     }
+    else if(req.body.purpose === "edit")
+    {
+        var id = req.body.id;
+        var field = req.body.field;
+        var editedValue = req.body.editedValue;
+        console.log("Body:", req.body)
+        var controller = new RegistrationController();
+        var result = await controller.updateParticipantParticulars(id, field, editedValue);
+        //console.log("Update Particulars:", result) 
+        return res.json({"result": result}); 
+    }
     else if(req.body.purpose === "updatePaymentStatus")
     {
         console.log("Official Use", req.body);

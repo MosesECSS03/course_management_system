@@ -768,10 +768,10 @@ class RegistrationPaymentSection extends Component {
 
   // Column Definitions
   getColumnDefs = () => [
-    { headerName: "S/N", field: "sn", width: 100 },
-    { headerName: "Name", field: "name", width: 300 },
-    { headerName: "Contact Number", field: "contactNo", width: 150 },
-    { headerName: "Course Name", field: "course", width: 350 },
+    { headerName: "S/N", field: "sn", width: 100},
+    { headerName: "Name", field: "name", width: 300, editable: true},
+    { headerName: "Contact Number", field: "contactNo", width: 150, editable: true },
+    { headerName: "Course Name", field: "course", width: 350},
     {
       headerName: 'Payment Method',
       field: 'paymentMethod',
@@ -938,9 +938,9 @@ class RegistrationPaymentSection extends Component {
 
     try 
     {
-        this.props.showUpdatePopup("Updating in progress... Please wait ...")
         if (columnName === "Payment Method") 
         {
+          this.props.showUpdatePopup("Updating in progress... Please wait ...")
           await axios.post(
             //'http://localhost:3001/courseregistration', 
             'https://moses-ecss-backend.azurewebsites.net/courseregistration',
@@ -988,6 +988,7 @@ class RegistrationPaymentSection extends Component {
         }
         else if (columnName === "Confirmation") 
         {
+          this.props.showUpdatePopup("Updating in progress... Please wait ...")
           console.log('Cell clicked', event);
           const response = await axios.post(
               //'http://localhost:3001/courseregistration', 
@@ -999,47 +1000,48 @@ class RegistrationPaymentSection extends Component {
                 staff: this.props.userName 
               }
             );
-        console.log(`${columnName}: ${newValue}`);
-        if(paymentMethod === "SkillsFuture" && newValue === true)
-        {
-            if (response.data.result === true) 
-            {
-              console.log("Auto Generate SkillsFuture Invoice");
-              // Define the parallel tasks function
-              const response = await axios.post(
-                //'http://localhost:3001/courseregistration', 
-                'https://moses-ecss-backend.azurewebsites.net/courseregistration',
-                { 
-                  purpose: 'updatePaymentStatus', 
-                  id: id, 
-                  newUpdateStatus: "Generating SkillsFuture Invoice", 
-                  staff: this.props.userName 
-                }
-              );
-
+          console.log(`${columnName}: ${newValue}`);
+          if(paymentMethod === "SkillsFuture" && newValue === true)
+          {
               if (response.data.result === true) 
-                {
-                    // Define the parallel tasks function
-                    const performParallelTasks = async () => {
-                      try {
-                        // Run the two functions in parallel using Promise.all
-                        await Promise.all([
-                          this.autoReceiptGenerator(id, participantInfo, courseInfo, officialInfo, paymentMethod, "Generating SkillsFuture Invoice")
-                        ]);
-                        console.log("Updated Successfully");
-                      } catch (error) {
-                        console.error("Error occurred during parallel task execution:", error);
-                      }
-                  };
-                  await performParallelTasks();
-                } 
-            }
-        }
-        this.props.closePopup();
-        this.refreshChild();  
+              {
+                console.log("Auto Generate SkillsFuture Invoice");
+                // Define the parallel tasks function
+                const response = await axios.post(
+                  //'http://localhost:3001/courseregistration', 
+                  'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+                  { 
+                    purpose: 'updatePaymentStatus', 
+                    id: id, 
+                    newUpdateStatus: "Generating SkillsFuture Invoice", 
+                    staff: this.props.userName 
+                  }
+                );
+
+                if (response.data.result === true) 
+                  {
+                      // Define the parallel tasks function
+                      const performParallelTasks = async () => {
+                        try {
+                          // Run the two functions in parallel using Promise.all
+                          await Promise.all([
+                            this.autoReceiptGenerator(id, participantInfo, courseInfo, officialInfo, paymentMethod, "Generating SkillsFuture Invoice")
+                          ]);
+                          console.log("Updated Successfully");
+                        } catch (error) {
+                          console.error("Error occurred during parallel task execution:", error);
+                        }
+                    };
+                    await performParallelTasks();
+                  } 
+              }
+          }
+          this.props.closePopup();
+          this.refreshChild();  
         }
         else if (columnName === "Payment Status") 
         {
+          this.props.showUpdatePopup("Updating in progress... Please wait ...")
           console.log('Cell clicked', event);
             const response = await axios.post(
               //'http://localhost:3001/courseregistration', 
@@ -1125,6 +1127,20 @@ class RegistrationPaymentSection extends Component {
           this.props.closePopup();
           this.refreshChild(); 
         }
+        else
+        {
+          console.log("Updated Particulars:", event.colDef.field, newValue);
+          const response = await axios.post(
+            'http://localhost:3001/courseregistration', 
+            //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+            { 
+              purpose: 'edit', 
+              id: id, 
+              field: event.colDef.field,
+              editedValue: newValue
+            }
+          );
+        }
     } catch (error) {
       console.error('Error during submission:', error);
       this.props.closePopup();
@@ -1135,58 +1151,6 @@ class RegistrationPaymentSection extends Component {
    {
      this.props.refreshChild();
    }
-
-   /*filterRegistrationDetails() {
-    const { section, selectedLocation, selectedCourseName, searchQuery } = this.props;
-  
-    if (section === "registration") {
-      const { originalData } = this.state;
-  
-      console.log("Original Data:", originalData);
-      console.log("Filters Applied:", { selectedLocation, selectedCourseName, searchQuery });
-  
-      // Normalize the search query
-      const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
-  
-      // Define filter conditions
-      const filters = {
-        location: selectedLocation !== "All Locations" ? selectedLocation : null,
-        courseName: selectedCourseName !== "All Courses" ? selectedCourseName : null,
-        searchQuery: normalizedSearchQuery || null,
-      };
-  
-      // Apply all active filters in a single pass
-      const filteredDetails = originalData.filter(data => {
-        // Check location filter
-        const matchesLocation = filters.location
-          ? data.course.courseLocation === filters.location
-          : true;
-  
-        // Check course name filter
-        const matchesCourseName = filters.courseName
-          ? data.course.courseEngName === filters.courseName
-          : true;
-  
-        // Check search query filter
-        const matchesSearchQuery = filters.searchQuery
-          ? [
-              (data.participant.name || "").toLowerCase(),
-              (data.course.courseLocation || "").toLowerCase(),
-              (data.course.courseEngName || "").toLowerCase(),
-            ].some(field => field.includes(filters.searchQuery))
-          : true;
-  
-        // Return true if all active filters match
-        return matchesLocation && matchesCourseName && matchesSearchQuery;
-      });
-  
-      // Log filtered results
-      console.log("Filtered Details:", filteredDetails);
-  
-      // Update the row data with the filtered results
-      this.updateRowData(filteredDetails);
-    }
-  }*/
 
  // componentDidUpdate is called after the component has updated (re-rendered)
   componentDidUpdate(prevProps, prevState) {
@@ -1201,11 +1165,6 @@ class RegistrationPaymentSection extends Component {
       // Call the filter method when relevant props change
       this.filterRegistrationDetails();
     }
-
-    // Log for debugging
-    //console.log("Component did update, current props:", this.props);
-    //console.log("Previous props:", prevProps);
-    //console.log("Current state:", this.state);
   }
 
 
