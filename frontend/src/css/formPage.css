@@ -4,7 +4,7 @@
     background-color: rgba(121, 62, 84, 0.4); 
     margin: 0;
     padding: 20px;
-    height: 250vh; /* Full viewport height */
+    height: auto; /* Allow height to adapt to content */
 }
 
 /* Header Styles */
@@ -12,7 +12,7 @@ h1 {
     text-align: center;
     color: #333;
     margin-bottom: 20px;
-    font-size: 3rem;
+    font-size: 2rem; /* Adjust for smaller screens */
 }
 
 h2 {
@@ -24,7 +24,7 @@ h2 {
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    max-width: 1200px;
+    max-width: 95%; /* Adjust max width for smaller screens */
     margin: 0 auto; /* Center align with no top margin */
     background-color: rgba(238, 74, 74, 0.37); 
     display: flex;
@@ -34,46 +34,133 @@ h2 {
 /* Button Container */
 .button-container {
     display: flex;
-    justify-content: space-between; /* Space buttons to the edges */
+    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    gap: 10px; /* Add space between buttons */
     margin: 20px 0; /* Vertical spacing */
-    max-width: 1200px; /* Match the form's max width */
-    margin-left: auto; /* Center align with form */
-    margin-right: auto; /* Center align with form */
+    max-width: 95%; /* Match form's width */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .button-container button {
-    padding: 10px 20px; /* Button padding */
-    font-size: 2em; /* Adjust font size */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #007bff; /* Button color */
-    color: white; /* Text color */
-    cursor: pointer; /* Pointer on hover */
-    transition: background-color 0.3s; /* Smooth transition */
+    padding: 10px 20px;
+    font-size: 1.5em; /* Adjust font size for smaller screens */
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%; /* Make buttons full width */
 }
 
 .button-container button:hover {
-    background-color: #0056b3; /* Darker shade on hover */
+    background-color: #0056b3;
 }
 
 .button-container button:disabled {
-    background-color: #ccc; /* Disabled button color */
-    cursor: not-allowed; /* Not allowed cursor */
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
-.error-message {
+/* Error Messages */
+.error-message, .error-message3 {
     color: red;
     font-weight: bold;
-    display: block;
-    font-size: 2em;
+    font-size: 1.2rem; /* Reduce font size for smaller screens */
     margin-top: 8px;
 }
 
-.error-message3
-{
-    color: #FF0000;
-    font-size: 0.85rem;
-    font-weight: bold;
-    font-size: 2em;
-    margin-top: 8px;
+/* Media Query for Devices up to 768px */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8rem; /* Smaller header size */
+    }
+
+    .form-container {
+        padding: 15px; /* Reduce padding */
+        max-width: 90%; /* Further reduce width */
+    }
+
+    .button-container button {
+        font-size: 1.2em; /* Adjust button font size */
+        padding: 10px; /* Ensure buttons remain tappable */
+    }
+
+    .error-message, .error-message3 {
+        font-size: 1rem; /* Further reduce error font size */
+    }
+}
+
+/* Media Query for Devices up to 480px */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem; /* Smaller header size for very small screens */
+    }
+
+    .form-container {
+        padding: 10px; /* Further reduce padding */
+        max-width: 85%;
+    }
+
+    .button-container {
+        gap: 8px; /* Reduce gap */
+    }/* Ensure the button container is visible and responsive */
+    
+.button-container {
+    display: flex;
+    flex-direction: row; /* By default, buttons are in a row */
+    justify-content: space-between; /* Space them out properly */
+    margin: 20px 0; /* Add vertical spacing */
+    max-width: 100%; /* Ensure it doesn’t exceed the container width */
+    padding: 10px; /* Add padding for better touch targets */
+    background-color: transparent; /* Optional: Ensure it doesn't blend with the background */
+    position: relative; /* Ensure it stays within the parent container */
+}
+
+/* Buttons within the container */
+.button-container button {
+    flex: 1; /* Make buttons take equal space */
+    margin: 0 5px; /* Add space between buttons */
+    font-size: 1rem; /* Adjust font size for readability */
+    padding: 10px; /* Ensure adequate touch area */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Media Query for Devices up to 768px */
+@media (max-width: 768px) {
+    .button-container {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px; /* Add spacing between buttons */
+    }
+
+    .button-container button {
+        font-size: 0.9rem; /* Adjust font size for smaller screens */
+        padding: 8px; /* Reduce padding */
+    }
+}
+
+/* Media Query for Devices up to 480px */
+@media (max-width: 480px) {
+    .button-container {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: center; /* Center align buttons */
+        gap: 10px; /* Add spacing between buttons */
+    }
+
+    .button-container button {
+        font-size: 0.8rem; /* Smaller font size for compact devices */
+        padding: 6px; /* Compact padding */
+    }
+}
+
+
+    .button-container button {
+        font-size: 1em; /* Smaller button font size */
+        padding: 8px;
+    }
+
+    .error-message, .error-message3 {
+        font-size: 0.9rem; /* Smallest error font size */
+    }
 }
