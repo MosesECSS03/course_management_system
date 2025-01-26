@@ -1312,7 +1312,7 @@ class RegistrationPaymentSection extends Component {
     render()
     {
       ModuleRegistry.registerModules([AllCommunityModule]);
-      var paginatedDetails = this.state.registerationDetails;
+      var paginatedDetails =  this.state.rowData;
       console.log("Rows Data:", this.state.rowData);
       return (
         <>
