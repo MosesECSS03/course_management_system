@@ -82,11 +82,11 @@
   }
 
   .agreement-options label {
-    font-size: 1.1em; /* Adjust font size */
+    font-size: 1em; /* Adjust font size */
   }
 
   /* Input Group Label Adjustment */
   .input-group label {
-    font-size: 1.3em; /* Smaller label font size for mobile phones */
+    font-size: 1; /* Smaller label font size for mobile phones */
   }
 }
