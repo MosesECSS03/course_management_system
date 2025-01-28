@@ -286,7 +286,7 @@ class FormPage extends Component {
             {currentSection === 3 && <AgreementDetailsSection ref={(ref) => this.agreementDetailsRef = ref} agreement={formData.agreement} onChange={this.handleDataChange} errors={validationErrors}/>}
             {currentSection === 4 && <SubmitDetailsSection />}
           </div>
-  
+        </div>   
           {/* Conditionally render the button container */}
           {currentSection < 4 && (
             <div className="button-container">
@@ -296,7 +296,6 @@ class FormPage extends Component {
               </button>
             </div>
           )}
-        </div>
       </div>
     );
   }

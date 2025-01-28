@@ -242,6 +242,7 @@
   font-size: 1rem;
   width: auto;  /* Set width to auto for each button */
   display: inline-block;  /* Ensure buttons behave inline */
+  color: #B8B8B8;
 }
 
 /* Highlight the selected payment method */
@@ -323,10 +324,3 @@
   background-color: #d0e2f5;
 }
 
-.ag-center-header {
-  text-align: center !important; /* Center-align the header */
-}
-
-.ag-center-cell {
-  text-align: center !important; /* Center-align the cell content */
-}
