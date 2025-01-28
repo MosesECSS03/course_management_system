@@ -72,7 +72,7 @@
 @media (max-width: 480px) {
   /* Agreement Detail Text Adjustment */
   .agreement-detail-text {
-    font-size: 1.3em; /* Further reduce font size for mobile phones */
+    font-size: 1em; /* Further reduce font size for mobile phones */
   }
 
   /* Agreement Options Styling */
