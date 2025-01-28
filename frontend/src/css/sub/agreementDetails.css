@@ -72,21 +72,29 @@
 @media (max-width: 480px) {
   /* Agreement Detail Text Adjustment */
   .agreement-detail-text {
-    font-size: 1em; /* Further reduce font size for mobile phones */
+    font-size: 1.2em; /* Slightly increased font size */
+    padding-bottom: 0.5rem; /* Space below the text */
   }
 
   /* Agreement Options Styling */
   .agreement-options {
     flex-direction: column; /* Stack the radio options vertically */
-    gap: 0.8rem; /* Reduced gap between options */
+    gap: 1rem; /* Increased gap between options */
   }
 
   .agreement-options label {
-    font-size: 1em; /* Adjust font size */
+    font-size: 1.2em; /* Adjust font size */
   }
 
   /* Input Group Label Adjustment */
   .input-group label {
-    font-size: 1; /* Smaller label font size for mobile phones */
+    font-size: 1.2em; /* Adjust label font size for better readability on small screens */
+  }
+
+  /* Prevent overlapping by adjusting the size of input elements */
+  .input-group input,
+  .input-group select {
+    width: 100%; /* Ensure inputs take up full width */
+    margin-bottom: 1rem; /* Space between inputs */
   }
 }
