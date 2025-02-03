@@ -275,35 +275,41 @@ class invoiceGenerator {
 
     courseReferenceCode(course) {
         console.log("Course Name: ", course);
-        
-        // Trim spaces and normalize the case (optional)
-        //const course = courseName.trim();
     
-        if (course === "Nagomi Pastel Art Basic") {
-            return "TGS-2022011919";
-        } else if (course === "The Rest Note - Mandarin") {
-            return "TGS-2022015736";
-        } else if (course === "Community Ukulele - Mandarin") {
-            return "TGS-2021008564";
-        } else if (course === "Chinese Calligraphy Basic") {
-            return "TGS-2022011920";
-        } else if (course === "Chinese Calligraphy Intermediate") {
-            return "TGS-2022011921";
-        } else if (course === "Self-Care TCM Wellness - Mandarin") {
-            return "TGS-2021008561";
-        } else if (course === "TCM Diet") {
-            return "TGS-2021008570";
-        } else if (course === "Therapeutic Basic Line Work") {
-            return "TGS-2024047927";
-        } else if (course === "Therapeutic Watercolor Painting for Beginners") {
-            return "TGS-2022015736";
-        } else if (course === "Community Singing - Mandarin") {
-            return "TGS-2021008563";
+        // Define course mappings
+        const courseMap = {
+            "Nagomi Pastel Art Basic": "TGS-2022011919",
+            //"The Rest Note - Mandarin": "TGS-2022015736",
+            "The Rest Note": "TGS-2022015736",
+            "Community Ukulele": "TGS-2021008564",
+            //"Community Ukulele - Mandarin": "TGS-2021008564",
+            "Chinese Calligraphy Basic": "TGS-2022011920",
+            "Chinese Calligraphy Intermediate": "TGS-2022011921",
+            "Self-Care TCM Wellness": "TGS-2021008561",
+            //"Self-Care TCM Wellness - Mandarin": "TGS-2021008561",
+            "TCM Diet": "TGS-2021008570",
+            "Therapeutic Basic Line Work": "TGS-2024047927",
+            "Therapeutic Watercolor Painting for Beginners": "TGS-2022015736",
+            "Community Singing": "TGS-2021008563"
+            //"Community Singing - Mandarin": "TGS-2021008563"
+        };
+    
+       /* // Check for exact match
+        if (courseMap[course]) {
+            return courseMap[course];
+        }*/
+    
+        // Optional: Check for partial match (if needed)
+        for (let key in courseMap) {
+            if (course.includes(key)) {
+                return courseMap[key];
+            }
         }
     
-        // If no match, return a default value or a message
-        return "No course reference found for this course name.";
+        // If no match, return a default value
+        return "";
     }
+    
     
     async createCourseTable(doc, array, header1, header2, header3, header4, header5, header6) {
         const fontPathBold = path.join(__dirname, '../../fonts/ARIALBD.TTF'); 

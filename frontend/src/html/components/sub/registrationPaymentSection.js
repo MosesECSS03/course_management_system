@@ -1373,28 +1373,28 @@ class RegistrationPaymentSection extends Component {
                }}
                 >
                   {/* Custom content you want to display */}
-                  <p><strong>More Information</strong></p>
-                  <strong>Course Details</strong>
-                  <p>
+                  <p  style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
+                  <p  style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Course Details</h3></p>
+                  <p style={{textAlign:"left"}}>
                     <strong>Type: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.courseType}
                   </p>
-                  <p>
+                  <p style={{textAlign:"left"}}>
                     <strong>Location: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.courseLocation}
                   </p>
-                  <p>
+                  <p style={{textAlign:"left"}}>
                     <strong>Price: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.coursePrice}
                   </p>
-                  <p>
+                  <p style={{textAlign:"left"}}>
                     <strong>Duration: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.courseDuration}
-                  </p>
-                  <strong>Official Use</strong>
-                  <p>
+                  </p >
+                  <p style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Official Use</h3></p>
+                  <p style={{textAlign:"left"}}> 
                     <strong>Staff Name: </strong>{this.state.rowData[this.state.expandedRowIndex].officialInfo.name}
                   </p>
-                  <p>
+                  <p style={{textAlign:"left"}}>
                     <strong>Received Date: </strong>{this.state.rowData[this.state.expandedRowIndex].officialInfo.date}
                   </p>
-                  <p>
+                  <p style={{textAlign:"left"}}>
                     <strong>Received Time: </strong>{this.state.rowData[this.state.expandedRowIndex].officialInfo.time}
                   </p>
                 </div>
