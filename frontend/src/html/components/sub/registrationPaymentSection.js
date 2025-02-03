@@ -944,10 +944,13 @@ class RegistrationPaymentSection extends Component {
         }
         else if (columnName === "Receipt/Invoice Number")
         {
-          this.props.showUpdatePopup("In Progress... Please wait...");
-          console.log("Receipt/Invoice Number");
-          await this.receiptShown(participantInfo, courseInfo, receiptInvoice);
-          this.props.closePopup();
+          if(receiptInvoice !== "")
+          {
+            this.props.showUpdatePopup("In Progress... Please wait...");
+            console.log("Receipt/Invoice Number");
+            await this.receiptShown(participantInfo, courseInfo, receiptInvoice);
+            this.props.closePopup();
+          }
         }
       }
       catch (error) {
