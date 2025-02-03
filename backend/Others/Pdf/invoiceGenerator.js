@@ -274,36 +274,26 @@ class invoiceGenerator {
     
 
     courseReferenceCode(course) {
+        //The Rest Note of Life – Mandarin 14-Feb
         console.log("Course Name: ", course);
     
         // Define course mappings
         const courseMap = {
             "Nagomi Pastel Art Basic": "TGS-2022011919",
-            //"The Rest Note - Mandarin": "TGS-2022015736",
-            "The Rest Note": "TGS-2022015736",
-            "Community Ukulele": "TGS-2021008564",
-            //"Community Ukulele - Mandarin": "TGS-2021008564",
+            "The Rest Note of Life – Mandarin": "TGS-2022015736",
+            "Community Ukulele – Mandarin": "TGS-2021008564",
             "Chinese Calligraphy Basic": "TGS-2022011920",
             "Chinese Calligraphy Intermediate": "TGS-2022011921",
-            "Self-Care TCM Wellness": "TGS-2021008561",
-            //"Self-Care TCM Wellness - Mandarin": "TGS-2021008561",
+            "Self-Care TCM Wellness – Mandarin": "TGS-2021008561",
             "TCM Diet": "TGS-2021008570",
             "Therapeutic Basic Line Work": "TGS-2024047927",
-            "Therapeutic Watercolor Painting for Beginners": "TGS-2022015736",
-            "Community Singing": "TGS-2021008563"
-            //"Community Singing - Mandarin": "TGS-2021008563"
+            "Therapeutic Watercolour Painting for Beginners ": "TGS-2022015736",
+            "Community Singing – Mandarin": "TGS-2021008563"
         };
     
-       /* // Check for exact match
+       // Check for exact match
         if (courseMap[course]) {
             return courseMap[course];
-        }*/
-    
-        // Optional: Check for partial match (if needed)
-        for (let key in courseMap) {
-            if (course.includes(key)) {
-                return courseMap[key];
-            }
         }
     
         // If no match, return a default value
@@ -317,7 +307,7 @@ class invoiceGenerator {
     
         const leftMargin = 2.54 * 28.35 - 50; 
         const tableTop = doc.y; 
-        const rowHeight = 40; 
+        const rowHeight = 35; 
         const borderExternalThickness = 2; 
         const borderInternalThickness = 1; 
         const headerHeight = rowHeight; 
@@ -333,14 +323,14 @@ class invoiceGenerator {
     
         const columnWidths = {
             courseRef: Math.max(headerWidths[0], 125), 
-            courseTitle: Math.max(headerWidths[1], 150),
+            courseTitle: Math.max(headerWidths[1], 160),
             startDate: Math.max(headerWidths[2], 100),
             endDate: Math.max(headerWidths[3], 100),
             fullCourse: Math.max(headerWidths[4], 125),
-            subsidised: Math.max(headerWidths[5], 125),
+            subsidised: Math.max(headerWidths[5], 100)
         };
     
-        const totalTableWidth = columnWidths.courseRef + columnWidths.courseTitle + columnWidths.startDate + columnWidths.endDate + columnWidths.fullCourse + columnWidths.subsidised;
+        const totalTableWidth = columnWidths.courseRef + columnWidths.courseTitle + columnWidths.startDate + columnWidths.endDate + columnWidths.fullCourse + columnWidths.subsidised-10;
     
         const columnPositions = {
             courseRef: leftMargin,
@@ -353,7 +343,7 @@ class invoiceGenerator {
     
         doc.rect(leftMargin, tableTop, totalTableWidth, headerHeight).fill('#FBFBFB');
     
-        doc.fontSize(12).fillColor('black').font(fontPathBold);
+        doc.fontSize(10).fillColor('black').font(fontPathBold);
         doc.text(header1, columnPositions.courseRef + columnWidths.courseRef / 2 - headerWidths[0] / 2, tableTop + 12);
         doc.text(header2, columnPositions.courseTitle + columnWidths.courseTitle / 2 - headerWidths[1] / 2, tableTop + 12);
         doc.text(header3, columnPositions.startDate + columnWidths.startDate / 2 - headerWidths[2] / 2, tableTop + 12);
@@ -374,11 +364,11 @@ class invoiceGenerator {
         }
     
         let currentY = tableTop + headerHeight + 2; 
-        doc.fontSize(12).fillColor('black').font(fontPathRegular);
+        doc.fontSize(10).fillColor('black').font(fontPathRegular);
         array.forEach((item, index) => {
             console.log("Course Reference Code:", this.courseReferenceCode(item.course.courseEngName));
             doc.text(this.courseReferenceCode(item.course.courseEngName), columnPositions.courseRef + 15, currentY + 3)
-            doc.text(item.course.courseEngName, columnPositions.courseTitle + 15, currentY + 3);
+            doc.text(item.course.courseEngName, columnPositions.courseTitle + 10, currentY + 3);
             const durationParts = item.course.courseDuration.split('-');
             const startDate = durationParts[0].trim(); // '23 January 2025'
             const endDate = durationParts[1].trim(); // '23 January 2025'
@@ -425,9 +415,9 @@ class invoiceGenerator {
         .stroke('black');    
         
         doc.lineWidth(borderInternalThickness)
-    .moveTo(leftMargin + totalTableWidth, tableTop) // Starting from the top-right corner
-    .lineTo(leftMargin + totalTableWidth, currentY + rowHeight) // Ending at the bottom-right corner
-    .stroke('black');
+        .moveTo(leftMargin + totalTableWidth, tableTop) // Starting from the top-right corner
+        .lineTo(leftMargin + totalTableWidth, currentY + rowHeight) // Ending at the bottom-right corner
+        .stroke('black');
         
         // Add the last row with specific border logic
         const invoiceText = 'Invoice Total';
@@ -452,7 +442,7 @@ class invoiceGenerator {
         // Draw the bottom border for the last row (for the last 3 columns: endDate, subsidised, and totalPrice)
         doc.lineWidth(borderInternalThickness)
             .moveTo(columnPositions.endDate, currentY + rowHeight) // Starting from the endDate column
-            .lineTo(columnPositions.subsidised + columnWidths.subsidised, currentY + rowHeight) // Extending to the end of the subsidised column
+            .lineTo(columnPositions.subsidised + columnWidths.subsidised-10, currentY + rowHeight) // Extending to the end of the subsidised column
             .stroke('black');
     }
 
@@ -460,9 +450,9 @@ class invoiceGenerator {
         const fontPathBold = path.join(__dirname, '../../fonts/ARIALBD.TTF');
         const fontPathRegular = path.join(__dirname, '../../fonts/ARIAL.TTF');
     
-        const leftMargin = 1 * 28.35; // Left margin
+        const leftMargin = 1 * 28.35-5; // Left margin
         const tableTop = doc.y; // Top position of the table
-        const rowHeight = 40; // Row height
+        const rowHeight = 30; // Row height
         const borderInternalThickness = 1; // Border thickness
         const headerHeight = rowHeight; // Header row height
     
@@ -474,14 +464,14 @@ class invoiceGenerator {
             doc.widthOfString(header5),
             doc.widthOfString(header6),
         ];
-    
+
         const columnWidths = {
-            nric: Math.max(headerWidths[0], 75),
-            pName: Math.max(headerWidths[1], 125),
-            fullCourse: Math.max(headerWidths[2], 125),
-            subsidised: Math.max(headerWidths[3], 175),
-            cash: Math.max(headerWidths[4], 50),
-            sFCClaim: Math.max(headerWidths[5], 125),
+            nric: Math.max(headerWidths[0], 100),
+            pName: Math.max(headerWidths[1], 135),
+            fullCourse: Math.max(headerWidths[2], 100),
+            subsidised: Math.max(headerWidths[3], 100),
+            cash: Math.max(headerWidths[4], 100),
+            sFCClaim: Math.max(headerWidths[5], 100),
         };
     
         const totalTableWidth =
@@ -490,7 +480,7 @@ class invoiceGenerator {
             columnWidths.fullCourse +
             columnWidths.subsidised +
             columnWidths.cash +
-            columnWidths.sFCClaim;
+            columnWidths.sFCClaim+45;
     
         const columnPositions = {
             nric: leftMargin,
@@ -501,14 +491,14 @@ class invoiceGenerator {
             sFCClaim: leftMargin + columnWidths.nric + columnWidths.pName + columnWidths.fullCourse + columnWidths.subsidised + columnWidths.cash,
         };
     
-        doc.fontSize(12).fillColor('black').font(fontPathBold);
+        doc.fontSize(10).fillColor('black').font(fontPathBold);
     
         // Draw table headers
         Object.entries(columnPositions).forEach(([key, position], index) => {
             doc.text(
                 [header1, header2, header3, header4, header5, header6][index],
                 position + columnWidths[key] / 2 - headerWidths[index] / 2,
-                tableTop + 12
+                tableTop + 10
             );
         });
     
@@ -530,7 +520,7 @@ class invoiceGenerator {
         });
     
         let currentY = tableTop + headerHeight;
-        doc.fontSize(12).fillColor('black').font(fontPathRegular);
+        doc.fontSize(10).fillColor('black').font(fontPathRegular);
     
         // Draw table rows
         array.forEach((item, index) => {
