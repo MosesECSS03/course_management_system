@@ -102,6 +102,37 @@
   display: none;
 }
 
+/* Ensure the popup is positioned correctly */
+.calendar-popup {
+  position: absolute;
+  top: 100%;  /* Adjust top to ensure the popup appears below the input */
+  left: 0;
+  z-index: 9999; /* Make sure the popup is above other content */
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 250px;  /* Adjust the width */
+}
+
+/* Styling for Close button */
+.calendar-popup button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.calendar-popup button:hover {
+  background-color: #0056b3;
+}
+
+
 /* Mobile Responsive Adjustments */
 
 /* For screens up to 768px (tablets and small screens) */
@@ -167,6 +198,7 @@
     font-size: 1.2rem;
   }
 }
+
 
 /* For smaller screens up to 480px (mobile phones) */
 @media (max-width: 480px) {
