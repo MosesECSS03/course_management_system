@@ -76,6 +76,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-left: 12%;
+  width: 500px;
 }
 
 /* Month/Year Selection Styling */
@@ -101,6 +103,37 @@
 .rdp-chevron {
   display: none;
 }
+
+/* Ensure the popup is positioned correctly */
+.calendar-popup {
+  position: absolute;
+  top: 100%;  /* Adjust top to ensure the popup appears below the input */
+  left: 0;
+  z-index: 9999; /* Make sure the popup is above other content */
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 400px;  /* Adjust the width */
+}
+
+/* Styling for Close button */
+.calendar-popup button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.calendar-popup button:hover {
+  background-color: #0056b3;
+}
+
 
 /* Mobile Responsive Adjustments */
 
@@ -168,6 +201,7 @@
   }
 }
 
+
 /* For smaller screens up to 480px (mobile phones) */
 @media (max-width: 480px) {
   /* Input group adjustments */
@@ -185,6 +219,13 @@
   .personal-info-input1 {
       font-size: 1.1em; /* Adjust font size for smaller screens */
       padding: 0.6rem; /* Slightly reduced padding */
+  }
+
+  .calendar-popup
+  {
+    margin-top: -25%;
+    margin-left: 5%;
+    width: 80% !important;
   }
 
   /* Radio buttons stacked vertically */
