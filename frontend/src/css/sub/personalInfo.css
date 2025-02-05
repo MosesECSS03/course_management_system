@@ -256,7 +256,8 @@
       padding: 6px;
   }
 
-  /* Day Picker font size adjustments */
+  /* Day Picker font size adjustment
+  //oks */
   .day-picker {
       font-size: 0.9rem;
   }
