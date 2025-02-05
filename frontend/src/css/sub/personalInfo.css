@@ -134,6 +134,24 @@
   background-color: #0056b3;
 }
 
+.calendar-popup button:hover {
+  background-color: #0056b3; /* Slightly darker blue */
+}
+
+.calendar-popup button:focus {
+  outline: 2px solid #ffcc00; /* Highlight on focus */
+}
+
+.calendar-popup button:active {
+  background-color: #003d80; /* Darkest blue when clicked */
+  transform: scale(0.98); /* Slight press effect */
+}
+
+.rdp-nav
+{
+  display:none !important;
+}
+
 
 /* Mobile Responsive Adjustments */
 
