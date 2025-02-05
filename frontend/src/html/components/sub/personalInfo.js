@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { DatePicker } from "@heroui/date-picker";
-import 'react-day-picker/style.css'; // Import default styles
 import '../../../css/sub/personalInfo.css'; // Custom styles
+import { DayPicker, dayPickerContext } from 'react-day-picker';
+import 'react-day-picker/style.css'; // Import default styles
 
 // Custom input for the DayPicker component
 const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
@@ -28,19 +29,33 @@ class PersonalInfo extends Component {
   handleChange = (e) => {
     const { name, value } = e.target;
     console.log(`${name}: ${value}`);
-    this.props.onChange({ [name]: value });
+    this.props.onChange({ [name]: value});
   };
 
   handleChange1 = (e, field) => {
-    if(field === "DOB")
-    {
+    if (field === "DOB") {
       const { name, value } = e.target;
+  
       console.log(`${name}: ${value}`);
-      this.setState({manualDate: value});
-      this.props.onChange({ [name]: value });
+  
+      // Update state immediately with user input (even if invalid)
+      this.setState({ manualDate: value });
+  
+      // Regular expression to match "dd/mm/yyyy" format
+      const datePattern = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+  
+      if (datePattern.test(value)) {
+        console.log(`Valid Date Entered: ${value}`);
+        this.props.onChange({ [name]: value }); // Pass to parent only if valid
+        this.setState({ selectedDate: new Date(value)});
+  
+      } else {
+        console.warn("Invalid date format. Please use dd/mm/yyyy.");
+      }
     }
   };
-
+  
+  
 
   // Handle backspace dynamically
   handleBackspace = (event) => {
@@ -59,10 +74,12 @@ class PersonalInfo extends Component {
 
   handleDateChange = (date) => {
     console.log("Handle Date Change:", date);
+    console.log("Current Selected Date:", this.state.selectedDate)
+    console.log("Year:", date.getFullYear());
   
-    if (date) {
+   if (date) {
       // Format the date as dd/mm/yyyy
-      const formattedDate = `${date.day.toString().padStart(2, '0')}/${(date.month + 1).toString().padStart(2, '0')}/${date.year}`;
+      const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
   
       // Format the date as yyyy年mm月dd日 for Chinese format
       //const chineseDate = `${date.getFullYear()}年${(date.getMonth() + 1)}月${date.getDate()}日`;
@@ -78,7 +95,7 @@ class PersonalInfo extends Component {
   
       // Optionally, pass empty values to parent
       this.props.onChange({ dOB: { formattedDate: ''} });
-    }
+     }
   };
 
   // Toggle the calendar visibility
@@ -89,6 +106,44 @@ class PersonalInfo extends Component {
   // Close the calendar
   closeCalendar = () => {
     this.setState({ showCalendar: false });
+  };
+
+  // Handle month change
+  handleMonthChange = (event) => {
+    const { selectedDate, manualDate } = this.state;
+    const newMonth = parseInt(event, 10); // Get selected month (0-based)
+    const newDate = new Date(selectedDate.getFullYear(), newMonth, selectedDate.getDate());
+  
+    // Format the date as dd/mm/yyyy
+    const formattedDate = `${newDate.getDate().toString().padStart(2, '0')}/${(newDate.getMonth() + 1).toString().padStart(2, '0')}/${newDate.getFullYear()}`;
+    const chineseDate = `${newDate.getFullYear()}年${(newDate.getMonth() + 1)}月${newDate.getDate()}日`;
+  
+    // Update local state to reflect the new selected date
+    this.setState({ selectedDate: newDate, manualDate: formattedDate});
+  
+    // Update the parent component with the new formatted date and chinese date
+    this.props.onChange({ dOB: { formattedDate, chineseDate } });
+    this.setState({ showCalendar: false }); // Close calendar after selecting a date
+  };
+
+  handleYearChange = (event) => {
+    const { selectedDate, manualDate } = this.state;
+    console.log(event);
+    console.log( selectedDate, manualDate);
+    const newYear = parseInt(event, 10); // Get selected year
+    const newDate = new Date(newYear, selectedDate.getMonth(), selectedDate.getDate());
+
+    // Format the date as dd/mm/yyyy
+    const formattedDate = `${newDate.getDate().toString().padStart(2, '0')}/${(newDate.getMonth() + 1).toString().padStart(2, '0')}/${newDate.getFullYear()}`;
+    const chineseDate = `${newDate.getFullYear()}年${(newDate.getMonth() + 1)}月${newDate.getDate()}日`;
+    console.log(formattedDate); 
+  
+    // Update local state to reflect the new selected date
+    this.setState({ selectedDate: newDate, manualDate: formattedDate });
+  
+    // Update the parent component with the new formatted date and chinese date
+    this.props.onChange({ dOB: { formattedDate, chineseDate } });
+    this.setState({ showCalendar: false }); // Close calendar after selecting a date*/
   };
 
   render() {
@@ -154,8 +209,8 @@ class PersonalInfo extends Component {
       const years = Array.from({ length: latestYear - earliestYear + 1 }, (_, i) => earliestYear + i);
   
       const maxDate = new Date();
-      console.log("Last Year:", maxDate.getFullYear()-55);
-      maxDate.setFullYear(maxDate.getFullYear() - 55);
+      console.log("Last Year:", maxDate.getFullYear()-50);
+      maxDate.setFullYear(maxDate.getFullYear() - 50);
 
     return (
       <div>
@@ -188,20 +243,45 @@ class PersonalInfo extends Component {
                   value={this.state.manualDate || ''}
                   onClick={(e) => { e.stopPropagation(); this.toggleCalendar(e); }}
                   placeholder="dd/mm/yyyy"
-                  onChange={(e) => { e.stopPropagation(); this.handleChange1(e, "DOB"); }} // Ensure onChange is set
+                  onChange={(e) => { e.stopPropagation(); this.handleChange1(e, "DOB")}} // Ensure onChange is set
+                  //onBlur={(e) => { e.stopPropagation(); this.onSetDate(e)}}
                 />
-                {this.state.showCalendar && (
-                  // Set the max date to 55 years before today
-                  // Inside your DatePicker
-                  <DatePicker
-                    selected={this.state.selectedDate}
-                    onChange={this.handleDateChange}
-                    minDate={maxDate} // Limit date selection to 55 years ago
-                    showCalendar={this.state.showCalendar}
-                    onCalendarToggle={() => this.setState({ showCalendar: !this.state.showCalendar })}
-                    month={this.state.selectedDate}
-                  />
-                )}
+                 {this.state.showCalendar && (
+                    <div className="calendar-popup">
+                       {/* Month and Year Select Dropdowns */}
+                       <div className="month-year-selection">
+                        <select
+                          value={new Date(this.state.manualDate).getMonth()}
+                          onChange={(e) => { e.stopPropagation(); this.handleMonthChange(e.target.value)}}
+                        >
+                          {months.map((month, index) => (
+                            <option key={index} value={index}>
+                              {month}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={new Date(this.state.manualDate).getFullYear()}
+                          onChange={(e) => { e.stopPropagation(); this.handleYearChange(e.target.value)}}
+                        >
+                          {years.map((year) => (
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <DayPicker
+                          selected={this.state.selectedDate}
+                          onDayClick={this.handleDateChange}
+                          month={this.state.selectedDate}
+                          maxDate={new Date(new Date().getFullYear() - 50, 0, 1)}
+                          disabled={(date) => date.toDateString() === new Date().toDateString()}
+                        />
+                        <button type="button" onClick={this.closeCalendar}>Close</button>
+                    </div>
+                  )}
+                  <br />
               </>
             ) : (  
               <input

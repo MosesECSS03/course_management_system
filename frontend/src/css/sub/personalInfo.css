@@ -76,6 +76,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-left: 12%;
+  width: 500px;
 }
 
 /* Month/Year Selection Styling */
@@ -113,7 +115,7 @@
   padding: 1rem;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 250px;  /* Adjust the width */
+  width: 400px;  /* Adjust the width */
 }
 
 /* Styling for Close button */
@@ -217,6 +219,13 @@
   .personal-info-input1 {
       font-size: 1.1em; /* Adjust font size for smaller screens */
       padding: 0.6rem; /* Slightly reduced padding */
+  }
+
+  .calendar-popup
+  {
+    margin-top: -25%;
+    margin-left: 5%;
+    width: 80% !important;
   }
 
   /* Radio buttons stacked vertically */
