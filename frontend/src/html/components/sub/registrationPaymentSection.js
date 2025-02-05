@@ -1377,6 +1377,36 @@ class RegistrationPaymentSection extends Component {
                 >
                   {/* Custom content you want to display */}
                   <p  style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
+                  <p  style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Participant Details</h3></p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>NRIC: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.nric}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Residential Status: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.residentialStatus}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Race: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.race}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Gender: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.gender}
+                  </p>                  <p style={{textAlign:"left"}}>
+                    <strong>Date of Birth: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.dateOfBirth}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Contact Number : </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.contactNumber}
+                  </p> 
+                  <p style={{textAlign:"left"}}>
+                    <strong>Email: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.email}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Postal Code: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.postalCode}
+                  </p>                  
+                  <p style={{textAlign:"left"}}>
+                    <strong>Education Level: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.educationLevel}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Work Status: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.workStatus}
+                  </p>
                   <p  style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Course Details</h3></p>
                   <p style={{textAlign:"left"}}>
                     <strong>Type: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.courseType}
