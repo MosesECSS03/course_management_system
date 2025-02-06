@@ -20,7 +20,7 @@ class PersonalInfo extends Component {
     super(props);
     this.state = {
       showCalendar: false, // Initialize the showCalendar state
-      selectedDate: new Date(1800, 0, 1), // Store the selected date
+      selectedDate: new Date(new Date().getFullYear() - 89, 0, 1), // Store the selected date
       manualDate: '', // Store the manual input for backspace handling
     };
   }
@@ -228,7 +228,8 @@ class PersonalInfo extends Component {
                       name={section.name}
                       value={option}
                       checked={data[section.name] === option}
-                      onChange={this.handleChange} // Ensure this is set
+                      onChange={this.handleChange} // 
+                      onClick={this.closeCalendar}
                     />
                     {option}
                   </label>
@@ -276,9 +277,10 @@ class PersonalInfo extends Component {
                         </select>
                       </div>
                       <DayPicker
-                          selected={this.state.selectedDate}
+                          selected={this.state.selectedDate || new Date(new Date().getFullYear() - 50, 0, 1)}
                           onDayClick={this.handleDateChange}
                           month={this.state.selectedDate}
+                          minDate={new Date(new Date().getFullYear() - 100, 0, 1)}
                           maxDate={new Date(new Date().getFullYear() - 50, 0, 1)}
                           disabled={(date) => date.toDateString() === new Date().toDateString()}
                         />
@@ -296,6 +298,7 @@ class PersonalInfo extends Component {
                 value={data[section.name] || ''} // Ensure we use empty string as fallback
                 onChange={this.handleChange} // Ensure onChange is set
                 className="personal-info-input1"
+                onClick={this.closeCalendar}
               />
             )}
             {errors[section.name] && <span className="error-message3">{errors[section.name]}</span>}
