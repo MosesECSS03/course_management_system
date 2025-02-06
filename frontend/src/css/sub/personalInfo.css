@@ -29,6 +29,7 @@
 /* General Personal Info Input Styling */
 .personal-info-input {
   font-size: 2em;
+  width: 95%;
 }
 
 /* Input Group Styling */
@@ -46,6 +47,10 @@
   width: 100%; /* Full width of the section */
   padding: 0.5rem; /* Padding inside the input */
   box-sizing: border-box; /* Include padding and border in width */
+}
+
+.custom-icon {
+  font-size: 3rem; /* Adjust as needed */
 }
 
 /* Radio Button Group Styling */
@@ -288,4 +293,9 @@
     width: 60%; 
     font-size: 1.2rem;
   }
+
+  .custom-icon {
+    font-size: 1.5rem; /* Adjust as needed */
+  }
+  
 }

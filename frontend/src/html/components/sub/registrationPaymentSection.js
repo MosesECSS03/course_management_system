@@ -1419,7 +1419,7 @@ class RegistrationPaymentSection extends Component {
                   </p>
                   <p style={{textAlign:"left"}}>
                     <strong>Duration: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.courseDuration}
-                  </p >
+                  </p>
                   <p style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Official Use</h3></p>
                   <p style={{textAlign:"left"}}> 
                     <strong>Staff Name: </strong>{this.state.rowData[this.state.expandedRowIndex].officialInfo.name}
