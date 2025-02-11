@@ -238,6 +238,7 @@ class RegistrationPaymentSection extends Component {
             purpose: "getReceiptNo",
             courseLocation,
           });
+
     
           if (response?.data?.result?.success) {
             console.log("Fetched receipt number:", response.data.result.receiptNumber);
@@ -498,31 +499,31 @@ class RegistrationPaymentSection extends Component {
         // Add the values
         paginatedDetails.forEach(detail => {
             const row = [
-                detail.participant.name,
-                detail.participant.nric,
-                detail.participant.residentialStatus,
-                detail.participant.race,
-                detail.participant.gender,
-                detail.participant.dateOfBirth,
-                detail.participant.contactNumber,
-                detail.participant.email,
-                detail.participant.postalCode,
-                detail.participant.educationLevel,
-                detail.participant.workStatus,
-                detail.course.courseType,
-                detail.course.courseEngName,
-                detail.course.courseChiName,
-                detail.course.courseLocation,
-                detail.course.coursePrice,
-                detail.course.courseDuration,
-                detail.course.payment,
+                detail.participantInfo.name,
+                detail.participantInfo.nric,
+                detail.participantInfo.residentialStatus,
+                detail.participantInfo.race,
+                detail.participantInfo.gender,
+                detail.participantInfo.dateOfBirth,
+                detail.participantInfo.contactNumber,
+                detail.participantInfo.email,
+                detail.participantInfo.postalCode,
+                detail.participantInfo.educationLevel,
+                detail.participantInfo.workStatus,
+                detail.courseInfo.courseType,
+                detail.courseInfo.courseEngName,
+                detail.courseInfo.courseChiName,
+                detail.courseInfo.courseLocation,
+                detail.courseInfo.coursePrice,
+                detail.courseInfo.courseDuration,
+                detail.courseInfo.payment,
                 detail.agreement,
                 detail.status,
-                detail.official?.name,
-                detail.official?.date,
-                detail.official?.time,
-                detail.official?.receiptNo,
-                detail.official?.remarks
+                detail.officialInfo?.name,
+                detail.officialInfo?.date,
+                detail.officialInfo?.time,
+                detail.officialInfo?.receiptNo,
+                detail.officialInfo?.remarks
             ];
             preparedData.push(row);
         });
@@ -914,7 +915,9 @@ class RegistrationPaymentSection extends Component {
         recinvNo: item.official.receiptNo,  // Replace with the actual field for receipt/invoice number
         participantInfo: item.participant,
         courseInfo: item.course,
-        officialInfo: item.official
+        officialInfo: item.official,
+        agreement: item.agreement,
+        status: item.status
       };
     });
     console.log("All Rows Data:", rowData);
@@ -1024,7 +1027,7 @@ class RegistrationPaymentSection extends Component {
           if(newValue === "Cash" || newValue === "PayNow")
           {
               const response = await axios.post(
-              // 'http://localhost:3001/courseregistration', 
+               //'http://localhost:3001/courseregistration', 
               'https://moses-ecss-backend.azurewebsites.net/courseregistration',
                 { 
                   purpose: 'updatePaymentStatus', 

@@ -794,6 +794,7 @@ def update_stock_react(request):
             chi_name = courseName.get('courseChiName', '')
             eng_name = courseName.get('courseEngName', '')
             location = courseName.get('courseLocation', '')
+            print(chi_name+"<br />"+eng_name+"<br />"+location)
 
             # Initialize WooCommerce API and fetch the product ID
             woo_api = WooCommerceAPI()
@@ -804,6 +805,7 @@ def update_stock_react(request):
                 print("Update Product Stocks")
                 status = data.get('status') 
                 productId = result['id']
+                print('Product Id:', result)
                 result2 = woo_api.updateCourseQuantity(productId, status)
 
                 print(status)

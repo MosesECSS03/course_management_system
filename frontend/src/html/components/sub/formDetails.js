@@ -19,6 +19,12 @@ class FormDetailsSection extends Component {
           <h5 className="description">
             *NSA subsidy applicable for Singaporean and PR age 50 and above
           </h5>
+          <h5 className="notification" style={{color:"red"}}>
+            *No refunds within 2 weeks before the course starts.
+          </h5>
+          <h5 className="notification" style={{color:"red"}}>
+            *课程开始前两周内不予退款。
+          </h5>
         </div>
         <div className="image-container">
           <img src={"https://ecss.org.sg/wp-content/uploads/2024/09/NSA-En.jpg"} alt="Description of the image" className="registration-image" />
