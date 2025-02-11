@@ -290,9 +290,9 @@ class receiptGenerator {
 
          this.createTable(doc, array);
 
-        console.log(name);
+
         //var staffName = `Issue By: ${name}`;
-        var staffName = `Issue By: ${array[0].official.staff}`;
+        var staffName = `Issue By: ${array[0].official.name}`;
         doc.font(fontPathTimesRegular).fontSize(12).text(staffName, leftMargin, doc.y, {
             align: 'right' // Align the date to the left
         });

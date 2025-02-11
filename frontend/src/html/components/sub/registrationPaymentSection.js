@@ -275,7 +275,7 @@ class RegistrationPaymentSection extends Component {
       };
       
     
-      receiptShown = async (participant, course, receiptNo) => 
+      receiptShown = async (participant, course, receiptNo, officialInfo) => 
       {
         try {
           if(course.payment === "Cash" || course.payment === "PayNow")
@@ -289,6 +289,7 @@ class RegistrationPaymentSection extends Component {
                 course,
                 staff: this.props.userName,
                 receiptNo,
+                officialInfo
               },
               { responseType: "blob" }
             );
@@ -929,6 +930,8 @@ class RegistrationPaymentSection extends Component {
     const receiptInvoice = event.data.recinvNo;
     const participantInfo = event.data.participantInfo;
     const courseInfo = event.data.courseInfo;
+    const officialInfo = event.data.officialInfo;
+    console.log("officialInfo:", officialInfo);
 
     const rowIndex = event.rowIndex; // Get the clicked row index
     const expandedRowIndex = this.state.expandedRowIndex;
@@ -954,7 +957,7 @@ class RegistrationPaymentSection extends Component {
           {
             this.props.showUpdatePopup("In Progress... Please wait...");
             console.log("Receipt/Invoice Number");
-            await this.receiptShown(participantInfo, courseInfo, receiptInvoice);
+            await this.receiptShown(participantInfo, courseInfo, receiptInvoice, officialInfo);
             this.props.closePopup();
           }
         }
