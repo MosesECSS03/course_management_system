@@ -638,6 +638,7 @@ class RegistrationPaymentSection extends Component {
     
         paginatedDetails.forEach((detail, index) => {
           console.log("Paginated Detail1",  detail);
+         // console.log("Date Of Birth:", detail.participantInfo.dateOfBirth);
           if (detail.courseInfo.courseType === "NSA") {
             const rowIndex = startRow + index;
             const newDataRow = sourceSheet.getRow(rowIndex);
@@ -649,10 +650,15 @@ class RegistrationPaymentSection extends Component {
             sourceSheet.getCell(`C${rowIndex}`).value = detail.participantInfo.nric;
             sourceSheet.getCell(`D${rowIndex}`).value = detail.participantInfo.residentialStatus.substring(0, 2);
     
-            const [day, month, year] = detail.participantInfo.dateOfBirth.split("/");
-            sourceSheet.getCell(`E${rowIndex}`).value = day.trim();
-            sourceSheet.getCell(`F${rowIndex}`).value = month.trim();
-            sourceSheet.getCell(`G${rowIndex}`).value = year.trim();
+            //console.log("Date of birth:", detail.participantInfo.name, detail?.participantInfo?.dateOfBirth.split("/"));
+            const dob = detail?.participantInfo?.dateOfBirth;
+
+            if (dob) {
+                const [day, month, year] = dob.split("/");
+                sourceSheet.getCell(`E${rowIndex}`).value = day.trim();
+              sourceSheet.getCell(`F${rowIndex}`).value = month.trim();
+              sourceSheet.getCell(`G${rowIndex}`).value = year.trim()
+            }
     
             sourceSheet.getCell(`H${rowIndex}`).value = detail.participantInfo.gender.split(" ")[0];
             sourceSheet.getCell(`I${rowIndex}`).value = detail.participantInfo.race.split(" ")[0];
@@ -685,7 +691,7 @@ class RegistrationPaymentSection extends Component {
           }
         });
     
-        // Create new file name and sav
+       // Create new file name and sav
         const originalFileName = `List of Eligible Participants for ${courseName} as of ${this.getCurrentDateTime()}.xlsx`
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], {
@@ -693,7 +699,7 @@ class RegistrationPaymentSection extends Component {
         });
     
         // Trigger download
-        saveAs(blob, originalFileName);    
+        saveAs(blob, originalFileName);
       } catch (error) {
         console.error("Error exporting LOP:", error);
         this.props.warningPopUpMessage("An error occurred during export.");
