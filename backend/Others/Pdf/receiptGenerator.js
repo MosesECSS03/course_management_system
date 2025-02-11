@@ -154,7 +154,7 @@ class receiptGenerator {
     }
     
     addInvoiceFooter = async(doc) =>
-        {
+    {
             console.log("Add Footer");
             const imagePath = "https://ecss.org.sg/wp-content/uploads/2024/10/ok.png";
     
@@ -276,14 +276,33 @@ class receiptGenerator {
 
          doc.moveDown(1);
 
+        //console.log(array[0]);
+
+        // Add a new line before adding the date text
+        const paymentMethod = `Payment Method   : ${array[0].course.payment}`;
+ 
+        // Add the date on a new line
+        doc.font(fontPathTimesRegular).fontSize(12).text(paymentMethod, leftMargin, doc.y, {
+              align: 'left' // Align the date to the left
+        });
+ 
+          doc.moveDown(1);
+
          this.createTable(doc, array);
 
-         console.log(name);
-        var staffName = `Issue By: ${name}`;
-
+        console.log(name);
+        //var staffName = `Issue By: ${name}`;
+        var staffName = `Issue By: ${array[0].official.staff}`;
         doc.font(fontPathTimesRegular).fontSize(12).text(staffName, leftMargin, doc.y, {
             align: 'right' // Align the date to the left
         });
+        doc.moveDown(1);
+
+        // Add the date on a new line
+        doc.font(fontPathTimesRegular).fontSize(12).text("This is a computer generated receipt... Do not need any signature...", leftMargin, doc.y, {
+            align: 'left' // Align the date to the left
+        });
+
         doc.moveDown(5);
     }
 
