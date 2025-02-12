@@ -179,7 +179,7 @@ class RegistrationPaymentSection extends Component {
         // Check if the value is "Paid" or "Generate SkillsFuture Invoice"
         if (updatedStatus === "Paid" || updatedStatus === "SkillsFuture Done" || updatedStatus === "Cancelled") {
           // Proceed to update WooCommerce stock
-          //const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
+         // const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
           const stockResponse = await axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', { 
             type: 'update', 
             page: {"courseChiName":chi, "courseEngName":eng, "courseLocation":location}, // Assuming `chi` refers to the course or page

@@ -152,73 +152,75 @@ class WooCommerceAPI:
         Updates the product stock based on the product ID and the status.
         Arguments:
             - product_id: The ID of the product to update.
-            - status: The status to update stock based on ("Cancelled", "Paid").
+            - status: The status to update stock based on ("Cancelled", "Paid", "SkillsFuture Done").
         """
         try:
-            # Construct the WooCommerce API URL to fetch product details
+            # Fetch current product details
             url = f"{settings.WOOCOMMERCE_API_URL}products/{product_id}"
             auth = (settings.WOOCOMMERCE_CONSUMER_KEY, settings.WOOCOMMERCE_CONSUMER_SECRET)
-            
-            # Fetch current product details
             response = requests.get(url, auth=auth)
-            response.raise_for_status()  # Raises an HTTPError if the response was an error
-            
-            product = response.json()
-            print("Update Product Stocks:", status)
+            response.raise_for_status()
 
-            # Check the current stock quantity
-            new_stock_quantity = product['stock_quantity']
-            print("New Stock Quantity:", new_stock_quantity)
+            product = response.json()
+            print("Updating Product Stock:", status)
+
+            # Get the current stock quantity
+            original_stock_quantity = product.get("stock_quantity", 0)
+            new_stock_quantity = original_stock_quantity  # Start with current stock
+            print("Current Stock Quantity:", new_stock_quantity)
 
             # Parse short description to find "vacancy"
-            short_description = product.get('short_description', '')
+            short_description = product.get("short_description", "")
             array = short_description.split("<p>")
-            
-            if array[0] == '':
-                array.pop(0)  # Remove the empty string at the start
+            if array and array[0] == '':
+                array.pop(0)  # Remove empty first entry
 
-            # Extract the vacancy information
-            vacancies = next(
-                (item.replace("\n", "").replace("<b>", "").replace("</b>x", "") for item in array if "vacancy" in item.lower()),
+            # Extract the number of vacancies directly within this function
+            vacancies_text = next(
+                (item.replace("\n", "").replace("<b>", "").replace("</b>", "")
+                for item in array if "vacancy" in item.lower()),
                 ""
-            ).split("<br />")[-1].strip().split("/")[2]
-            
-            # Match and extract the number of vacancies
-            vacancies_match = re.search(r'\d+', vacancies)
-            vacancies_match = int(vacancies_match.group(0)) if vacancies_match else 0
-            print("Actual:", vacancies_match)
+            ).split("<br />")[-1].strip()
+            vacancies_text = vacancies_text.replace("</p>", "").strip()        
 
-            print("Current:", product['stock_quantity'])
-            print(f"Status is {status}")
-            
-                if vacancies_match <= new_stock_quantity:
-                    # Decrease stock to match vacancy if needed
-                    new_stock_quantity = vacancies_match
-                elif vacancies_match > new_stock_quantity and new_stock_quantity >= 0:
-                    if status == "Cancelled":
-                        print("Increase")
-                        new_stock_quantity += 1  # Increase stock by 1 if cancelled
-                    elif status == "Paid":
-                        print("Decrease")
-                        new_stock_quantity -= 1  # Decrease stock by 1 if paid
-                    elif status == "SkillsFuture Done":
-                        print("Decrease")
-                        new_stock_quantity -= 1  # Decrease stock by 1 if SkillsFuture Done
-                elif new_stock_quantity < 0:
-                    new_stock_quantity = 0  # Ensure stock doesn't fall below 0
+            print("Vacancies Text:", vacancies_text)
 
+            # Extract actual vacancies number using a regex directly in this function
+            vacancies_match = re.search(r'(\d+)\s*Vacancies', vacancies_text)
+            if vacancies_match:
+                vacancies = int(vacancies_match.group(1))
+            else:
+                vacancies = 0  # Return 0 if no vacancies are found
 
-            # Prepare data for updating the product stock
-            update_data = {
-                "stock_quantity": new_stock_quantity
-            }
+            print("Actual Vacancies:", vacancies)
 
-            # Update the product stock via API
-            update_response = requests.put(f"{settings.WOOCOMMERCE_API_URL}products/{product_id}", 
-                                        json=update_data, auth=auth)
-            update_response.raise_for_status()  # Check if the update was successful
+            print(f"Processing status: {status}")
 
-            return True
+            # **Stock Update Logic**
+            if status == "Cancelled":
+                if new_stock_quantity < vacancies:  # Only increase stock if it is below vacancies
+                    print("Increase stock by 1")
+                    new_stock_quantity += 1
+                else:
+                    print("Stock is full, no increase.")  # Prevent increase beyond vacancies
+
+            elif status in ["Paid", "SkillsFuture Done"]:
+                if new_stock_quantity > 0:  # Only decrease if stock is greater than 0
+                    print("Decrease stock by 1")
+                    new_stock_quantity -= 1  
+                else:
+                    print("Stock is already 0, cannot decrease further.")  # Prevents negative stock
+
+            print("Updated Stock Quantity:", new_stock_quantity)
+
+            # Only update stock if it has changed
+            update_data = {"stock_quantity": new_stock_quantity}
+            update_response = requests.put(f"{settings.WOOCOMMERCE_API_URL}products/{product_id}",
+                                            json=update_data, auth=auth)
+            update_response.raise_for_status()
+
+            return True  # Successfully updated stock
+
         except requests.exceptions.RequestException as e:
             print(f"Error updating product stock: {e}")
             return False
