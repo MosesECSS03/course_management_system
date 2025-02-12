@@ -168,6 +168,7 @@ class WooCommerceAPI:
 
             # Check the current stock quantity
             new_stock_quantity = product['stock_quantity']
+            print("New Stock Quantity:", new_stock_quantity)
 
             # Parse short description to find "vacancy"
             short_description = product.get('short_description', '')
@@ -178,32 +179,33 @@ class WooCommerceAPI:
 
             # Extract the vacancy information
             vacancies = next(
-                (item.replace("\n", "").replace("<b>", "").replace("</b>", "") for item in array if "vacancy" in item.lower()),
+                (item.replace("\n", "").replace("<b>", "").replace("</b>x", "") for item in array if "vacancy" in item.lower()),
                 ""
             ).split("<br />")[-1].strip().split("/")[2]
             
             # Match and extract the number of vacancies
             vacancies_match = re.search(r'\d+', vacancies)
             vacancies_match = int(vacancies_match.group(0)) if vacancies_match else 0
+            print("Actual:", vacancies_match)
 
             print("Current:", product['stock_quantity'])
             print(f"Status is {status}")
             
-            if vacancies_match < new_stock_quantity:
-                # Decrease stock to match vacancy if needed
-                new_stock_quantity = vacancies_match
-            elif vacancies_match >= new_stock_quantity and new_stock_quantity >= 0:
-                if status == "Cancelled":
-                    print("Increase")
-                    new_stock_quantity += 1  # Increase stock by 1 if cancelled
-                elif status == "Paid":
-                    print("Decrease")
-                    new_stock_quantity -= 1  # Decrease stock by 1 if paid
-                elif status == "SkillsFuture Done":
-                    print("Decrease")
-                    new_stock_quantity -= 1  # Decrease stock by 1 if SkillsFuture Done
-            if new_stock_quantity < 0:
-                new_stock_quantity = 0  # Ensure stock doesn't fall below 0
+                if vacancies_match <= new_stock_quantity:
+                    # Decrease stock to match vacancy if needed
+                    new_stock_quantity = vacancies_match
+                elif vacancies_match > new_stock_quantity and new_stock_quantity >= 0:
+                    if status == "Cancelled":
+                        print("Increase")
+                        new_stock_quantity += 1  # Increase stock by 1 if cancelled
+                    elif status == "Paid":
+                        print("Decrease")
+                        new_stock_quantity -= 1  # Decrease stock by 1 if paid
+                    elif status == "SkillsFuture Done":
+                        print("Decrease")
+                        new_stock_quantity -= 1  # Decrease stock by 1 if SkillsFuture Done
+                elif new_stock_quantity < 0:
+                    new_stock_quantity = 0  # Ensure stock doesn't fall below 0
 
 
             # Prepare data for updating the product stock

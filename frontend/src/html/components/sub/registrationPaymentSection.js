@@ -59,13 +59,10 @@ class RegistrationPaymentSection extends Component {
     fetchCourseRegistrations = async (language) => {
       try {
         const response = await axios.post(
+          //'http://localhost:3001/courseregistration', 
           'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
           { purpose: 'retrieve' }
         );
-        /*const response = await axios.post(
-          'http://localhost:3001/courseregistration', 
-          { purpose: 'retrieve' }
-        );*/
 
         console.log("Course Registration:", response);
     
@@ -1004,6 +1001,7 @@ class RegistrationPaymentSection extends Component {
     const confirmed = event.data.confirmed;
     const paymentMethod = event.data.paymentMethod;
     const paymentStatus = event.data.paymentStatus;
+    const oldPaymentStatus = event.data.status;
 
     console.log("Column Name:", columnName);
 
@@ -1054,8 +1052,6 @@ class RegistrationPaymentSection extends Component {
                 await performParallelTasks();
               } 
           }
-          this.props.closePopup();
-          this.refreshChild();  
         }
         else if (columnName === "Confirmation") 
         {
@@ -1107,8 +1103,7 @@ class RegistrationPaymentSection extends Component {
                   } 
               }
           }
-          this.props.closePopup();
-          this.refreshChild();  
+          console.log("Change SkillsFuture Confirmation");
         }
         else if (columnName === "Payment Status") 
         {
@@ -1133,18 +1128,22 @@ class RegistrationPaymentSection extends Component {
                 console.log("Update Payment Status Success1");
                   if(newValue === "Cancelled")
                   {
-                    const performParallelTasks = async () => {
-                      try {
-                        // Run the two functions in parallel using Promise.all
-                        await Promise.all([
-                          this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
-                        ]);
-                        console.log("Both tasks completed successfully.");
-                      } catch (error) {
-                        console.error("Error occurred during parallel task execution:", error);
-                      }};
-                      await performParallelTasks();
-                  } 
+                    console.log("Old Payment Status:", oldPaymentStatus);
+                    if(oldPaymentStatus === "Paid")
+                    {
+                      const performParallelTasks = async () => {
+                        try {
+                          // Run the two functions in parallel using Promise.all
+                          await Promise.all([
+                            this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
+                          ]);
+                          console.log("Both tasks completed successfully.");
+                        } catch (error) {
+                          console.error("Error occurred during parallel task execution:", error);
+                        }};
+                        await performParallelTasks();
+                    }
+                }
                 else
                 {
                   // Define the parallel tasks function
@@ -1179,8 +1178,10 @@ class RegistrationPaymentSection extends Component {
                   await performParallelTasks();
               }
               else if(newValue === "Cancelled")
+              {
+                console.log("SkillsFuture, Old Payment Status:", oldPaymentStatus);
+                if(oldPaymentStatus === "SkillsFuture Done")
                 {
-                  console.log("Cancelled Participants");
                   const performParallelTasks = async () => {
                     try {
                       // Run the two functions in parallel using Promise.all
@@ -1192,11 +1193,14 @@ class RegistrationPaymentSection extends Component {
                       console.error("Error occurred during parallel task execution:", error);
                     }};
                     await performParallelTasks();
-                } 
+                }
+                else
+                {
+                  console.log("SkillsFuture: Do not need to update Woocommerce");
+                }
+              } 
             }
           }
-          this.props.closePopup();
-          this.refreshChild(); 
         }
         else
         {
@@ -1212,15 +1216,25 @@ class RegistrationPaymentSection extends Component {
             }
           );
         }
+        this.refreshChild(); 
     } catch (error) {
       console.error('Error during submission:', error);
       this.props.closePopup();
     }
   };
   
-   refreshChild = () =>
+   refreshChild = async () =>
    {
-     this.props.refreshChild();
+
+    const { language } = this.props;
+    const data = await this.fetchCourseRegistrations(language);
+    this.setState({
+      originalData: data,
+      registerationDetails: data, // Update with fetched da
+      //rowData: data
+    });
+    this.getRowData(data);
+    this.props.closePopup();
    }
 
  // componentDidUpdate is called after the component has updated (re-rendered)

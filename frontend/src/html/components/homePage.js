@@ -963,6 +963,7 @@
                         showUpdatePopup = {this.showUpdatePopup}
                         generateInvoiceNumber = {this.generateInvoiceNumber}
                         onResetSearch = {this.onResetSearch}
+                        closePopupMessage = {this.closePopupMessage}
                     />
                     </div>
                   </>}                 
