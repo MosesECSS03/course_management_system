@@ -1,22 +1,20 @@
-  import React, { Component } from 'react';
-  import axios from 'axios';
-  import '../../../css/sub/courseSection.css';
+import React, { Component } from 'react';
+import axios from 'axios';
+import '../../../css/sub/courseSection.css';
+import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 
-  class CoursesSection extends Component {
+class CoursesSection extends Component {
     constructor(props) {
       super(props);
       this.state = {
         courses: [], // All fetched courses
         filteredCourses: [], // Courses filtered based on user inputs
         loading: false,
-        hideAllCells: false,
-        dataFetched: false,
-        clearTable: false,
-        currentPage: 1, // Add this
-        entriesPerPage: 10, // Add 
-        expandedRow: null// Track expanded rows
+        columnDefs: this.getColumnDefs(),
+        rowData: [],
       };
-      this.tableRef = React.createRef();
+      this.tableWrapperRef = React.createRef();
     }
 
     handleEntriesPerPageChange = (e) => {
@@ -26,14 +24,81 @@
       });
     }
 
-    getPaginatedCourses() {
-      const { filteredCourses } = this.state;
-      const { currentPage, entriesPerPage } = this.props;
-      const indexOfLastCourse = currentPage * entriesPerPage;
-      const indexOfFirstCourse = indexOfLastCourse - entriesPerPage;
-      return filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+    getColumnDefs = () => [
+      {
+        headerName: "Course ID",
+        field: "courseId",
+        width: 100,
+      },
+      {
+        headerName: "Course Name",
+        field: "courseName",
+        width: 350,
+      },
+      {
+        headerName: "Centre Location",
+        field: "centreLocation",
+        width: 150,
+      },
+      {
+        headerName: "Vacancies",
+        field: "vacanices",
+        width: 100,
+      },
+      {
+        headerName: "Status",
+        field: "status",
+        width: 200,
+        cellRenderer: (params) => {
+          const statusStyles = {
+            Ongoing: "#FF6347",  // Red (Tomato)
+            Available: "#32CD32",  // Green (LimeGreen)
+            Ended: "#A9A9A9",  // Gray (DarkGray)
+            Full: "#4682B4",  // Blue (SteelBlue)
+          };
+      
+          const backgroundColor = statusStyles[params.value] || "#D3D3D3"; // Default light gray for unknown values
+      
+          return (
+            <span
+              style={{
+                fontWeight: "bold",
+                color: "white",
+                textAlign: "center",
+                display: "inline-block",
+                borderRadius: "20px",
+                paddingLeft: "30px",  // Adjust padding for better width/height
+                paddingRight: "30px",
+                Width: "fit-content",  // Ensures that the width fits content
+                lineHeight: "30px",  // Centers text vertically
+                whiteSpace: "nowrap", // Prevents text wrapping
+                backgroundColor: backgroundColor
+              }}
+            >
+              {params.value}
+            </span>
+          );
+        }  
+      },
+      {
+        headerName: "Course Duration",
+        field: "courseDuration",
+        width: 250,
+      },
+      {
+        headerName: "Course Timing",
+        field: "courseTiming",
+        width: 180,
+      }
+    ];
+    
+    // Method to get all languages
+    getAllLanguages= async(courses)  =>  {
+      return [...new Set(courses.map(course => {
+        var courseDetails = this.getSelectedDetails(course.short_description);
+        return courseDetails.language;
+      }))];
     }
-  
 
     async fetchCourses(courseType) {
       try {
@@ -55,8 +120,6 @@
           courses: courses,
           filteredCourses: courses, // Initially, show all fetched courses
           loading: false,
-          hideAllCells: false,
-          dataFetched: true,
           locations: locations, // Set locations in state
           languages: languages  // Set languages in state
         });
@@ -64,10 +127,7 @@
         this.props.closePopup();
         await this.props.getTotalNumberofCourses(courses.length);
 
-        // Scroll to the leftmost position
-        if (this.tableRef.current) {
-          this.tableRef.current.scrollLeft = 0;
-        }
+        this.getRowData(courses);
       } catch (error) {
         console.error('Error fetching data:', error);
         this.setState({ loading: false });
@@ -75,526 +135,371 @@
       }
     }
 
+  getRowData = (filteredCourse) => 
+  {
+    console.log("Get Row Data");
+    const locationMap = {
+      "Tampines 253 Centre": "T-253",
+      "Pasir Ris West Wellness Centre": "PRW",
+      "Tampines North Community Centre": "TNCC",
+      "CT Hub": "CTH"
+    };        
+
+    const rowData = filteredCourse.map((item, index) => {
+      console.log("Course Details:", item);
+      var displayedDetails = JSON.parse(this.getSelectedDetails(item.short_description, item.stock_quantity));
+      console.log("Displayed Details:", displayedDetails);
     
+      // Split the name by <br/> or <br /> and use a ternary operator
+      const splitName = item.name.split(/<br\s*\/?>/);
+      console.log("Split Name:", splitName);
 
-    // Method to get all locations
-    getAllLocations = async(courses)  => {
-      return [...new Set(courses.map(course => {
-        var nameDetails = this.courseNameAndDetails(course.name);
-        return nameDetails.location;
-      }))];
-    }
-
-    // Method to get all languages
-    getAllLanguages= async(courses)  =>  {
-      return [...new Set(courses.map(course => {
-        var courseDetails = this.getSelectedDetails(course.short_description);
-        return courseDetails.language;
-      }))];
-    }
-
-    filterCourses() 
-    {
-      var {section} = this.props;
-      if(section === "courses")
-      {
-        const { courses } = this.state;
-        const { selectedLanguage, selectedLocation, searchQuery } = this.props;
-        console.log("Props:", this.props);
-       
-          // Reset filtered courses to all courses if the search query is empty
-          if (!searchQuery && selectedLanguage === "All Languages" && selectedLocation === "All Locations") {
-            this.setState({ filteredCourses: courses });
-            return;
-          }
-        
-          const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
-
-          const filteredCourses = courses.filter(course => {
-            const nameDetails = this.courseNameAndDetails(course.name);
-            const courseDetails = this.getSelectedDetails(course.short_description);
-        
-            // Normalize fields
-            const courseName = course.name.toLowerCase().trim();
-            const courseDescription = course.short_description.toLowerCase().trim();
-            const location = nameDetails.location.toLowerCase().trim();
-            const language = courseDetails.language.toLowerCase().trim();
-            const startDate = courseDetails.startDate.toLowerCase().trim();
-            const endDate = courseDetails.endDate.toLowerCase().trim();
-            const startTime = courseDetails.startTime.toLowerCase().trim();
-            const endTime = courseDetails.endTime.toLowerCase().trim();
-        
-            // Match 'All Languages' and 'All Locations'
-            const matchesLanguage = selectedLanguage === "All Languages" || selectedLanguage === "所有语言" || selectedLanguage === "" || !selectedLanguage ? true : language === selectedLanguage.toLowerCase().trim();
-            var matchesLocation = selectedLocation === "All Locations" || selectedLocation === "所有地点" || selectedLocation === "" || !selectedLocation ? true : location === selectedLocation.toLowerCase().trim();
-        
-            // Match search query against multiple fields
-          const matchesSearchQuery = normalizedSearchQuery
-              ? (courseName.includes(normalizedSearchQuery) ||
-                courseDescription.includes(normalizedSearchQuery) ||
-                language.includes(normalizedSearchQuery) ||
-                startDate.includes(normalizedSearchQuery) ||
-                endDate.includes(normalizedSearchQuery) ||
-                startTime.includes(normalizedSearchQuery) ||
-                endTime.includes(normalizedSearchQuery))
-              : true;
-            return matchesLanguage && matchesLocation && matchesSearchQuery;
-          });
-        
-          this.setState({ filteredCourses });
-        }
-    }
-
-    // Function to get CSRF token from cookies
-    getCsrfToken = async () => {
-      const name = 'csrftoken';
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(`${name}=`)) {
-          return cookie.substring(name.length + 1);
-        }
-      }
-      return null;
-    };
-
-    // Axios instance with CSRF token attached
-    axiosInstance = axios.create({
-      baseURL: 'http://localhost:3002',  // Your Django backend URL
-      //baseURL: 'https://moses-ecss-data.azurewebsites.net/',  // Your Django backend URL
-      withCredentials: true            // Ensure cookies are sent with requests
+  
+      return {
+        courseId: item.id,
+        courseName: splitName.length === 3 ? splitName[1] : (splitName.length === 2 ? splitName[0] : item.name),
+        centreLocation: splitName.length === 3 ? locationMap[splitName[2].replace(/[()]/g, '').trim()] || splitName[2].replace(/[()]/g, '').trim() : splitName.length === 2 ? locationMap[splitName[1].replace(/[()]/g, '').trim()] || splitName[1].replace(/[()]/g, '').trim(): '',
+        vacanices: item.stock_quantity,
+        status: displayedDetails.status,
+        courseDuration: displayedDetails.startDate+" - "+displayedDetails.endDate,
+        courseTiming: displayedDetails.startTime+" - "+displayedDetails.endTime,
+      };
     });
-
-    componentDidMount = async () => 
-    {
-      this.axiosInstance.interceptors.request.use(config => {
-        const csrfToken = this.getCsrfToken();
-        if (csrfToken) {
-          config.headers['X-CSRFToken'] = csrfToken;  // Attach CSRF token to headers
-        }
-        return config;
-      });
-      var { courseType } = this.props;
-      if (courseType && !this.state.dataFetched) {
-        await this.fetchCourses(courseType);
-      }
-    }
+  
+    console.log("All Rows Data:", rowData);
+  
+    // Set the state with the new row data
+    this.setState({ courses: rowData, filteredCourse: rowData, rowData });
+  };
   
 
+  getSelectedDetails(short_description, vacancy) {
+    let array = short_description.split('<p>');
+    if (array[0] === '') {
+      array.shift(); // Remove the empty string at the start
+    }
+  
+    array = array.flatMap(element => element.split('</p>'));
+    array = array.filter(element => element.trim() !== '');
+  
+    var noOfLesson = array.find(item => item.toLowerCase().includes("lesson")).split("<br />")[1].replace(/\n|<b>|<\/b>/g, "").match(/\d+/);  // Extracts the first sequence of digits
+  
+    // If you want a number, you can parse it:
+    if (noOfLesson) {
+      noOfLesson = parseInt(noOfLesson[0], 10);  // Converts the matched number string to an integer
+    }
+  
+    console.log("No. of Lesson:", noOfLesson);
+  
+    var language = array.flatMap(item => item.replace(/\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("language")).split("<br />").pop().trim();
     
+    var vacancies = array.flatMap(item => item.replace(/\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("vacancy")).split("<br />").pop().trim().split("/")[2];
+    var vacanciesMatch = vacancies.match(/\d+/);
     
+    var startDate = array.flatMap(item => item.replace(/\<strong>|\<\/strong>|\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("start date")).split("<br />").pop().trim();
+    var startDates = startDate.split(" ");
+    var day = parseInt(startDates[0]);
+    var month = this.changeMonthToNumber(startDates[1]);
+    var year = parseInt(startDates[2]);
     
-   /* async componentDidMount() {
-      var { courseType } = this.props;
-      if (courseType && !this.state.dataFetched) {
-        await this.fetchCourses(courseType);
+    var endDate = array.flatMap(item => item.replace(/\<strong>|\<\/strong>|\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("end date")).split("<br />").pop().trim();
+    var endDates = endDate.split(" ");
+    var day1 = parseInt(endDates[0]);
+    var month1 = this.changeMonthToNumber(endDates[1]);
+    var year1 = parseInt(endDates[2]);
+    
+    let timing = array.flatMap(item => item.replace(/\<strong>|\<\/strong>|\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("lesson schedule")).split("<br />").pop().trim();
+    let startTime = '';
+    let endTime = '';
+  
+    if (timing) {
+      if (timing.includes("&#8211;")) {
+        [startTime, endTime] = timing.split("&#8211;").map(t => t.trim());
       }
-    }*/
-
-      componentDidUpdate(prevProps)
-       {
-
-        var { courseType, selectedLanguage, selectedLocation, searchQuery, language } = this.props;
-
-        // Check if any of the relevant props have changed
-        if (
-          courseType !== prevProps.courseType || 
-          language !== prevProps.language
-        ) {
-          this.setState({ filteredCourses: [] });
-          this.fetchCourses(courseType);
-        }
-        else if (
-          selectedLanguage !== prevProps.selectedLanguage ||
-          selectedLocation !== prevProps.selectedLocation ||
-          searchQuery !== prevProps.searchQuery 
-        ) {
-          this.filterCourses(); // Filter courses based on updated props
-        }
+      if (timing.includes("–")) {
+        [startTime, endTime] = timing.split("–").map(t => t.trim());
       }
-
-    courseNameAndDetails(product_name) {
-      var regex = /<br\s*\/?>/gi;
-      var array = product_name.split(regex);
-      if (array.length === 3) {
-        array[2] = array[2].replace(/[()]/g, '');
-        return { "engName": array[1], "chiName": array[0], "location": array[2] };
-      }
-      if (array.length === 2) {
-        array[1] = array[1].replace(/[()]/g, '');
-        return { "engName": array[0], "chiName": array[0], "location": array[1] };
+      // Check if startTime contains a comma
+      if (startTime.includes(",")) {
+        startTime = startTime.split(",")[1].trim();  // Get the part after the comma and trim it
       }
     }
 
-    changeMonthToNumber(month) {
-      const monthMap = {
-        'January': 1,
-        'February': 2,
-        'March': 3,
-        'April': 4,
-        'May': 5,
-        'June': 6,
-        'July': 7,
-        'August': 8,
-        'September': 9,
-        'October': 10,
-        'November': 11,
-        'December': 12,
-        '一月': 1,
-        '二月': 2,
-        '三月': 3,
-        '四月': 4,
-        '五月': 5,
-        '六月': 6,
-        '七月': 7,
-        '八月': 8,
-        '九月': 9,
-        '十月': 10,
-        '十一月': 11,
-        '十二月': 12,
-      };
-    
-      return monthMap[month] || 0; // Return 0 for invalid month
-    }
-
-    convertTo24HourWithHrs(time12) {
-      const [time, modifier] = time12.split(/(am|pm)/i); // Split by 'am' or 'pm'
-      let [hours, minutes] = time.split(":").map(Number);
-      if (modifier.toLowerCase() === "pm" && hours < 12) {
-        hours += 12; // Convert PM hours
-      } else if (modifier.toLowerCase() === "am" && hours === 12) {
-        hours = 0; // Midnight case
-      }
-      console.log("24 hr Format:", hours);
-      // Return formatted time as "HHmm hrs"
-      return { hours, minutes }; // Return hours and minutes as an object
-    }
-    
         
-
-    getSelectedDetails(short_description, vacancy) {
-      let array = short_description.split('<p>');
-      if (array[0] === '') {
-        array.shift(); // Remove the empty string at the start
-      }
-
-      array = array.flatMap(element => element.split('</p>'));
-      array = array.filter(element => element.trim() !== '');
-
-      var noOfLesson = array.find(item => item.toLowerCase().includes("lesson")).split("<br />")[1].replace(/\n|<b>|<\/b>/g, "").match(/\d+/);  // Extracts the first sequence of digits
-
-        // If you want a number, you can parse it:
-        if (noOfLesson) {
-          noOfLesson = parseInt(noOfLesson[0], 10);  // Converts the matched number string to an integer
-        }
-      console.log("No. of Lesson:", noOfLesson);
-      var language = array.flatMap(item => item.replace(/\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("language")).split("<br />").pop().trim();
-      var vacancies = array.flatMap(item => item.replace(/\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("vacancy")).split("<br />").pop().trim().split("/")[2];
-      var vacanciesMatch = vacancies.match(/\d+/);
-      var startDate = array.flatMap(item => item.replace(/\<strong>|\<\/strong>|\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("start date")).split("<br />").pop().trim();
-      var startDates = startDate.split(" ");
-      var day = parseInt(startDates[0])
-      var month = this.changeMonthToNumber(startDates[1])
-      var year = parseInt(startDates[2]);
-      var endDate = array.flatMap(item => item.replace(/\<strong>|\<\/strong>|\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("end date")).split("<br />").pop().trim();
-      var endDates = endDate.split(" ");
-      var day1 = parseInt(endDates[0])
-      var month1 = this.changeMonthToNumber(endDates[1])
-      var year1 = parseInt(endDates[2]);
-      let timing = array.flatMap(item => item.replace(/\<strong>|\<\/strong>|\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("lesson schedule")).split("<br />").pop().trim().split(",")[1].trim();
-      let startTime = '';
-      let endTime = '';
-      
-      if (timing) {
-        if (timing.includes("&#8211;")) {
-          [startTime, endTime] = timing.split("&#8211;").map(t => t.trim());
-        }
-        if (timing.includes("–")) {
-          [startTime, endTime] = timing.split("–").map(t => t.trim());
-        }
-      }
-      const startDateTime = new Date(year, month, day);
-      const { hours: startHours, minutes: startMinutes } = this.convertTo24HourWithHrs(startTime);
-      startDateTime.setHours(startHours);
-      startDateTime.setMinutes(startMinutes);
-      startDateTime.setSeconds(0);
-      //console.log("Start Date Time:", startDateTime);
-      
-      const endDateTime = new Date(year1, month1, day1);
-      const { hours: endHours, minutes: endMinutes } = this.convertTo24HourWithHrs(endTime); // Fix here
-      endDateTime.setHours(endHours);
-      endDateTime.setMinutes(endMinutes);
-      endDateTime.setSeconds(0);
-      console.log("End Date Time:", endDateTime);
-      
-      //console.log("Today Date:", startDateTime < new Date());
-      console.log("Start Date:", startDate, year, month, day, startTime, startHours);
-
-      var status;
-
-      var startDate = new Date(startDateTime);
-      var endDate = new Date(endDateTime);
-      var currentDate = new Date();
-      
-      // If no vacancies, the course is "Full" regardless of the date
-      if (vacancy === 0) {
-        status = "Full"; // Always "Full" if there are no vacancies
-      } else if (vacancy > 0) {
-        // If the course is available (future course)
-        if (currentDate < startDate) {
-          status = "Available";
-        }
-        // If the course has ended
-        else if (currentDate >= endDate) {
-          status = "Ended";
-        }
-        else
-        {
-          status = "Ongoing"
-        }
-      }
-      
-      console.log("Status:", status);
-
-      return { noOfLesson, language, vacancies: vacanciesMatch, startDate, endDate, startTime, endTime, status };
-    }
-
-    translateLanguage(language, targetLang) {
-      var translations = {
-        'en': {
-          'English': 'English',
-          'Mandarin': 'Mandarin',
-          'English and Mandarin': 'English and Mandarin'
-        },
-        'zh': {
-          'English': '英文',
-          'Mandarin': '中文',
-          'English and Mandarin': '英文和中文'
-        }
-      };
+    const startDateTime = new Date(year, month, day);
+    const { hours: startHours, minutes: startMinutes } = this.convertTo24HourWithHrs(startTime);
+    startDateTime.setHours(startHours);
+    startDateTime.setMinutes(startMinutes);
+    startDateTime.setSeconds(0);
     
-      return translations[targetLang][language] || language;
-    }
-
-    formatDateToChinese(dateStr) {
-      var monthMap = {
-        'January': '1月',
-        'February': '2月',
-        'March': '3月',
-        'April': '4月',
-        'May': '5月',
-        'June': '6月',
-        'July': '7月',
-        'August': '8月',
-        'September': '9月',
-        'October': '10月',
-        'November': '11月',
-        'December': '12月'
-      };
-      
-      var [day, month, year] = dateStr.split(' ');
-      var monthChinese = monthMap[month];
-      
-      return `${year}年${monthChinese}${day}日`;
-    }
-
-    formatTimeToChinese(timeStr) {
-      var time = timeStr.slice(0, -2);
-      var period = timeStr.slice(-2).toUpperCase();
-      var hours = parseInt(time.slice(0, -2), 10);
-      var minutes = parseInt(time.slice(-2), 10);
-      
-      if (hours === 12 && minutes === 0 && period === 'PM') {
-        return `中午12点`;
-      }
-      
-      let displayHours = hours % 12 || 12;
-      let formattedTime = `${displayHours}点${minutes > 0 ? minutes + '分' : ''}`;
-      var periodChinese = period === 'AM' ? '上午' : '下午';
-      
-      return `${periodChinese}${formattedTime}`;
-    }
-
-    formatStatusToChinese(status)
-    {
-      if (status === "Available") {
-       return "可用"; // "Available"
-      } 
-      else if (status === "Ongoing"){
-       return "进行中"; // "Ongoing"
-      } 
-      else if ("Ended") {
-        return "已结束"; // "Ended"
-      } 
-    }
-
-    shorternMonth(dateString)
-    {
-      const date = new Date(dateString);
-      const day = date.getDate(); // Extract the day
-      const month = date.toLocaleString("en-US", { month: "short" }); // Shortened month
-      const year = date.getFullYear(); // Full year
-      return `${day} ${month} ${year}`; // Combine into the desired format
-    }
-
-    handleRowToggle(index) {
-      // Toggle the expanded row based on the index
-      this.setState({
-        expandedRow: this.state.expandedRow === index ? null : index, // If the clicked row is already expanded, collapse it; else, expand it.
-      });
-    }
-
-  render() {
-    const { hideAllCells, clearTable, currentPage, entriesPerPage, expandedRow} = this.state;
-    const paginatedCourses = this.getPaginatedCourses(); // Get paginated courses 
+    const endDateTime = new Date(year1, month1, day1);
+    const { hours: endHours, minutes: endMinutes } = this.convertTo24HourWithHrs(endTime);
+    endDateTime.setHours(endHours);
+    endDateTime.setMinutes(endMinutes);
+    endDateTime.setSeconds(0);
   
+    console.log("End Date Time:", endDateTime);
+  
+    console.log("Start Date:", startDate, year, month, day, startTime, startHours);
+  
+    var status;
+    var currentDate = new Date();
+  
+    // If no vacancies, the course is "Full" regardless of the date
+    if (vacancy === 0) {
+      status = "Full"; // Always "Full" if there are no vacancies
+    } else if (vacancy > 0) {
+      // If the course is available (future course)
+      if (currentDate < startDateTime) {
+        status = "Available";
+      }
+      // If the course has ended
+      else if (currentDate >= endDateTime) {
+        status = "Ended";
+      }
+      else {
+        status = "Ongoing";
+      }
+    }
+  
+    console.log("Status:", status);
+    startDate = this.shorternMonth(startDate);
+    endDate = this.shorternMonth(startDate);
+  
+    return JSON.stringify({
+      noOfLesson,
+      language,
+      vacancies: vacanciesMatch,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      status
+    });
+  }
+    
+  courseNameAndDetails(product_name) {
+    var regex = /<br\s*\/?>/gi;
+    var array = product_name.split(regex);
+    if (array.length === 3) {
+      array[2] = array[2].replace(/[()]/g, '');
+      return { "engName": array[1], "chiName": array[0], "location": array[2] };
+    }
+    if (array.length === 2) {
+      array[1] = array[1].replace(/[()]/g, '');
+      return { "engName": array[0], "chiName": array[0], "location": array[1] };
+    }
+  }
+
+  // Method to get all locations
+  getAllLocations = async(courses)  => {
+    return [...new Set(courses.map(course => {
+      var nameDetails = this.courseNameAndDetails(course.name);
+      return nameDetails.location;
+    }))];
+  }
+  
+  updateRowData(paginatedDetails) {
+    this.setState({ filteredCourse: paginatedDetails });
+  }
+  
+  filterCourses() {
+    const { section, selectedLocation, searchQuery } = this.props;
+    console.log("Section:", section);
+  
+    if (section === "courses") {
+      const { courses } = this.state;
+      console.log("Original Data:", courses);
+      console.log("Get Row Data");
+  
+      const locationMap = {
+        "T-253": "Tampines 253 Centre",
+        "PRW": "Pasir Ris West Wellness Centre",
+        "TNCC": "Tampines North Community Centre",
+        "CTH": "CT Hub"
+      };
+  
+      let filteredDetails = courses;
+  
+      // If you want to filter by location
+      if (selectedLocation && selectedLocation !== "All Locations") {
+        filteredDetails = filteredDetails.filter(item => {
+          return locationMap[item.centreLocation] === selectedLocation;
+        });
+      }
+
+      // Normalize search query to lowercase for case-insensitive comparison
+      const normalizedSearchQuery = searchQuery ? searchQuery.toLowerCase().trim() : '';
+
+      // Apply search query if it's provided
+      if (normalizedSearchQuery) {
+        filteredDetails = filteredDetails.filter(item => {
+          // Filter courses based on courseName or centreLocation
+          return (
+            item.courseName.toLowerCase().includes(normalizedSearchQuery) ||
+            locationMap[item.centreLocation].toLowerCase().includes(normalizedSearchQuery)
+          );
+        });
+      }
+    
+      // Map filteredDetails to rowData
+      const rowData = filteredDetails.map((item) => {
+        console.log("Filtered Course Details:", item);
+  
+        // Return mapped data
+        return {
+          courseId: item.courseId,
+          courseName: item.courseName,
+          centreLocation: item.centreLocation,  // Only display the code like "T-253"
+          vacanices: item.vacanices,
+          status: item.status,
+          courseDuration: item.courseDuration,
+          courseTiming: item.courseTiming
+        };
+      });
+  
+      console.log("Filtered Row Data:", rowData);
+  
+      this.setState({ rowData });
+    }
+  }
+  
+  // Function to get CSRF token from cookies
+  getCsrfToken = async () => 
+  {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(`${name}=`)) {
+        return cookie.substring(name.length + 1);
+      }
+    }
+    return null;
+  };
+
+  // Axios instance with CSRF token attached
+  axiosInstance = axios.create({
+    baseURL: 'http://localhost:3002',  // Your Django backend URL
+    //baseURL: 'https://moses-ecss-data.azurewebsites.net/',  // Your Django backend URL
+    withCredentials: true            // Ensure cookies are sent with requests
+  });
+
+  componentDidMount = async () => 
+  {
+    // Attach CSRF token to Axios request headers
+    this.axiosInstance.interceptors.request.use(config => {
+      const csrfToken = this.getCsrfToken();
+      if (csrfToken) {
+        config.headers['X-CSRFToken'] = csrfToken;  // Attach CSRF token to headers
+      }
+      return config;
+    });
+  
+    const { courseType } = this.props;
+  
+    // Fetch data if not already fetched
+    if (courseType && !this.state.dataFetched) {
+      await this.fetchCourses(courseType);
+    }
+  };
+    
+  componentDidUpdate(prevProps)
+  {
+    var { courseType, selectedLanguage, selectedLocation, searchQuery, language } = this.props;
+
+    // Check if any of the relevant props have changed
+    if (
+      courseType !== prevProps.courseType
+    ) {
+      this.setState({ filteredCourses: [] });
+      this.fetchCourses(courseType);
+    }
+    else if (
+      selectedLanguage !== prevProps.selectedLanguage ||
+      selectedLocation !== prevProps.selectedLocation ||
+      searchQuery !== prevProps.searchQuery 
+    ) {
+      this.filterCourses(); // Filter courses based on updated props
+    }
+  }
+    
+  changeMonthToNumber(month) {
+    const monthMap = {
+      'January': 1,
+      'February': 2,
+      'March': 3,
+      'April': 4,
+      'May': 5,
+      'June': 6,
+      'July': 7,
+      'August': 8,
+      'September': 9,
+      'October': 10,
+      'November': 11,
+      'December': 12,
+      '一月': 1,
+      '二月': 2,
+      '三月': 3,
+      '四月': 4,
+      '五月': 5,
+      '六月': 6,
+      '七月': 7,
+      '八月': 8,
+      '九月': 9,
+      '十月': 10,
+      '十一月': 11,
+      '十二月': 12,
+    };
+  
+    return monthMap[month] || 0; // Return 0 for invalid month
+  }
+
+  convertTo24HourWithHrs(time12) {
+    const [time, modifier] = time12.split(/(am|pm)/i); // Split by 'am' or 'pm'
+    let [hours, minutes] = time.split(":").map(Number);
+    if (modifier.toLowerCase() === "pm" && hours < 12) {
+      hours += 12; // Convert PM hours
+    } else if (modifier.toLowerCase() === "am" && hours === 12) {
+      hours = 0; // Midnight case
+    }
+    console.log("24 hr Format:", hours);
+    // Return formatted time as "HHmm hrs"
+    return { hours, minutes }; // Return hours and minutes as an object
+  }
+  
+  shorternMonth(dateString)
+  {
+    const date = new Date(dateString);
+    const day = date.getDate(); // Extract the day
+    const month = date.toLocaleString("en-US", { month: "short" }); // Shortened month
+    const year = date.getFullYear(); // Full year
+    return `${day} ${month} ${year}`; // Combine into the desired format
+  }
+
+  render() 
+  {
+    ModuleRegistry.registerModules([AllCommunityModule]);  
     return (
       <div className="nsa-course-container">
         <div className="nsa-course-heading">
-          <h1>
-            {this.props.language === "zh"
-              ? `${this.props.courseType === "NSA" ? "NSA 课程" : "ILP 课程"}`
-              : `${this.props.courseType === "NSA" ? "NSA Course" : "ILP Course"}`}
+          <h1 style={{ textAlign: 'center' }}>
+            {this.props.courseType === "NSA" ? "NSA Courses" : "ILP Courses"}
           </h1>
-          <div className="table-wrapper" ref={this.tableRef}>
-            {!clearTable && (
-              <table className="course-table modern-style">
-                <thead>
-                  <tr>
-                    {[
-                      { en: "Course ID", zh: "课程 ID" },
-                      { en: "Course Name", zh: "课程名称" },
-                      { en: "Centre Location", zh: "中心位置" },
-                      { en: "Vacancies", zh: "空位" },
-                      { en: "Status", zh: "状态" },
-                      { en: "Course Duration", zh: "开始日期" },
-                      { en: "Course Timing", zh: "开始时间" },
-                    ].map((header, index) => (
-                      <th key={index}>
-                        {this.props.language === "zh" ? header.zh : header.en}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedCourses.map((course, index) => {
-                    const nameDetails = this.courseNameAndDetails(course.name);
-                    const courseDetails = this.getSelectedDetails(course.short_description, course.stock_quantity);
-                    const coursePrice = parseFloat(course.regular_price);
-                    const isExpanded = expandedRow === index;
-  
-                    const location =
-                      nameDetails.location === "Pasir Ris West Wellness Centre"
-                        ? "PRW"
-                        : nameDetails.location === "Tampines 253 Centre"
-                        ? "253"
-                        : nameDetails.location === "CT Hub"
-                        ? "CTH"
-                        : nameDetails.location;
-  
-                    const courseMainDetails = [
-                      course.id,
-                      this.props.language === "zh" ? nameDetails.chiName : nameDetails.engName,
-                      location,
-                      `${course.stock_quantity}/${parseInt(courseDetails.vacancies)}`,
-                      this.props.language === "zh"
-                        ? this.formatStatusToChinese(courseDetails.status)
-                        : courseDetails.status,
-                      this.props.language === "zh"
-                        ? this.formatDateToChinese(courseDetails.startDate)
-                        : `${this.shorternMonth(courseDetails.startDate)} - ${this.shorternMonth(courseDetails.endDate)}`,
-                      this.props.language === "zh"
-                        ? this.formatTimeToChinese(courseDetails.startTime)
-                        : `${courseDetails.startTime} - ${courseDetails.endTime}`,
-                    ];
-  
-                    const expandedDetails = [
-                      {
-                        label: this.props.language === "zh" ? "课程价格:" : "Course Price:",
-                        value:
-                          coursePrice <= 0
-                            ? this.props.language === "zh"
-                              ? "免费"
-                              : "Free"
-                            : `$${coursePrice.toFixed(2)}`,
-                      },
-                      {
-                        label: this.props.language === "zh" ? "讲师：" : "No. of Lesson(s):",
-                        value: parseInt(courseDetails.noOfLesson),
-                      },
-                    ];
-  
-                    // Get the status and apply styles
-                    const status = this.props.language === "zh"
-                      ? this.formatStatusToChinese(courseDetails.status)
-                      : courseDetails.status;
-
-                      const getStatusBackgroundColor = (status) => {
-                        switch (status) {
-                          case "Available":
-                            return "#4CAF50"; // Green
-                          case "Full":
-                            return "#f44336"; // Red
-                          case "Ongoing":
-                            return "#ff9800"; // Orange
-                          case "Ended":
-                            return "#000000"; // Black
-                          default:
-                            return "#ff9800"; // Default Orange for other cases
-                        }
-                      };
-  
-                    const statusStyles = {
-                      backgroundColor: getStatusBackgroundColor(status),
-                      color: "#fff",
-                      padding: "0.2rem 0.5rem",
-                      borderRadius: "0.3rem",
-                      fontWeight: "bold",
-                      fontSize: "0.8rem", // Smaller font size
-                    };
-  
-                    return (
-                      <React.Fragment key={index}>
-                        <tr
-                          onClick={() => this.handleRowToggle(index)}
-                          className={`main-row ${isExpanded ? "expanded" : ""}`}
-                        >
-                          {courseMainDetails.map((detail, cellIndex) => (
-                            <td key={cellIndex}>
-                              {cellIndex === 4 ? (
-                                <span style={statusStyles}>
-                                  {status}
-                                </span>
-                              ) : (
-                                !hideAllCells && detail
-                              )}
-                            </td>
-                          ))}
-                        </tr>
-  
-                        {isExpanded && (
-                          <tr className="expanded-row">
-                            <td colSpan="7">
-                              <div className="expanded-content">
-                                <h3>
-                                  {this.props.language === "zh" ? "课程详情" : "More Information"}
-                                </h3>
-                                {expandedDetails.map((detail, detailIndex) => (
-                                  <p key={detailIndex}>
-                                    <strong>{detail.label}</strong> {detail.value}
-                                  </p>
-                                ))}
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </div>
+        </div>
+        <div className="course-table-wrapper">
+            <AgGridReact
+              columnDefs={this.state.columnDefs}
+              rowData={this.state.rowData}
+              domLayout="normal"
+              statusBar={false}
+              pagination={true}
+              paginationPageSize={this.state.rowData.length}
+              defaultColDef={{
+                resizable: true, // Make columns resizable
+              }}
+              sortable={true} 
+            />
         </div>
       </div>
     );
