@@ -288,7 +288,8 @@ class invoiceGenerator {
             "TCM Diet": "TGS-2021008570",
             "Therapeutic Basic Line Work": "TGS-2024047927",
             "Therapeutic Watercolour Painting for Beginners ": "TGS-2022015736",
-            "Community Singing – Mandarin": "TGS-2021008563"
+            "Community Singing – Mandarin": "TGS-2021008563",
+            "TCM – Don’t be a friend of Chronic Diseases": "TGS-2021008576",
         };
     
        // Check for exact match
@@ -368,7 +369,12 @@ class invoiceGenerator {
         array.forEach((item, index) => {
             console.log("Course Reference Code:", this.courseReferenceCode(item.course.courseEngName));
             doc.text(this.courseReferenceCode(item.course.courseEngName), columnPositions.courseRef + 15, currentY + 3)
-            doc.text(item.course.courseEngName, columnPositions.courseTitle + 10, currentY + 3);
+            const courseTitleX = columnPositions.courseTitle + 10;
+            const maxWidth = 80; // Adjust the width based on your layout
+            // Split the text into multiple lines if necessary
+            const lines = doc.splitTextToSize(item.course.courseEngName, maxWidth);
+            doc.text(lines, courseTitleX, currentY + 3);
+            //doc.text(item.course.courseEngName, columnPositions.courseTitle + 10, currentY + 3);
             const durationParts = item.course.courseDuration.split('-');
             const startDate = durationParts[0].trim(); // '23 January 2025'
             const endDate = durationParts[1].trim(); // '23 January 2025'
