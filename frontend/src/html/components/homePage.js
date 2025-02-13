@@ -843,15 +843,6 @@
                         item={item}
                       />
                     </div>
-                    <div className="view-toggle-section">
-                      <ViewToggle
-                        language={language}
-                        viewMode={viewMode}
-                        onToggleView={this.toggleViewMode}
-                        onEntriesPerPageChange={this.handleEntriesPerPageChange}  
-                        getTotalNumber= {nofAccounts}
-                      />
-                    </div>
                     <div className="account-section">
                       <AccountsSection
                         language={language}
@@ -868,14 +859,6 @@
                         edit = {this.editAccountPopupMessage}
                         updateAccessRights = {this.updateAccessRights}
                         key={this.state.refreshKey}
-                      />
-                    </div>
-                    <div className="pagination-section">
-                      <Pagination
-                        viewMode = {viewMode}
-                        currentPage={currentPage} 
-                        totalPages={totalPages} 
-                        onPageChange={this.handlePageChange}
                       />
                     </div>
                   </>
