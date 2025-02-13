@@ -368,18 +368,8 @@ class invoiceGenerator {
         doc.fontSize(10).fillColor('black').font(fontPathRegular);
         array.forEach((item, index) => {
             console.log("Course Reference Code:", this.courseReferenceCode(item.course.courseEngName));
-            doc.text(this.courseReferenceCode(item.course.courseEngName), columnPositions.courseRef + 15, currentY + 3)
-            const courseTitleX = columnPositions.courseTitle + 10;
-            const words = item.course.courseEngName.split(" "); // Split text into words
-            let lines = [];
-
-            // Group words into pairs
-            for (let i = 0; i < words.length; i += 2) {
-                lines.push(words.slice(i, i + 2).join(" ")); // Join two words per line
-            }
-
-            doc.text(lines, courseTitleX, currentY + 3);
-            //doc.text(item.course.courseEngName, columnPositions.courseTitle + 10, currentY + 3);
+            doc.fontSize(10).text(this.courseReferenceCode(item.course.courseEngName), columnPositions.courseRef + 15, currentY + 3)
+            doc.fontSize(10).text(item.course.courseEngName, columnPositions.courseTitle + 10, currentY + 3);
             const durationParts = item.course.courseDuration.split('-');
             const startDate = durationParts[0].trim(); // '23 January 2025'
             const endDate = durationParts[1].trim(); // '23 January 2025'
@@ -387,12 +377,12 @@ class invoiceGenerator {
             const formattedStartDate = this.formatDate(startDate);
             const formattedEndDate = this.formatDate(endDate);
 
-            doc.text(formattedStartDate, columnPositions.startDate+ 5, currentY + 3); 
-            doc.text(formattedEndDate, columnPositions.endDate+ 5, currentY + 3); 
+            doc.fontSize(10).text(formattedStartDate, columnPositions.startDate+ 5, currentY + 3); 
+            doc.fontSize(10).text(formattedEndDate, columnPositions.endDate+ 5, currentY + 3); 
             const coursePrice = parseFloat(item.course.coursePrice.replace('$', '').trim());
             const totalPrice = coursePrice * 5;
-            doc.text(`$     ${totalPrice.toFixed(2)}`, columnPositions.fullCourse+ 5, currentY + 3); 
-            doc.text(`$     ${coursePrice.toFixed(2)}`, columnPositions.subsidised+ 5, currentY + 3); 
+            doc.fontSize(10).text(`$     ${totalPrice.toFixed(2)}`, columnPositions.fullCourse+ 5, currentY + 3); 
+            doc.fontSize(10).text(`$     ${coursePrice.toFixed(2)}`, columnPositions.subsidised+ 5, currentY + 3); 
         
             // Draw borders for the first row
             if (index === 0) {
