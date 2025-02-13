@@ -41,6 +41,11 @@ class CoursesSection extends Component {
         width: 150,
       },
       {
+        headerName: "No.of Lesson",
+        field: "noLesson",
+        width: 150,
+      },
+      {
         headerName: "Vacancies",
         field: "vacanices",
         width: 100,
@@ -160,6 +165,7 @@ class CoursesSection extends Component {
         courseName: splitName.length === 3 ? splitName[1] : (splitName.length === 2 ? splitName[0] : item.name),
         centreLocation: splitName.length === 3 ? locationMap[splitName[2].replace(/[()]/g, '').trim()] || splitName[2].replace(/[()]/g, '').trim() : splitName.length === 2 ? locationMap[splitName[1].replace(/[()]/g, '').trim()] || splitName[1].replace(/[()]/g, '').trim(): '',
         vacanices: item.stock_quantity,
+        noOfLesson: displayedDetails.noOfLesson,
         status: displayedDetails.status,
         courseDuration: displayedDetails.startDate+" - "+displayedDetails.endDate,
         courseTiming: displayedDetails.startTime+" - "+displayedDetails.endTime,
@@ -351,6 +357,7 @@ class CoursesSection extends Component {
           courseId: item.courseId,
           courseName: item.courseName,
           centreLocation: item.centreLocation,  // Only display the code like "T-253"
+          noLesson: item.noLesson,
           vacanices: item.vacanices,
           status: item.status,
           courseDuration: item.courseDuration,
