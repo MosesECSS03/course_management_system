@@ -380,8 +380,8 @@ class CoursesSection extends Component {
 
   // Axios instance with CSRF token attached
   axiosInstance = axios.create({
-    baseURL: 'http://localhost:3002',  // Your Django backend URL
-    //baseURL: 'https://moses-ecss-data.azurewebsites.net/',  // Your Django backend URL
+    //baseURL: 'http://localhost:3002',  // Your Django backend URL
+    baseURL: 'https://moses-ecss-data.azurewebsites.net/',  // Your Django backend URL
     withCredentials: true            // Ensure cookies are sent with requests
   });
 
