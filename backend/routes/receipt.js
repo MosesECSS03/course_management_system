@@ -29,7 +29,7 @@ router.post('/', async function(req, res, next)
     if(req.body.purpose === "getReceiptNo")
     {   
         var controller = new ReceiptController();
-        var result = await controller.newReceiptNo(req.body.courseLocation);
+        var result = await controller.newReceiptNo(req.body.courseLocation, req.body.centreLocation);
         return res.json({"result": result});
     }
     else if(req.body.purpose === "createReceipt")

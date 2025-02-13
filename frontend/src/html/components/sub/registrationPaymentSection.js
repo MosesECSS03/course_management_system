@@ -225,14 +225,16 @@ class RegistrationPaymentSection extends Component {
       {
         const courseLocation = newMethod === "SkillsFuture" ? "ECSS/SFC/" : course.courseLocation;
         console.log("Course Location:", courseLocation);
-    
+        const centreLocation = course.courseLocation;
+    ,
         try {
           //console.log("Fetching receipt number for location:", courseLocation);
           const response = await axios.post(
             //"http://localhost:3001/receipt", {
-            'https://moses-ecss-backend.azurewebsites.net/courseregistration',{
+            'https://moses-ecss-backend.azurewebsites.net/receipt',{
             purpose: "getReceiptNo",
             courseLocation,
+            centreLocation
           });
 
     

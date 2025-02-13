@@ -528,54 +528,7 @@ class DatabaseConnectivity {
             console.log("Error updating database:", error);
         }
     }
-
-
-    async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
-        const db = this.client.db(databaseName);
-        const collection = db.collection(collectionName);
     
-        // Retrieve all receipts matching the specified courseLocation
-        const existingReceipts = await collection.find({
-            receiptNo: { $regex: `^${courseLocation} - \\d+$` } // Match receipt numbers with courseLocation and numeric part
-        }).toArray();
-    
-        console.log("Current receipts:", existingReceipts);
-    
-        // If there are no receipts for the specific courseLocation, return '1' as the starting number
-        if (existingReceipts.length === 0) 
-        {
-            if(courseLocation === "ECSS/SFC/")
-            {
-                //ECSS/SFC/036/25 
-                return `${courseLocation}/37/2024` 
-            }
-            else
-            {
-                return `${courseLocation} - 0001`; // Start from '1' for new courseLocation
-            }
-        }
-    
-        // Extract the numeric part of receipt numbers
-        const receiptNumbers = existingReceipts.map(receipt => {
-            const match = receipt.receiptNo.match(new RegExp(`^${courseLocation} - (\\d+)$`));
-            return match ? parseInt(match[1], 10) : null; // Extract and parse numeric part
-        }).filter(num => num !== null); // Remove invalid entries
-    
-        // Find the latest (maximum) existing number
-        const latestNumber = Math.max(...receiptNumbers);
-    
-        // Determine the next number
-        const nextNumber = latestNumber + 1;
-    
-        // Calculate the length dynamically based on the maximum numeric length in existing receipts
-       // const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), String(nextNumber).length);
-       const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 4);
-    
-        // Format the next number with leading zeros to match the dynamic length
-        return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
-    }
-        
-
     async deleteAccount(databaseName, collectionName, id) {
         const db = this.client.db(databaseName);
         const table = db.collection(collectionName);
@@ -597,76 +550,48 @@ class DatabaseConnectivity {
         }
     }
 
-    /*async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
+    async getNextReceiptNumber(databaseName, collectionName, courseLocation, centreLocation) {
         const db = this.client.db(databaseName);
         const collection = db.collection(collectionName);
     
+        // Get the current two-digit year
+        const currentYear = new Date().getFullYear().toString().slice(-2);
+    
         // Retrieve all receipts matching the specified courseLocation
         const existingReceipts = await collection.find({
-            receiptNo: { $regex: `^${courseLocation} - \\d+$` } // Match receipt numbers with courseLocation and numeric part
+            receiptNo: { $regex: `^${courseLocation}` } // Match all receipts starting with courseLocation
         }).toArray();
     
-        console.log("Current receipts:", existingReceipts);
+        console.log("Existing receipts:", existingReceipts);
     
-        // If there are no receipts for the specific courseLocation, return '1' as the starting number
-        if (existingReceipts.length === 0) {
-            return `${courseLocation} - 0001`; // Start from '1' for new courseLocation
-        }
-    
-        // Extract the numeric part of receipt numbers
-        const receiptNumbers = existingReceipts.map(receipt => {
-            const match = receipt.receiptNo.match(new RegExp(`^${courseLocation} - (\\d+)$`));
-            return match ? parseInt(match[1], 10) : null; // Extract and parse numeric part
-        }).filter(num => num !== null); // Remove invalid entries
-    
-        // Find the latest (maximum) existing number
-        const latestNumber = Math.max(...receiptNumbers);
-    
-        // Determine the next number
-        const nextNumber = latestNumber + 1;
-    
-        // Calculate the length dynamically based on the maximum numeric length in existing receipts
-       // const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), String(nextNumber).length);
-       const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 4);
-    
-        // Format the next number with leading zeros to match the dynamic length
-        return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
-    }*/
-
-        async getNextReceiptNumber(databaseName, collectionName, courseLocation) {
-            const db = this.client.db(databaseName);
-            const collection = db.collection(collectionName);
-        
-            // Get the current two-digit year
-            const currentYear = new Date().getFullYear().toString().slice(-2);
-        
-            // Retrieve all receipts matching the specified courseLocation
-            const existingReceipts = await collection.find({
-                receiptNo: { $regex: `^${courseLocation}` } // Match all receipts starting with courseLocation
-            }).toArray();
-        
-            console.log("Existing receipts:", existingReceipts);
-        
-            // Filter receipts to determine if a reset is needed for ECSS/SFC
-            const validReceipts = existingReceipts.filter(receipt => {
-                if (courseLocation === "ECSS/SFC/") {
-                    // Match receipts for the current year
-                    const regex = new RegExp(`^${courseLocation}\\d+/(${currentYear})$`);
-                    return regex.test(receipt.receiptNo);
-                }
-                return true; // For other prefixes, year isn't relevant
-            });
-        
-            // Handle special case for ECSS/SFC/ in 2024
-            if (validReceipts.length === 0) {
-                if (courseLocation === "ECSS/SFC/" && currentYear === "24") {
-                    return `${courseLocation}037/${currentYear}`; // Start from 037 in 2024
-                } else if (courseLocation === "ECSS/SFC/") {
-                    return `${courseLocation}001/${currentYear}`; // Start from 001 for other years
-                } else {
-                    return `${courseLocation} - 0001`;
-                }
+        // Filter receipts to determine if a reset is needed for ECSS/SFC
+        const validReceipts = existingReceipts.filter(receipt => {
+            if (courseLocation === "ECSS/SFC/") {
+                // Match receipts for the current year
+                const regex = new RegExp(`^${courseLocation}\\d+/(${currentYear})$`);
+                return regex.test(receipt.receiptNo);
             }
+            return true; // For other prefixes, year isn't relevant
+        });
+    
+        // Handle special case for ECSS/SFC/ in 2024
+        if (validReceipts.length === 0) {
+            if (courseLocation === "ECSS/SFC/" && currentYear === "25") 
+            {
+                if(centreLocation === "CT Hub")
+                {
+                    return `${courseLocation}109/${currentYear}`; // Start from 037 in 2024
+                }
+                else
+                {
+                    return `${courseLocation}109/${currentYear}`; // Start from 037 in 2024
+                }
+            } else if (courseLocation === "ECSS/SFC/") {
+                return `${courseLocation}001/${currentYear}`; // Start from 001 for other years
+            } else {
+                return `${courseLocation} - 0001`;
+            }
+        }
         
             // Extract numeric parts for the running number
             const receiptNumbers = validReceipts.map(receipt => {
