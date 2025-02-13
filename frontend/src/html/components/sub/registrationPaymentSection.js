@@ -226,7 +226,6 @@ class RegistrationPaymentSection extends Component {
         const courseLocation = newMethod === "SkillsFuture" ? "ECSS/SFC/" : course.courseLocation;
         console.log("Course Location:", courseLocation);
         const centreLocation = course.courseLocation;
-    ,
         try {
           //console.log("Fetching receipt number for location:", courseLocation);
           const response = await axios.post(
