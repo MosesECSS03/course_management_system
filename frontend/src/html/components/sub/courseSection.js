@@ -163,6 +163,7 @@ class CoursesSection extends Component {
         centreLocation: splitName.length === 3 ? locationMap[splitName[2].replace(/[()]/g, '').trim()] || splitName[2].replace(/[()]/g, '').trim() : splitName.length === 2 ? locationMap[splitName[1].replace(/[()]/g, '').trim()] || splitName[1].replace(/[()]/g, '').trim(): '',
         vacanices: item.stock_quantity,
         noLesson: displayedDetails.noOfLesson,
+        language: displayedDetails.language,
         status: displayedDetails.status,
         courseDuration: displayedDetails.startDate+" - "+displayedDetails.endDate,
         courseTiming: displayedDetails.startTime+" - "+displayedDetails.endTime,
@@ -358,7 +359,8 @@ class CoursesSection extends Component {
           vacanices: item.vacanices,
           status: item.status,
           courseDuration: item.courseDuration,
-          courseTiming: item.courseTiming
+          courseTiming: item.courseTiming,
+          language: item.language
         };
       });
   
@@ -533,26 +535,29 @@ class CoursesSection extends Component {
             sortable={true} 
             onCellClicked={this.handleValueClick}
           />
-          {this.state.expandedRowIndex !== null && (
-              <div
-              style={{
-                padding: '10px',
-                backgroundColor: '#F9E29B',
-                marginLeft: '5%',
-                width: '88vw',
-                height: 'fit-content',
-                borderRadius: '15px', // Make the border more rounded
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for a floating effect
-              }}
-              >
-                {/* Custom content you want to display */}
-                <p  style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
-                <p style={{textAlign:"left"}}>
-                  <strong>No Of Lesson: </strong>{this.state.rowData[this.state.expandedRowIndex].noLesson+" Lesson(s)"}
-                </p>
-              </div>
-            )} 
         </div>
+        {this.state.expandedRowIndex !== null && (
+            <div
+            style={{
+              padding: '10px',
+              backgroundColor: '#F9E29B',
+              marginLeft: '5%',
+              width: '88vw',
+              height: 'fit-content',
+              borderRadius: '15px', // Make the border more rounded
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for a floating effect
+            }}
+            >
+              {/* Custom content you want to display */}
+              <p  style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
+              <p style={{textAlign:"left"}}>
+                <strong>No Of Lesson: </strong>{this.state.rowData[this.state.expandedRowIndex].noLesson+" Lesson(s)"}
+              </p>
+              <p style={{textAlign:"left"}}>
+                <strong>No Of Lesson: </strong>{this.state.rowData[this.state.expandedRowIndex].language+" Lesson(s)"}
+              </p>
+            </div>
+          )} 
       </div>
     );
   }  
