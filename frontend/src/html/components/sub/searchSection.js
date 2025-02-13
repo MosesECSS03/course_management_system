@@ -383,7 +383,7 @@ render() {
                 <i className="fas fa-angle-down dropdown-icon"></i>
               </div>
             </div>
-            <div className="form-group">
+            {/*<div className="form-group">
             <label htmlFor="language">{this.props.language === 'zh' ? '语言' : 'Languages'}</label>
             <div
               className={`dropdown-container ${showLanguageDropdown ? 'open' : ''}`}
@@ -413,7 +413,7 @@ render() {
               )}
               <i className="fas fa-angle-down dropdown-icon"></i>
             </div>
-          </div>
+          </div>*/}
             <div className="form-group">
               <label htmlFor="searchQuery">{this.props.language === 'zh' ? '搜寻' : 'Search'}</label>
               <div className="search-container">

@@ -895,15 +895,6 @@
                         item={item}
                       />
                     </div>
-                    <div className="view-toggle-section">
-                      <ViewToggle
-                        language={language}
-                        viewMode={viewMode}
-                        onToggleView={this.toggleViewMode}
-                        onEntriesPerPageChange={this.handleEntriesPerPageChange}  
-                        getTotalNumber= {nofCourses}
-                      />
-                    </div>
                     <div className="courses-section">
                       <CoursesSection
                         language={language}
@@ -919,14 +910,6 @@
                         resetSearch={resetSearch} 
                         section={section}
                         item={item}
-                      />
-                    </div>
-                    <div className="pagination-section">
-                      <Pagination
-                        viewMode = {viewMode}
-                        currentPage={currentPage} 
-                        totalPages={totalPages} 
-                        onPageChange={this.handlePageChange}
                       />
                     </div>
                   </>
