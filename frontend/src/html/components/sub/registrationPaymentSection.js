@@ -58,12 +58,9 @@ class RegistrationPaymentSection extends Component {
 
     fetchCourseRegistrations = async (language) => {
       try {
-        /*const response = await axios.post(
-          'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
-          { purpose: 'retrieve' }
-        );*/
         const response = await axios.post(
-          'http://localhost:3001/courseregistration', 
+          //'http://localhost:3001/courseregistration', 
+          'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
           { purpose: 'retrieve' }
         );
 
@@ -182,8 +179,8 @@ class RegistrationPaymentSection extends Component {
         // Check if the value is "Paid" or "Generate SkillsFuture Invoice"
         if (updatedStatus === "Paid" || updatedStatus === "SkillsFuture Done" || updatedStatus === "Cancelled") {
           // Proceed to update WooCommerce stock
-          const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
-          //const stockResponse = await axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', { 
+         // const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
+          const stockResponse = await axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', { 
             type: 'update', 
             page: {"courseChiName":chi, "courseEngName":eng, "courseLocation":location}, // Assuming `chi` refers to the course or page
             status: updatedStatus, // Using updatedStatus directly here
@@ -234,10 +231,6 @@ class RegistrationPaymentSection extends Component {
             courseLocation,
           });
 
-         /* const response = await axios.post("https://moses-ecss-backend.azurewebsites.net/receipt", {
-            purpose: "getReceiptNo",
-            courseLocation,
-          });*/
     
           if (response?.data?.result?.success) {
             console.log("Fetched receipt number:", response.data.result.receiptNumber);
@@ -275,7 +268,7 @@ class RegistrationPaymentSection extends Component {
       };
       
     
-      receiptShown = async (participant, course, receiptNo) => 
+      receiptShown = async (participant, course, receiptNo, officialInfo) => 
       {
         try {
           if(course.payment === "Cash" || course.payment === "PayNow")
@@ -289,6 +282,7 @@ class RegistrationPaymentSection extends Component {
                 course,
                 staff: this.props.userName,
                 receiptNo,
+                officialInfo
               },
               { responseType: "blob" }
             );
@@ -497,31 +491,31 @@ class RegistrationPaymentSection extends Component {
         // Add the values
         paginatedDetails.forEach(detail => {
             const row = [
-                detail.participant.name,
-                detail.participant.nric,
-                detail.participant.residentialStatus,
-                detail.participant.race,
-                detail.participant.gender,
-                detail.participant.dateOfBirth,
-                detail.participant.contactNumber,
-                detail.participant.email,
-                detail.participant.postalCode,
-                detail.participant.educationLevel,
-                detail.participant.workStatus,
-                detail.course.courseType,
-                detail.course.courseEngName,
-                detail.course.courseChiName,
-                detail.course.courseLocation,
-                detail.course.coursePrice,
-                detail.course.courseDuration,
-                detail.course.payment,
+                detail.participantInfo.name,
+                detail.participantInfo.nric,
+                detail.participantInfo.residentialStatus,
+                detail.participantInfo.race,
+                detail.participantInfo.gender,
+                detail.participantInfo.dateOfBirth,
+                detail.participantInfo.contactNumber,
+                detail.participantInfo.email,
+                detail.participantInfo.postalCode,
+                detail.participantInfo.educationLevel,
+                detail.participantInfo.workStatus,
+                detail.courseInfo.courseType,
+                detail.courseInfo.courseEngName,
+                detail.courseInfo.courseChiName,
+                detail.courseInfo.courseLocation,
+                detail.courseInfo.coursePrice,
+                detail.courseInfo.courseDuration,
+                detail.courseInfo.payment,
                 detail.agreement,
                 detail.status,
-                detail.official?.name,
-                detail.official?.date,
-                detail.official?.time,
-                detail.official?.receiptNo,
-                detail.official?.remarks
+                detail.officialInfo?.name,
+                detail.officialInfo?.date,
+                detail.officialInfo?.time,
+                detail.officialInfo?.receiptNo,
+                detail.officialInfo?.remarks
             ];
             preparedData.push(row);
         });
@@ -638,6 +632,7 @@ class RegistrationPaymentSection extends Component {
     
         paginatedDetails.forEach((detail, index) => {
           console.log("Paginated Detail1",  detail);
+         // console.log("Date Of Birth:", detail.participantInfo.dateOfBirth);
           if (detail.courseInfo.courseType === "NSA") {
             const rowIndex = startRow + index;
             const newDataRow = sourceSheet.getRow(rowIndex);
@@ -649,10 +644,15 @@ class RegistrationPaymentSection extends Component {
             sourceSheet.getCell(`C${rowIndex}`).value = detail.participantInfo.nric;
             sourceSheet.getCell(`D${rowIndex}`).value = detail.participantInfo.residentialStatus.substring(0, 2);
     
-            const [day, month, year] = detail.participantInfo.dateOfBirth.split("/");
-            sourceSheet.getCell(`E${rowIndex}`).value = day.trim();
-            sourceSheet.getCell(`F${rowIndex}`).value = month.trim();
-            sourceSheet.getCell(`G${rowIndex}`).value = year.trim();
+            //console.log("Date of birth:", detail.participantInfo.name, detail?.participantInfo?.dateOfBirth.split("/"));
+            const dob = detail?.participantInfo?.dateOfBirth;
+
+            if (dob) {
+                const [day, month, year] = dob.split("/");
+                sourceSheet.getCell(`E${rowIndex}`).value = day.trim();
+              sourceSheet.getCell(`F${rowIndex}`).value = month.trim();
+              sourceSheet.getCell(`G${rowIndex}`).value = year.trim()
+            }
     
             sourceSheet.getCell(`H${rowIndex}`).value = detail.participantInfo.gender.split(" ")[0];
             sourceSheet.getCell(`I${rowIndex}`).value = detail.participantInfo.race.split(" ")[0];
@@ -685,7 +685,7 @@ class RegistrationPaymentSection extends Component {
           }
         });
     
-        // Create new file name and sav
+       // Create new file name and sav
         const originalFileName = `List of Eligible Participants for ${courseName} as of ${this.getCurrentDateTime()}.xlsx`
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], {
@@ -693,7 +693,7 @@ class RegistrationPaymentSection extends Component {
         });
     
         // Trigger download
-        saveAs(blob, originalFileName);    
+        saveAs(blob, originalFileName);
       } catch (error) {
         console.error("Error exporting LOP:", error);
         this.props.warningPopUpMessage("An error occurred during export.");
@@ -907,7 +907,9 @@ class RegistrationPaymentSection extends Component {
         recinvNo: item.official.receiptNo,  // Replace with the actual field for receipt/invoice number
         participantInfo: item.participant,
         courseInfo: item.course,
-        officialInfo: item.official
+        officialInfo: item.official,
+        agreement: item.agreement,
+        status: item.status
       };
     });
     console.log("All Rows Data:", rowData);
@@ -923,6 +925,8 @@ class RegistrationPaymentSection extends Component {
     const receiptInvoice = event.data.recinvNo;
     const participantInfo = event.data.participantInfo;
     const courseInfo = event.data.courseInfo;
+    const officialInfo = event.data.officialInfo;
+    console.log("officialInfo:", officialInfo);
 
     const rowIndex = event.rowIndex; // Get the clicked row index
     const expandedRowIndex = this.state.expandedRowIndex;
@@ -948,7 +952,7 @@ class RegistrationPaymentSection extends Component {
           {
             this.props.showUpdatePopup("In Progress... Please wait...");
             console.log("Receipt/Invoice Number");
-            await this.receiptShown(participantInfo, courseInfo, receiptInvoice);
+            await this.receiptShown(participantInfo, courseInfo, receiptInvoice, officialInfo);
             this.props.closePopup();
           }
         }
@@ -992,6 +996,7 @@ class RegistrationPaymentSection extends Component {
     const confirmed = event.data.confirmed;
     const paymentMethod = event.data.paymentMethod;
     const paymentStatus = event.data.paymentStatus;
+    const oldPaymentStatus = event.data.status;
 
     console.log("Column Name:", columnName);
 
@@ -1015,8 +1020,8 @@ class RegistrationPaymentSection extends Component {
           if(newValue === "Cash" || newValue === "PayNow")
           {
               const response = await axios.post(
-               'http://localhost:3001/courseregistration', 
-              //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+               //'http://localhost:3001/courseregistration', 
+              'https://moses-ecss-backend.azurewebsites.net/courseregistration',
                 { 
                   purpose: 'updatePaymentStatus', 
                   id: id, 
@@ -1042,8 +1047,6 @@ class RegistrationPaymentSection extends Component {
                 await performParallelTasks();
               } 
           }
-          this.props.closePopup();
-          this.refreshChild();  
         }
         else if (columnName === "Confirmation") 
         {
@@ -1095,8 +1098,7 @@ class RegistrationPaymentSection extends Component {
                   } 
               }
           }
-          this.props.closePopup();
-          this.refreshChild();  
+          console.log("Change SkillsFuture Confirmation");
         }
         else if (columnName === "Payment Status") 
         {
@@ -1121,18 +1123,22 @@ class RegistrationPaymentSection extends Component {
                 console.log("Update Payment Status Success1");
                   if(newValue === "Cancelled")
                   {
-                    const performParallelTasks = async () => {
-                      try {
-                        // Run the two functions in parallel using Promise.all
-                        await Promise.all([
-                          this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
-                        ]);
-                        console.log("Both tasks completed successfully.");
-                      } catch (error) {
-                        console.error("Error occurred during parallel task execution:", error);
-                      }};
-                      await performParallelTasks();
-                  } 
+                    console.log("Old Payment Status:", oldPaymentStatus);
+                    if(oldPaymentStatus === "Paid")
+                    {
+                      const performParallelTasks = async () => {
+                        try {
+                          // Run the two functions in parallel using Promise.all
+                          await Promise.all([
+                            this.updateWooCommerceForRegistrationPayment(courseChiName, courseName, courseLocation, newValue),
+                          ]);
+                          console.log("Both tasks completed successfully.");
+                        } catch (error) {
+                          console.error("Error occurred during parallel task execution:", error);
+                        }};
+                        await performParallelTasks();
+                    }
+                }
                 else
                 {
                   // Define the parallel tasks function
@@ -1167,8 +1173,10 @@ class RegistrationPaymentSection extends Component {
                   await performParallelTasks();
               }
               else if(newValue === "Cancelled")
+              {
+                console.log("SkillsFuture, Old Payment Status:", oldPaymentStatus);
+                if(oldPaymentStatus === "SkillsFuture Done")
                 {
-                  console.log("Cancelled Participants");
                   const performParallelTasks = async () => {
                     try {
                       // Run the two functions in parallel using Promise.all
@@ -1180,11 +1188,14 @@ class RegistrationPaymentSection extends Component {
                       console.error("Error occurred during parallel task execution:", error);
                     }};
                     await performParallelTasks();
-                } 
+                }
+                else
+                {
+                  console.log("SkillsFuture: Do not need to update Woocommerce");
+                }
+              } 
             }
           }
-          this.props.closePopup();
-          this.refreshChild(); 
         }
         else
         {
@@ -1200,15 +1211,25 @@ class RegistrationPaymentSection extends Component {
             }
           );
         }
+        this.refreshChild(); 
     } catch (error) {
       console.error('Error during submission:', error);
       this.props.closePopup();
     }
   };
   
-   refreshChild = () =>
+   refreshChild = async () =>
    {
-     this.props.refreshChild();
+
+    const { language } = this.props;
+    const data = await this.fetchCourseRegistrations(language);
+    this.setState({
+      originalData: data,
+      registerationDetails: data, // Update with fetched da
+      //rowData: data
+    });
+    this.getRowData(data);
+    this.props.closePopup();
    }
 
  // componentDidUpdate is called after the component has updated (re-rendered)
@@ -1377,6 +1398,36 @@ class RegistrationPaymentSection extends Component {
                 >
                   {/* Custom content you want to display */}
                   <p  style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
+                  <p  style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Participant Details</h3></p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>NRIC: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.nric}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Residential Status: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.residentialStatus}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Race: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.race}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Gender: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.gender}
+                  </p>                  <p style={{textAlign:"left"}}>
+                    <strong>Date of Birth: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.dateOfBirth}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Contact Number : </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.contactNumber}
+                  </p> 
+                  <p style={{textAlign:"left"}}>
+                    <strong>Email: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.email}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Postal Code: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.postalCode}
+                  </p>                  
+                  <p style={{textAlign:"left"}}>
+                    <strong>Education Level: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.educationLevel}
+                  </p>
+                  <p style={{textAlign:"left"}}>
+                    <strong>Work Status: </strong>{this.state.rowData[this.state.expandedRowIndex].participantInfo.workStatus}
+                  </p>
                   <p  style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Course Details</h3></p>
                   <p style={{textAlign:"left"}}>
                     <strong>Type: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.courseType}
@@ -1389,7 +1440,7 @@ class RegistrationPaymentSection extends Component {
                   </p>
                   <p style={{textAlign:"left"}}>
                     <strong>Duration: </strong>{this.state.rowData[this.state.expandedRowIndex].courseInfo.courseDuration}
-                  </p >
+                  </p>
                   <p style={{textAlign:"left"}}><h3 style={{color:'#000000'}}>Official Use</h3></p>
                   <p style={{textAlign:"left"}}> 
                     <strong>Staff Name: </strong>{this.state.rowData[this.state.expandedRowIndex].officialInfo.name}

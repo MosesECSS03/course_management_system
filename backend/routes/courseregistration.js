@@ -137,14 +137,18 @@ router.post('/', async function(req, res, next)
     }
     else if(req.body.purpose === "receipt")
     {
-        console.log(req.body);
+        console.log("Body trasffered:", req.body);
+        //console.log("OfficialInfo:", req.body.officialInfo);
+
         var receipt = new receiptGenerator();
         var array = []
         array.push({
             id: req.body.id,
             participant: req.body.participant,
-            course: req.body.course
+            course: req.body.course,
+            official: req.body.officialInfo
         });
+        console.log("Array:", array);
         await receipt.generateReceipt(res, array, req.body.staff, req.body.receiptNo);
     }
     else if(req.body.purpose === "addInvoiceNumber")

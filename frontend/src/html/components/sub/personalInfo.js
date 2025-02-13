@@ -20,7 +20,7 @@ class PersonalInfo extends Component {
     super(props);
     this.state = {
       showCalendar: false, // Initialize the showCalendar state
-      selectedDate: new Date(1800, 0, 1), // Store the selected date
+      selectedDate: new Date(new Date().getFullYear() - 89, 0, 1), // Store the selected date
       manualDate: '', // Store the manual input for backspace handling
     };
   }
@@ -73,22 +73,23 @@ class PersonalInfo extends Component {
   };
 
   handleDateChange = (date) => {
+    const formattedDate = date.toLocaleDateString("en-GB"); // "dd/mm/yyyy"
     console.log("Handle Date Change:", date);
     console.log("Current Selected Date:", this.state.selectedDate)
     console.log("Year:", date.getFullYear());
   
-   if (date) {
+   if (formattedDate) {
       // Format the date as dd/mm/yyyy
-      const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+      const formattedDate1 = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
   
       // Format the date as yyyy年mm月dd日 for Chinese format
       //const chineseDate = `${date.getFullYear()}年${(date.getMonth() + 1)}月${date.getDate()}日`;
   
       // Update the state with the selected date and formatted dates
-      this.setState({ selectedDate: date, manualDate: formattedDate });
+      this.setState({ selectedDate: date, manualDate: formattedDate1 });
   
       // Optionally, pass the formatted date back to parent (if needed)
-      this.props.onChange({ dOB: { formattedDate} });
+      this.props.onChange({ dOB: { formattedDate1} });
     } else {
       // If no date is selected, clear the date
       this.setState({ selectedDate: null, manualDate: '' });
@@ -226,7 +227,8 @@ class PersonalInfo extends Component {
                       name={section.name}
                       value={option}
                       checked={data[section.name] === option}
-                      onChange={this.handleChange} // Ensure this is set
+                      onChange={this.handleChange} // 
+                      onClick={this.closeCalendar}
                     />
                     {option}
                   </label>
@@ -241,11 +243,13 @@ class PersonalInfo extends Component {
                   className="personal-info-input"
                   //value={data[section.name] || ''}
                   value={this.state.manualDate || ''}
-                  onClick={(e) => { e.stopPropagation(); this.toggleCalendar(e); }}
                   placeholder="dd/mm/yyyy"
+                  //placeholder={this.state.placeholder}
                   onChange={(e) => { e.stopPropagation(); this.handleChange1(e, "DOB")}} // Ensure onChange is set
-                  //onBlur={(e) => { e.stopPropagation(); this.onSetDate(e)}}
+                  onBlur={this.closeCalendar}
+                  autoComplete='off'
                 />
+                <i class="fa fa-calendar custom-icon" aria-hidden="true" onClick={(e) => { e.stopPropagation(); this.toggleCalendar(e); }}/>
                  {this.state.showCalendar && (
                     <div className="calendar-popup">
                        {/* Month and Year Select Dropdowns */}
@@ -272,9 +276,10 @@ class PersonalInfo extends Component {
                         </select>
                       </div>
                       <DayPicker
-                          selected={this.state.selectedDate}
+                          selected={this.state.selectedDate || new Date(new Date().getFullYear() - 50, 0, 1)}
                           onDayClick={this.handleDateChange}
                           month={this.state.selectedDate}
+                          minDate={new Date(new Date().getFullYear() - 100, 0, 1)}
                           maxDate={new Date(new Date().getFullYear() - 50, 0, 1)}
                           disabled={(date) => date.toDateString() === new Date().toDateString()}
                         />
@@ -292,6 +297,7 @@ class PersonalInfo extends Component {
                 value={data[section.name] || ''} // Ensure we use empty string as fallback
                 onChange={this.handleChange} // Ensure onChange is set
                 className="personal-info-input1"
+                onClick={this.closeCalendar}
               />
             )}
             {errors[section.name] && <span className="error-message3">{errors[section.name]}</span>}

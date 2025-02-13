@@ -416,7 +416,7 @@
           isPopupOpen: false  // Close the popup
         });
         this.refreshChild();  // Refresh or call any child method if needed
-      }, 5000);  // 5000 milliseconds = 5 seconds
+      }, 900000);  // 15 mins
     };
 
 
@@ -963,6 +963,7 @@
                         showUpdatePopup = {this.showUpdatePopup}
                         generateInvoiceNumber = {this.generateInvoiceNumber}
                         onResetSearch = {this.onResetSearch}
+                        closePopupMessage = {this.closePopupMessage}
                     />
                     </div>
                   </>}                 
