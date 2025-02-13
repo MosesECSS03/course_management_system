@@ -370,9 +370,14 @@ class invoiceGenerator {
             console.log("Course Reference Code:", this.courseReferenceCode(item.course.courseEngName));
             doc.text(this.courseReferenceCode(item.course.courseEngName), columnPositions.courseRef + 15, currentY + 3)
             const courseTitleX = columnPositions.courseTitle + 10;
-            const maxWidth = 80; // Adjust the width based on your layout
-            // Split the text into multiple lines if necessary
-            const lines = doc.splitTextToSize(item.course.courseEngName, maxWidth);
+            const words = item.course.courseEngName.split(" "); // Split text into words
+            let lines = [];
+
+            // Group words into pairs
+            for (let i = 0; i < words.length; i += 2) {
+                lines.push(words.slice(i, i + 2).join(" ")); // Join two words per line
+            }
+
             doc.text(lines, courseTitleX, currentY + 3);
             //doc.text(item.course.courseEngName, columnPositions.courseTitle + 10, currentY + 3);
             const durationParts = item.course.courseDuration.split('-');
