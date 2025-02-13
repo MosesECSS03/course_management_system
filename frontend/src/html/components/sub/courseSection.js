@@ -541,8 +541,7 @@ class CoursesSection extends Component {
             style={{
               padding: '10px',
               backgroundColor: '#F9E29B',
-              marginLeft: '5%',
-              width: '88vw',
+              maxWidth: '1320px',
               height: 'fit-content',
               borderRadius: '15px', // Make the border more rounded
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for a floating effect
@@ -554,7 +553,7 @@ class CoursesSection extends Component {
                 <strong>No Of Lesson: </strong>{this.state.rowData[this.state.expandedRowIndex].noLesson+" Lesson(s)"}
               </p>
               <p style={{textAlign:"left"}}>
-                <strong>No Of Lesson: </strong>{this.state.rowData[this.state.expandedRowIndex].language+" Lesson(s)"}
+                <strong>Languages: </strong>{this.state.rowData[this.state.expandedRowIndex].language}
               </p>
             </div>
           )} 
