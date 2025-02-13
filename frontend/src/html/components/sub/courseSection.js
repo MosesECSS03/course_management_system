@@ -109,6 +109,7 @@ class CoursesSection extends Component {
         var response = await axios.post(`https://moses-ecss-data.azurewebsites.net/courses/`, { "courseType": courseType });
         var courses = response.data.courses;
         //console.log("From Django:", response);
+        //ok
 
         // Extract locations and languages
         var locations = await this.getAllLocations(courses);
