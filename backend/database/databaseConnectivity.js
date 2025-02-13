@@ -181,34 +181,15 @@ class DatabaseConnectivity {
         try {
             if (db) {
                 const table = db.collection(collectionName);
-                const count = await table.countDocuments();
-                console.log("No. of entry:", count)
     
+                // Ensure registration_id is an ObjectId only for "Receipts" collection
                 if (collectionName === "Receipts") {
-                    // Ensure registration_id is an ObjectId
                     const registrationId = new ObjectId(data.registration_id);
                     data.registration_id = registrationId;
-    
-                    // Check for existing document with the same registration_id
-                    const existingDocument = await table.findOne({ registration_id: registrationId });
-    
-                    if(count > 0)
-                    {
-                        if (!existingDocument) { // Check for duplicates
-                            result = await table.insertOne(data);
-                        } else {
-                            console.log(`Duplicate entry found for registration_id: ${registrationId}`);
-                            return { acknowledged: false, message: 'Duplicate entry' }; // Optionally return a message
-                        }
-                    }
-                    else
-                    {
-                        result = await table.insertOne(data);
-                    }
-                } else {
-                    // Insert data if not "Receipt" collection
-                    result = await table.insertOne(data);
                 }
+    
+                // Directly insert the data without any checks
+                result = await table.insertOne(data);
     
                 // Return the result based on the collection name
                 if (collectionName === "Accounts") {
@@ -222,7 +203,7 @@ class DatabaseConnectivity {
             return { acknowledged: false, error: error.message }; // Return error status
         }
     }
-        
+    
     async retrieveFromDatabase(dbname, collectionName)
     {
         var db = this.client.db(dbname); // return the db object
