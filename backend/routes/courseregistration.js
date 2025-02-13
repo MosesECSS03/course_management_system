@@ -154,19 +154,19 @@ router.post('/', async function(req, res, next)
         await receipt.generateReceipt(res, array, req.body.staff, req.body.receiptNo);
     }
     else if(req.body.purpose === "addInvoiceNumber")
-        {
-            console.log("Receipt body:", req.body); 
-            var controller = new RegistrationController();
-            var result = await controller.updateReceiptNumber(req.body.id, req.body.receiptNo);
-            console.log("updateReceiptNumber:", result); 
-            console.log("Array:", req.body.rowData);
-            const currentDateTime = getCurrentDateTime();
-            var date = currentDateTime.date;
-            var time = currentDateTime.time;
-            console.log("Check:", req.body._id,  req.body.staff, date, time, req.body.status);
-            await controller.updateOfficialUse(req.body._id, req.body.staff, date, time, req.body.status);
-            return res.json({ "result": "Success" }); 
-        }
+    {
+        console.log("Receipt body:", req.body); 
+        var controller = new RegistrationController();
+        var result = await controller.updateReceiptNumber(req.body.id, req.body.receiptNo);
+        console.log("updateReceiptNumber:", result); 
+        console.log("Array:", req.body.rowData);
+        const currentDateTime = getCurrentDateTime();
+        var date = currentDateTime.date;
+        var time = currentDateTime.time;
+        console.log("Check:", req.body._id,  req.body.staff, date, time, req.body.status);
+        await controller.updateOfficialUse(req.body._id, req.body.staff, date, time, req.body.status);
+        return res.json({ "result": "Success" }); 
+    }
     else if(req.body.purpose === "invoice")
     {
         console.log(req.body);

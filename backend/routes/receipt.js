@@ -30,16 +30,18 @@ router.post('/', async function(req, res, next)
     {   
         var controller = new ReceiptController();
         var result = await controller.newReceiptNo(req.body.courseLocation, req.body.centreLocation);
+        console.log("receiptNo:", result);
         return res.json({"result": result});
     }
     else if(req.body.purpose === "createReceipt")
     {
-       var {receiptNo, registration_id, url, staff} = req.body;
+        console.log(req.body);
+        var {receiptNo, registration_id, url, staff, location} = req.body;
         var currentDateTime = getCurrentDateTime();
         var date = currentDateTime.date;
         var time = currentDateTime.time;
         var controller = new ReceiptController();
-        var result = await controller.createReceipt(receiptNo, registration_id, url, staff, date, time);
+        var result = await controller.createReceipt(receiptNo, registration_id, url, staff, date, time, location);
         return res.json({"result": result.success});
     }
     else if(req.body.purpose === "retrieve")

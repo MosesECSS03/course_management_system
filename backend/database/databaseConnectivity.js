@@ -549,10 +549,11 @@ class DatabaseConnectivity {
             return { success: false, error };
         }
     }
-
+    
     async getNextReceiptNumber(databaseName, collectionName, courseLocation, centreLocation) {
         const db = this.client.db(databaseName);
         const collection = db.collection(collectionName);
+        console.log("Centre:", centreLocation);
     
         // Get the current two-digit year
         const currentYear = new Date().getFullYear().toString().slice(-2);
@@ -576,23 +577,23 @@ class DatabaseConnectivity {
     
         // Handle special case for ECSS/SFC/ in 2024
         if (validReceipts.length === 0) {
-            if (courseLocation === "ECSS/SFC/" && currentYear === "25") 
-            {
-                if(centreLocation === "CT Hub")
-                {
-                    return `${courseLocation}109/${currentYear}`; // Start from 037 in 2024
-                }
-                else
-                {
-                    return `${courseLocation}109/${currentYear}`; // Start from 037 in 2024
-                }
+            if (courseLocation === "ECSS/SFC/" && currentYear === "25") {
+                return centreLocation === "CT Hub"
+                    ? `${courseLocation}109/${currentYear}` // Start from 109 in 2024 for CT Hub
+                    : `${courseLocation}001/${currentYear}`; // Start from 001 in 2024 for other centres
             } else if (courseLocation === "ECSS/SFC/") {
                 return `${courseLocation}001/${currentYear}`; // Start from 001 for other years
             } else {
                 return `${courseLocation} - 0001`;
             }
         }
-        
+    
+        // Check if any of the valid receipts are from "CT Hub"
+        let isCTHubPresent = validReceipts.some(receipt => receipt.location === "CT Hub");
+    
+        if (isCTHubPresent) {
+            return `${courseLocation}109/${currentYear}`; // Start from 109 if CT Hub is present
+        } else {
             // Extract numeric parts for the running number
             const receiptNumbers = validReceipts.map(receipt => {
                 if (courseLocation === "ECSS/SFC/") {
@@ -607,14 +608,14 @@ class DatabaseConnectivity {
                     return match ? parseInt(match[1], 10) : null;
                 }
             }).filter(num => num !== null);
-        
+    
             // Determine the maximum length of existing numbers
             const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3);
-        
+    
             // Find the latest number and increment
             const latestNumber = Math.max(...receiptNumbers);
             const nextNumber = latestNumber + 1;
-        
+    
             // Format the next number with dynamic padding
             if (courseLocation === "ECSS/SFC/") {
                 return `${courseLocation}${String(nextNumber).padStart(maxLength, '0')}/${currentYear}`;
@@ -622,8 +623,8 @@ class DatabaseConnectivity {
                 return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
             }
         }
-        
-
+    }
+    
     async newInvoice(databaseName, collectionName, invoiceNumber, month, username, date, time) {
         try {
             // Connect to the database and collection

@@ -42,7 +42,7 @@ class ReceiptController {
     }
 
 
-    async createReceipt(receiptNo, registration_id, url, staff, date, time) {
+    async createReceipt(receiptNo, registration_id, url, staff, date, time, location) {
         try {
             // Prepare receipt details
             var receiptDetails = { 
@@ -50,8 +50,9 @@ class ReceiptController {
                 registration_id: registration_id, 
                 url: url, 
                 staff: staff, 
+                location:location,
                 date: date, 
-                time: time 
+                time: time,
             };
     
             // Initialize database connectivity
@@ -61,7 +62,8 @@ class ReceiptController {
             if(result === "Connected to MongoDB Atlas!") {
                 var databaseName = "Courses-Management-System";
                 var collectionName = "Receipts";
-    
+                
+                console.log("Data:", receiptDetails);
                 // Insert receipt details into the database
                 var connectedDatabase = await this.databaseConnectivity.insertToDatabase(databaseName, collectionName, receiptDetails);  
     

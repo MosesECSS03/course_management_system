@@ -234,20 +234,6 @@ class receiptGenerator {
         // Now add the page parts on the same line on the right
         const rightX = doc.page.width - rightMargin - 300; // Adjust this value to align the page number properly
 
-        const pageParts = [
-            { text: 'Page ', font: fontPathRegular },
-            { text: `${currentPage}`, font: fontPathBold },
-            { text: ' of ', font: fontPathRegular },
-            { text: `${totalPages}`, font: fontPathBold }
-        ];
-
-        // Iterate over the page parts to add them to the document
-        for (const part of pageParts) {
-            doc.font(part.font).fontSize(12).text(part.text, rightX, currentY, {
-                continued: true // This ensures each part stays on the same line
-            });
-        }
-
         // Finish the line without continued option
         doc.text('', rightX, currentY, {
             continued: false // End the line here
@@ -372,7 +358,7 @@ class receiptGenerator {
         array.forEach((item, index) => {
             // Add row content for each entry
             doc.text(index + 1, columnPositions.serial+15, currentY+12); // Serial number
-            doc.text(`${item.course.courseEngName} (${item.course.courseLocation})\n${item.course.courseDuration}`, columnPositions.description + 15, currentY+6); // Description
+            doc.text(`${item.course.courseEngName}\n${item.course.courseLocation}\n${item.course.courseDuration}`, columnPositions.description + 15, currentY+6); // Description
             doc.text(item.course.coursePrice, columnPositions.amount + 30, currentY+12); // Amount
 
             totalAmount += parseFloat(item.course.coursePrice.substring(1));
@@ -573,20 +559,6 @@ class receiptGenerator {
         // Initialize page numbers
         let currentPage = 1;
         let totalPages = 1;
-    
-        // Function to update the page numbers dynamically
-        const updatePageNumbers = async (doc, currentPage, totalPages, rightX) => {
-            const pageParts = [
-                { text: 'Page ', font: fontPathRegular },
-                { text: `${currentPage}`, font: fontPathBold },
-                //{ text: ' of ', font: fontPathRegular },
-               // { text: `${totalPages}`, font: fontPathBold }
-            ];
-            pageParts.forEach(part => {
-                doc.font(part.font).fontSize(12).text(part.text, rightX, doc.y, { continued: true });
-            });
-            doc.moveDown(1); // Adjust space after the page number
-        };
     
         // Function to check page space and add a new page if necessary
         const checkPageSpaceAndAddNewPage = async (doc, contentHeight, currentPage, totalPages, leftMargin, rightMargin) => {

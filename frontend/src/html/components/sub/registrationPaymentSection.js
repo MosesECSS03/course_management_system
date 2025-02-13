@@ -226,6 +226,7 @@ class RegistrationPaymentSection extends Component {
         const courseLocation = newMethod === "SkillsFuture" ? "ECSS/SFC/" : course.courseLocation;
         console.log("Course Location:", courseLocation);
         const centreLocation = course.courseLocation;
+        console.log("Centre Location:", centreLocation);
         try {
           //console.log("Fetching receipt number for location:", courseLocation);
           const response = await axios.post(
@@ -347,10 +348,9 @@ class RegistrationPaymentSection extends Component {
 
       generatePDFInvoice = async (id, participant, course, receiptNo, status) => {
         try {
-    
           const pdfResponse = await axios.post(
             //"http://localhost:3001/courseregistration",
-            "https://moses-ecss-backend.azurewebsites.net/courseregistration",
+           "https://moses-ecss-backend.azurewebsites.net/courseregistration",
             {
               purpose: "addInvoiceNumber",
               id,
@@ -368,7 +368,7 @@ class RegistrationPaymentSection extends Component {
         }
       };
     
-      createReceiptInDatabase = async (receiptNo, registration_id, url) => {
+      createReceiptInDatabase = async (receiptNo, location, registration_id, url) => {
         try {
           console.log("Creating receipt in database:", {
             receiptNo,
@@ -382,6 +382,7 @@ class RegistrationPaymentSection extends Component {
             {
               purpose: "createReceipt",
               receiptNo,
+              location, 
               registration_id,
               url,
               staff: this.props.userName,
@@ -411,7 +412,7 @@ class RegistrationPaymentSection extends Component {
               const receiptNo = await this.generateReceiptNumber(course, course.payment);
               console.log("Manual Receipt No:", receiptNo);
               await this.generatePDFReceipt(id, participant, course, receiptNo, value);
-              await this.createReceiptInDatabase(receiptNo,  id, "");  
+              await this.createReceiptInDatabase(receiptNo, course.courseLocation, id, "");  
             } 
             catch (error) 
             {
@@ -425,7 +426,7 @@ class RegistrationPaymentSection extends Component {
               const invoiceNo = await this.generateReceiptNumber(course);
               console.log("Invoice No:", invoiceNo);
               await this.generatePDFInvoice(id, participant, course, invoiceNo, value);  
-              await this.createReceiptInDatabase(invoiceNo,  id, ""); 
+              await this.createReceiptInDatabase(invoiceNo, course.courseLocation, id, ""); 
             } catch (error) {
               console.error("Error during SkillsFuture invoice generation:", error);
             }
@@ -448,7 +449,7 @@ class RegistrationPaymentSection extends Component {
               const receiptNo = await this.generateReceiptNumber(course, newMethod);
               console.log("Receipt No:", receiptNo);
               await this.generatePDFReceipt(id, participant, course, receiptNo, value);
-              await this.createReceiptInDatabase(receiptNo,  id, "");    
+              await this.createReceiptInDatabase(receiptNo, course.courseLocation, id, "");    
             } 
             catch (error) 
             {
@@ -466,7 +467,7 @@ class RegistrationPaymentSection extends Component {
             const invoiceNo = await this.generateReceiptNumber(course, newMethod);
             console.log("Invoice No:", invoiceNo);
             await this.generatePDFReceipt(id, participant, course, invoiceNo, value);
-            await this.createReceiptInDatabase(invoiceNo,  id, "");    
+            await this.createReceiptInDatabase(invoiceNo, course.courseLocation, id, "");    
           } 
           catch (error) 
           {
@@ -875,7 +876,7 @@ class RegistrationPaymentSection extends Component {
     {
       headerName: "Receipt/Invoice Number",
       field: "recinvNo",
-      width: 200,
+      width: 300,
     },
   ];
   

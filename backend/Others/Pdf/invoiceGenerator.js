@@ -290,6 +290,7 @@ class invoiceGenerator {
             "Therapeutic Watercolour Painting for Beginners ": "TGS-2022015736",
             "Community Singing – Mandarin": "TGS-2021008563",
             "TCM – Don’t be a friend of Chronic Diseases": "TGS-2021008576",
+            "Healthy Minds, Healthy Lives – Mandarin": ""
         };
     
        // Check for exact match
@@ -306,7 +307,7 @@ class invoiceGenerator {
         const fontPathBold = path.join(__dirname, '../../fonts/ARIALBD.TTF'); 
         const fontPathRegular = path.join(__dirname, '../../fonts/ARIAL.TTF'); 
     
-        const leftMargin = 2.54 * 28.35 - 50; 
+        const leftMargin = 2.54 * 28.35 - 60; 
         const tableTop = doc.y; 
         const rowHeight = 35; 
         const borderExternalThickness = 2; 
@@ -323,19 +324,19 @@ class invoiceGenerator {
         ];
     
         const columnWidths = {
-            courseRef: Math.max(headerWidths[0], 125), 
-            courseTitle: Math.max(headerWidths[1], 160),
-            startDate: Math.max(headerWidths[2], 100),
-            endDate: Math.max(headerWidths[3], 100),
-            fullCourse: Math.max(headerWidths[4], 125),
-            subsidised: Math.max(headerWidths[5], 100)
+            courseRef: Math.min(headerWidths[0], 100), 
+            courseTitle: Math.max(headerWidths[1], 275),
+            startDate: Math.max(headerWidths[2], 80),
+            endDate: Math.max(headerWidths[3], 80),
+            fullCourse: Math.min(headerWidths[4], 145),
+            subsidised: Math.min(headerWidths[5], 140)
         };
     
         const totalTableWidth = columnWidths.courseRef + columnWidths.courseTitle + columnWidths.startDate + columnWidths.endDate + columnWidths.fullCourse + columnWidths.subsidised-10;
     
         const columnPositions = {
             courseRef: leftMargin,
-            courseTitle: leftMargin + columnWidths.courseRef,
+            courseTitle: leftMargin + columnWidths.courseRef-10,
             startDate: leftMargin + columnWidths.courseRef + columnWidths.courseTitle,
             endDate: leftMargin + columnWidths.courseRef + columnWidths.courseTitle + columnWidths.startDate,
             fullCourse: leftMargin + columnWidths.courseRef + columnWidths.courseTitle + columnWidths.startDate + columnWidths.endDate,
@@ -345,12 +346,12 @@ class invoiceGenerator {
         doc.rect(leftMargin, tableTop, totalTableWidth, headerHeight).fill('#FBFBFB');
     
         doc.fontSize(10).fillColor('black').font(fontPathBold);
-        doc.text(header1, columnPositions.courseRef + columnWidths.courseRef / 2 - headerWidths[0] / 2, tableTop + 12);
+        doc.text(header1, columnPositions.courseRef + columnWidths.courseRef / 2 - headerWidths[0] / 2+2, tableTop + 12);
         doc.text(header2, columnPositions.courseTitle + columnWidths.courseTitle / 2 - headerWidths[1] / 2, tableTop + 12);
         doc.text(header3, columnPositions.startDate + columnWidths.startDate / 2 - headerWidths[2] / 2, tableTop + 12);
         doc.text(header4, columnPositions.endDate + columnWidths.endDate / 2 - headerWidths[3] / 2, tableTop + 12);
         doc.text(header5, columnPositions.fullCourse + columnWidths.fullCourse / 2 - headerWidths[4] / 2, tableTop + 12);
-        doc.text(header6, columnPositions.subsidised + columnWidths.subsidised / 2 - headerWidths[5] / 2, tableTop + 12);
+        doc.text(header6, columnPositions.subsidised  + columnWidths.subsidised / 2 - headerWidths[5] / 2+12, tableTop + 2);
     
         doc.lineWidth(borderExternalThickness)
             .moveTo(leftMargin, tableTop + headerHeight)
@@ -365,11 +366,11 @@ class invoiceGenerator {
         }
     
         let currentY = tableTop + headerHeight + 2; 
-        doc.fontSize(10).fillColor('black').font(fontPathRegular);
+        doc.fontSize(9).fillColor('black').font(fontPathRegular);
         array.forEach((item, index) => {
             console.log("Course Reference Code:", this.courseReferenceCode(item.course.courseEngName));
-            doc.fontSize(10).text(this.courseReferenceCode(item.course.courseEngName), columnPositions.courseRef + 15, currentY + 3)
-            doc.fontSize(10).text(item.course.courseEngName, columnPositions.courseTitle + 10, currentY + 3);
+            doc.text(this.courseReferenceCode(item.course.courseEngName), columnPositions.courseRef + 2, currentY + 3)
+            doc.text(item.course.courseEngName, columnPositions.courseTitle + 2, currentY + 3, { maxWidth: headerWidths[1]});
             const durationParts = item.course.courseDuration.split('-');
             const startDate = durationParts[0].trim(); // '23 January 2025'
             const endDate = durationParts[1].trim(); // '23 January 2025'
@@ -377,12 +378,12 @@ class invoiceGenerator {
             const formattedStartDate = this.formatDate(startDate);
             const formattedEndDate = this.formatDate(endDate);
 
-            doc.fontSize(10).text(formattedStartDate, columnPositions.startDate+ 5, currentY + 3); 
-            doc.fontSize(10).text(formattedEndDate, columnPositions.endDate+ 5, currentY + 3); 
+            doc.text(formattedStartDate, columnPositions.startDate+ 5, currentY + 3); 
+            doc.text(formattedEndDate, columnPositions.endDate+ 5, currentY + 3); 
             const coursePrice = parseFloat(item.course.coursePrice.replace('$', '').trim());
             const totalPrice = coursePrice * 5;
-            doc.fontSize(10).text(`$     ${totalPrice.toFixed(2)}`, columnPositions.fullCourse+ 5, currentY + 3); 
-            doc.fontSize(10).text(`$     ${coursePrice.toFixed(2)}`, columnPositions.subsidised+ 5, currentY + 3); 
+            doc.text(`$     ${totalPrice.toFixed(2)}`, columnPositions.fullCourse+ 5, currentY + 3); 
+            doc.text(`$     ${coursePrice.toFixed(2)}`, columnPositions.subsidised+ 5, currentY + 3); 
         
             // Draw borders for the first row
             if (index === 0) {
