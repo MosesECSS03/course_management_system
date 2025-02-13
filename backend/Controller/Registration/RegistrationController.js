@@ -43,7 +43,7 @@ class RegistrationController {
         }    
     }
 
-    async allParticipants() 
+    async allParticipants(role, siteIC) 
     {
         try {
             // Connect to the database
@@ -54,7 +54,7 @@ class RegistrationController {
             {
                 var databaseName = "Courses-Management-System";
                 var collectionName = "Registration Forms";
-                var connectedDatabase = await this.databaseConnectivity.retrieveFromDatabase(databaseName, collectionName);   
+                var connectedDatabase = await this.databaseConnectivity.retrieveCourseRegistration(databaseName, collectionName, role, siteIC);   
                 return connectedDatabase;
                 //console.log(connectedDatabase);
             }

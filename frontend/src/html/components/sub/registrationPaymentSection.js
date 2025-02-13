@@ -58,10 +58,12 @@ class RegistrationPaymentSection extends Component {
 
     fetchCourseRegistrations = async (language) => {
       try {
+        var {siteIC, role} = this.props;  
+        console.log("Role", role, "SiteIC", siteIC);
         const response = await axios.post(
-          //'http://localhost:3001/courseregistration', 
-          'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
-          { purpose: 'retrieve' }
+          'http://localhost:3001/courseregistration', 
+         // 'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
+          { purpose: 'retrieve', role, siteIC}
         );
 
         console.log("Course Registration:", response);
@@ -128,7 +130,7 @@ class RegistrationPaymentSection extends Component {
 
     async componentDidMount() { 
      // this.props.onResetSearch();
-      const { language } = this.props;
+      const { language, siteIC, role } = this.props;
       const data = await this.fetchCourseRegistrations(language);
       console.log('All Courses Registration:  ', data);
       var locations = await this.getAllLocations(data);
@@ -1220,7 +1222,6 @@ class RegistrationPaymentSection extends Component {
   
    refreshChild = async () =>
    {
-
     const { language } = this.props;
     const data = await this.fetchCourseRegistrations(language);
     this.setState({

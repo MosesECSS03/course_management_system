@@ -128,7 +128,8 @@ class LoginPage extends Component {
                 accountId: "",
                 name: ""
               });
-              this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name}}); 
+              //console.log(response.data.message.details.site, response.data.message.details.role);
+              this.props.history.push({ pathname: '/home', state: { accountId: response.data.message.details._id, name: response.data.message.details.name, role: response.data.message.details.role, siteIC: response.data.message.details.site}}); 
             }
         }, 5000);
       } else {

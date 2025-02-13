@@ -209,14 +209,7 @@ class CreateAccountsSection extends Component {
     else 
     {
         this.setState({ nameError: '', emailError: '', passwordError: '', roleError: '', siteError });
-        if(site !== "")
-        {
-            var accountDetails = {"name": name, "email": email, "password": password, "role": role};
-        }
-        else
-        {
-            var accountDetails = {"name": name, "email": email, "password": password, "role": role, "site": site};
-        }
+        var accountDetails = {"name": name, "email": email, "password": password, "role": role, "site": site};
         //axios.post('https://moses-ecss-backend.azurewebsites.net/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
         axios.post('http://localhost:3001/accountDetails', {"accountDetails": accountDetails, "purpose": "create"})
         .then((response) => {
@@ -331,11 +324,11 @@ class CreateAccountsSection extends Component {
                                         <input 
                                             type="radio" 
                                             name="site" 
-                                            value="Tampines 253 Block" 
-                                            checked={this.state.site === "Tampines 253 Block"}
+                                            value="Tampines 253 Centre" 
+                                            checked={this.state.site === "Tampines 253 Centre"}
                                             onChange={this.handleChange} 
                                         />
-                                        Tampines 253 Block
+                                        Tampines 253 Centre
                                     </label>
                                     <label>
                                         <input 

@@ -754,7 +754,10 @@
 
     render() 
     {
+      console.log("Props History Push", this.props);
       const userName = this.props.location.state?.name || 'User';
+      const role = this.props.location.state?.role;
+      const siteIC = this.props.location.state?.siteIC;
       const { item,isDropdownOpen, isReceiptVisible, invoiceVisibility, dashboard, displayedName, submenuVisible, language, courseType, accountType, isPopupOpen, popupMessage, popupType, sidebarVisible, locations, languages, types, selectedLanguage, selectedLocation, selectedCourseType, searchQuery, resetSearch, viewMode, currentPage, totalPages, nofCourses,noofDetails, isRegistrationPaymentVisible, section, roles, selectedAccountType, nofAccounts, createAccount} = this.state;
 
       return (
@@ -954,6 +957,8 @@
                         currentPage={currentPage} // Pass current page
                         entriesPerPage={this.state.entriesPerPage} // Pass entries per page
                         userName = {userName}
+                        siteIC = {siteIC}
+                        role = {role}
                         key={this.state.refreshKey}
                         refreshChild={this.refreshChild}
                         generateReceiptPopup = {this.generateReceiptPopup}

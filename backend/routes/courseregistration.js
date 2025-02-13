@@ -53,10 +53,12 @@ router.post('/', async function(req, res, next)
     }
     else if(req.body.purpose === "retrieve")
     {
-        //console.log("Retrieve From Database")
+        var {role, siteIC} = req.body;
+        console.log("Request Body:", role, siteIC);
+        console.log("Retrieve From Database")
         var controller = new RegistrationController();
-        var result = await controller.allParticipants();
-        console.log("Retrieve Payment:", result)
+        var result = await controller.allParticipants(role, siteIC);
+        //console.log("Retrieve Registration Records:", result);
         return res.json({"result": result}); 
     }
     else if(req.body.purpose === "update")

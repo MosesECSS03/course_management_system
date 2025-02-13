@@ -241,6 +241,35 @@ class DatabaseConnectivity {
         }
     }
 
+    async retrieveCourseRegistration(dbname, collectionName, role, siteIC) 
+    {
+        var db = this.client.db(dbname); // Return the db object
+        try {
+            if (db) {
+                var table = db.collection(collectionName);
+                
+                // Define query object
+                let query = {};
+
+                // If role is "Site in-charge", filter by course.courseLocation
+                if (role === "Site in-charge") {
+                    console.log("Site IC", siteIC)
+                    if (siteIC != null){
+                        query["course.courseLocation"] = siteIC; // Filtering based on courseLocation
+                    }
+                }
+                // If role is not "Site in-charge", return all documents (empty query retrieves all)
+                
+                var result = await table.find(query).toArray();
+                //console.log("Result:",result);
+                return result;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
     async retrieveOneFromDatabase(dbname, collectionName, id) {
         console.log("Selected One");
         console.log("Id:", id);
