@@ -346,55 +346,151 @@ class RegistrationPaymentSection extends Component {
         }
       };
 
-      generatePDFInvoice = async (id, participant, course, receiptNo, status) => {
-        try {
-          const pdfResponse = await axios.post(
-            //"http://localhost:3001/courseregistration",
-           "https://moses-ecss-backend.azurewebsites.net/courseregistration",
-            {
-              purpose: "addInvoiceNumber",
-              id,
-              participant,
-              course,
-              staff: this.props.userName,
-              receiptNo,
-              status,
-            }
-          );
-          return pdfResponse;
-        } catch (error) {
-          console.error("Error generating PDF receipt:", error);
-          throw error;
-        }
-      };
+      async getNextReceiptNumber(databaseName, collectionName, courseLocation, centreLocation) {
+        const db = this.client.db(databaseName);
+        const collection = db.collection(collectionName);
+        console.log("Centre:", centreLocation);
     
-      createReceiptInDatabase = async (receiptNo, location, registration_id, url) => {
-        try {
-          console.log("Creating receipt in database:", {
+        // Get the current two-digit year
+        const currentYear = new Date().getFullYear().toString().slice(-2);
+    
+        // Retrieve all receipts matching the specified courseLocation
+        const existingReceipts = await collection.find({
+            receiptNo: { $regex: `^${courseLocation}` } // Match all receipts starting with courseLocation
+        }).toArray();
+    
+        console.log("Existing receipts:", existingReceipts);
+    
+        // Filter receipts to determine if a reset is needed for ECSS/SFC
+        const validReceipts = existingReceipts.filter(receipt => {
+            if (courseLocation === "ECSS/SFC/") {
+                // Match receipts for the current year
+                const regex = new RegExp(`^${courseLocation}\\d+/(${currentYear})$`);
+                return regex.test(receipt.receiptNo);
+            }
+            return true; // For other prefixes, year isn't relevant
+        });
+    
+        // Separate out receipts for "CT Hub"
+        const cthubReceipts = validReceipts.filter(receipt => receipt.location === "CT Hub");
+    
+        // Get the highest receipt number for CT Hub (if any)
+        const cthubReceiptNumbers = cthubReceipts.map(receipt => {
+            if (courseLocation === "ECSS/SFC/") {
+                // Match format: ECSS/SFC/037/2024
+                const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            } else {
+                // Match format: XXX - 0001
+                const regex = new RegExp(`^${courseLocation} - (\\d+)$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            }
+        }).filter(num => num !== null);
+    
+        const maxCthubNumber = cthubReceiptNumbers.length > 0 ? Math.max(...cthubReceiptNumbers) : 0;
+    
+        // Separate out receipts for other locations
+        const otherReceipts = validReceipts.filter(receipt => receipt.location !== "CT Hub");
+    
+        // Get the highest receipt number for other locations
+        const otherReceiptNumbers = otherReceipts.map(receipt => {
+            if (courseLocation === "ECSS/SFC/") {
+                // Match format: ECSS/SFC/037/2024
+                const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            } else {
+                // Match format: XXX - 0001
+                const regex = new RegExp(`^${courseLocation} - (\\d+)$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            }
+        }).filter(num => num !== null);
+    
+        const maxOtherNumber = otherReceiptNumbers.length > 0 ? Math.max(...otherReceiptNumbers) : 0;
+    
+        // Now, determine the next receipt number
+        if (currentYear === "25") {
+            // If the current year is 25, and the centre is "CT Hub"
+            if (centreLocation === "CT Hub") {
+                const nextNumber = maxCthubNumber > 0 ? maxCthubNumber + 1 : 109; // Start from 109 if no CT Hub receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+            } else {
+                // For other centres, continue from the highest number for other locations
+                const nextNumber = maxOtherNumber > 0 ? maxOtherNumber + 1 : 1; // Start from 1 if no other receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+            }
+        } else {
+            // For other years, reset numbers
+            if (centreLocation === "CT Hub") {
+                const nextNumber = maxCthubNumber > 0 ? maxCthubNumber + 1 : 109; // Start from 109 if no CT Hub receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+            } else {
+                const nextNumber = maxOtherNumber > 0 ? maxOtherNumber + 1 : 1; // Start from 1 if no other receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+            }
+        }
+    }
+
+    generatePDFInvoice = async (id, participant, course, receiptNo, status) => {
+      try {
+        const pdfResponse = await axios.post(
+          //"http://localhost:3001/courseregistration",
+          "https://moses-ecss-backend.azurewebsites.net/courseregistration",
+          {
+            purpose: "addInvoiceNumber",
+            id,
+            participant,
+            course,
+            staff: this.props.userName,
             receiptNo,
+            status,
+          }
+        );
+        return pdfResponse;
+      } catch (error) {
+        console.error("Error generating PDF receipt:", error);
+        throw error;
+      }
+    };
+  
+    createReceiptInDatabase = async (receiptNo, location, registration_id, url) => {
+      try {
+        console.log("Creating receipt in database:", {
+          receiptNo,
+          registration_id,
+          url,
+        });
+  
+        const receiptCreationResponse = await axios.post(
+          //"http://localhost:3001/receipt",
+          "https://moses-ecss-backend.azurewebsites.net/receipt",
+          {
+            purpose: "createReceipt",
+            receiptNo,
+            location, 
             registration_id,
             url,
-          });
-    
-          const receiptCreationResponse = await axios.post(
-            //"http://localhost:3001/receipt",
-            "https://moses-ecss-backend.azurewebsites.net/receipt",
-            {
-              purpose: "createReceipt",
-              receiptNo,
-              location, 
-              registration_id,
-              url,
-              staff: this.props.userName,
-            }
-          );
-    
-          console.log("Receipt creation response:", receiptCreationResponse.data);
-        } catch (error) {
-          console.error("Error creating receipt in database:", error);
-          throw error;
-        }
-      };
+            staff: this.props.userName,
+          }
+        );
+  
+        console.log("Receipt creation response:", receiptCreationResponse.data);
+      } catch (error) {
+        console.error("Error creating receipt in database:", error);
+        throw error;
+      }
+    };
     
 
       receiptGenerator = async (id, participant, course, official, value) => {

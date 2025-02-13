@@ -575,55 +575,76 @@ class DatabaseConnectivity {
             return true; // For other prefixes, year isn't relevant
         });
     
-        // Handle special case for ECSS/SFC/ in 2024
-        if (validReceipts.length === 0) {
-            if (courseLocation === "ECSS/SFC/" && currentYear === "25") {
-                return centreLocation === "CT Hub"
-                    ? `${courseLocation}109/${currentYear}` // Start from 109 in 2024 for CT Hub
-                    : `${courseLocation}001/${currentYear}`; // Start from 001 in 2024 for other centres
-            } else if (courseLocation === "ECSS/SFC/") {
-                return `${courseLocation}001/${currentYear}`; // Start from 001 for other years
-            } else {
-                return `${courseLocation} - 0001`;
-            }
-        }
+        // Separate out receipts for "CT Hub"
+        const cthubReceipts = validReceipts.filter(receipt => receipt.location === "CT Hub");
     
-        // Check if any of the valid receipts are from "CT Hub"
-        let isCTHubPresent = validReceipts.some(receipt => receipt.location === "CT Hub");
-    
-        if (isCTHubPresent) {
-            return `${courseLocation}109/${currentYear}`; // Start from 109 if CT Hub is present
-        } else {
-            // Extract numeric parts for the running number
-            const receiptNumbers = validReceipts.map(receipt => {
-                if (courseLocation === "ECSS/SFC/") {
-                    // Match format: ECSS/SFC/037/2024
-                    const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
-                    const match = receipt.receiptNo.match(regex);
-                    return match ? parseInt(match[1], 10) : null;
-                } else {
-                    // Match format: XXX - 0001
-                    const regex = new RegExp(`^${courseLocation} - (\\d+)$`);
-                    const match = receipt.receiptNo.match(regex);
-                    return match ? parseInt(match[1], 10) : null;
-                }
-            }).filter(num => num !== null);
-    
-            // Determine the maximum length of existing numbers
-            const maxLength = Math.max(...receiptNumbers.map(num => String(num).length), 3);
-    
-            // Find the latest number and increment
-            const latestNumber = Math.max(...receiptNumbers);
-            const nextNumber = latestNumber + 1;
-    
-            // Format the next number with dynamic padding
+        // Get the highest receipt number for CT Hub (if any)
+        const cthubReceiptNumbers = cthubReceipts.map(receipt => {
             if (courseLocation === "ECSS/SFC/") {
-                return `${courseLocation}${String(nextNumber).padStart(maxLength, '0')}/${currentYear}`;
+                // Match format: ECSS/SFC/037/2024
+                const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
             } else {
-                return `${courseLocation} - ${String(nextNumber).padStart(maxLength, '0')}`;
+                // Match format: XXX - 0001
+                const regex = new RegExp(`^${courseLocation} - (\\d+)$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            }
+        }).filter(num => num !== null);
+    
+        const maxCthubNumber = cthubReceiptNumbers.length > 0 ? Math.max(...cthubReceiptNumbers) : 0;
+    
+        // Separate out receipts for other locations
+        const otherReceipts = validReceipts.filter(receipt => receipt.location !== "CT Hub");
+    
+        // Get the highest receipt number for other locations
+        const otherReceiptNumbers = otherReceipts.map(receipt => {
+            if (courseLocation === "ECSS/SFC/") {
+                // Match format: ECSS/SFC/037/2024
+                const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            } else {
+                // Match format: XXX - 0001
+                const regex = new RegExp(`^${courseLocation} - (\\d+)$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            }
+        }).filter(num => num !== null);
+    
+        const maxOtherNumber = otherReceiptNumbers.length > 0 ? Math.max(...otherReceiptNumbers) : 0;
+    
+        // Now, determine the next receipt number
+        if (currentYear === "25") {
+            // If the current year is 25, and the centre is "CT Hub"
+            if (centreLocation === "CT Hub") {
+                const nextNumber = maxCthubNumber > 0 ? maxCthubNumber + 1 : 109; // Start from 109 if no CT Hub receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+            } else {
+                // For other centres, continue from the highest number for other locations
+                const nextNumber = maxOtherNumber > 0 ? maxOtherNumber + 1 : 1; // Start from 1 if no other receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+            }
+        } else {
+            // For other years, reset numbers
+            if (centreLocation === "CT Hub") {
+                const nextNumber = maxCthubNumber > 0 ? maxCthubNumber + 1 : 109; // Start from 109 if no CT Hub receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+            } else {
+                const nextNumber = maxOtherNumber > 0 ? maxOtherNumber + 1 : 1; // Start from 1 if no other receipts exist
+                return courseLocation === "ECSS/SFC/"
+                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
+                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
             }
         }
-    }
+    }    
     
     async newInvoice(databaseName, collectionName, invoiceNumber, month, username, date, time) {
         try {
