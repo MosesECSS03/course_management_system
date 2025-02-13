@@ -13,6 +13,7 @@ class CoursesSection extends Component {
         loading: false,
         columnDefs: this.getColumnDefs(),
         rowData: [],
+        expandedRowIndex: null
       };
       this.tableWrapperRef = React.createRef();
     }
@@ -38,11 +39,6 @@ class CoursesSection extends Component {
       {
         headerName: "Centre Location",
         field: "centreLocation",
-        width: 150,
-      },
-      {
-        headerName: "No.of Lesson",
-        field: "noLesson",
         width: 150,
       },
       {
@@ -165,7 +161,7 @@ class CoursesSection extends Component {
         courseName: splitName.length === 3 ? splitName[1] : (splitName.length === 2 ? splitName[0] : item.name),
         centreLocation: splitName.length === 3 ? locationMap[splitName[2].replace(/[()]/g, '').trim()] || splitName[2].replace(/[()]/g, '').trim() : splitName.length === 2 ? locationMap[splitName[1].replace(/[()]/g, '').trim()] || splitName[1].replace(/[()]/g, '').trim(): '',
         vacanices: item.stock_quantity,
-        noOfLesson: displayedDetails.noOfLesson,
+        noLesson: displayedDetails.noOfLesson,
         status: displayedDetails.status,
         courseDuration: displayedDetails.startDate+" - "+displayedDetails.endDate,
         courseTiming: displayedDetails.startTime+" - "+displayedDetails.endTime,
@@ -484,6 +480,34 @@ class CoursesSection extends Component {
     return `${day} ${month} ${year}`; // Combine into the desired format
   }
 
+  handleValueClick = async (event) =>
+  {
+    console.log("handleValueClick");
+
+    const rowIndex = event.rowIndex; // Get the clicked row index
+    const columnName = event.colDef.headerName;
+    const expandedRowIndex = this.state.expandedRowIndex;
+
+    try {
+      if(columnName === "Course Name")
+        {
+          // Optional: Handle additional logic here if necessary
+          console.log("Cell clicked", event);
+          // Check if clicked on a row and handle expansion
+          if (expandedRowIndex === rowIndex) {
+            // If the same row is clicked, collapse it
+            this.setState({ expandedRowIndex: null });
+          } else {
+            // Expand the new row
+            this.setState({ expandedRowIndex: rowIndex });
+          }
+        }
+      }
+      catch (error) {
+        console.error('Error during submission:', error);
+      }
+    }
+
   render() 
   {
     ModuleRegistry.registerModules([AllCommunityModule]);  
@@ -495,18 +519,38 @@ class CoursesSection extends Component {
           </h1>
         </div>
         <div className="course-table-wrapper">
-            <AgGridReact
-              columnDefs={this.state.columnDefs}
-              rowData={this.state.rowData}
-              domLayout="normal"
-              statusBar={false}
-              pagination={true}
-              paginationPageSize={this.state.rowData.length}
-              defaultColDef={{
-                resizable: true, // Make columns resizable
+          <AgGridReact
+            columnDefs={this.state.columnDefs}
+            rowData={this.state.rowData}
+            domLayout="normal"
+            statusBar={false}
+            pagination={true}
+            paginationPageSize={this.state.rowData.length}
+            defaultColDef={{
+              resizable: true, // Make columns resizable
+            }}
+            sortable={true} 
+            onCellClicked={this.handleValueClick}
+          />
+          {this.state.expandedRowIndex !== null && (
+              <div
+              style={{
+                padding: '10px',
+                backgroundColor: '#F9E29B',
+                marginLeft: '5%',
+                width: '88vw',
+                height: 'fit-content',
+                borderRadius: '15px', // Make the border more rounded
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for a floating effect
               }}
-              sortable={true} 
-            />
+              >
+                {/* Custom content you want to display */}
+                <p  style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
+                <p style={{textAlign:"left"}}>
+                  <strong>No Of Lesson: </strong>{this.state.rowData[this.state.expandedRowIndex].noLesson+" Lesson(s)"}
+                </p>
+              </div>
+            )} 
         </div>
       </div>
     );
