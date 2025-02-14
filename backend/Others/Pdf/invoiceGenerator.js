@@ -289,7 +289,7 @@ class invoiceGenerator {
             "Self-Care TCM Wellness – Mandarin": "TGS-2021008561",
             "Hanyu Pinyin for Beginners": "TGS-2021008571",
             "The Rest Note of Life – Mandarin": "TGS-2022015736",
-            "TCM Diet": "TGS-2021008570",
+            "TCM Diet & Therapy": "TGS-2021008570",
             "Therapeutic Basic Line Work": "TGS-2024047927",
             "Healthy Minds, Healthy Lives – Mandarin": "",
             "Therapeutic Basic Line Work": "TGS-2022015736"
