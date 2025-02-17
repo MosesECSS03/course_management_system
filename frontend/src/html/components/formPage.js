@@ -98,6 +98,7 @@ class FormPage extends Component {
   };
 
   handleNext = () => {
+    console.log("Pressed Next");
     const errors = this.validateForm();
     const { currentSection } = this.state;
     console.log(currentSection);
@@ -187,8 +188,8 @@ class FormPage extends Component {
     console.log('Participants Details', participantDetails);
     
     // Example of sending data to the server using Axios
-    axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
-    //axios.post('http://localhost:3001/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
+    //axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
+    axios.post('http://localhost:3001/courseregistration', {"participantDetails": participantDetails, "purpose": "insert"})
       .then((response) => {
         console.log('Form submitted successfully', response.data);
         if(response.data)
@@ -224,55 +225,64 @@ class FormPage extends Component {
   }
 
   isValidDOB(dob) {
-    // Check if DOB is empty
-    if (!dob) {
-        return { isValid: false, error: 'Date of Birth is required. 出生日期是必填项。' };
-    }
-
-    // Regular expressions for different date formats (dd/mm/yyyy, yyyy/mm/dd, yyyy/dd/mm, mm/dd/yyyy)
-    const formats = [
-        /^\d{2}\/\d{2}\/\d{4}$/, // dd/mm/yyyy
-        /^\d{4}\/\d{2}\/\d{2}$/, // yyyy/mm/dd
-        /^\d{4}\/\d{2}\/\d{2}$/, // yyyy/dd/mm
-        /^\d{2}\/\d{2}\/\d{4}$/  // mm/dd/yyyy
-    ];
-
-    // Check if the date matches any of the allowed formats
-    if (!formats.some(format => format.test(dob))) {
+    console.log("Date of Birth:", dob);
+  
+    // First, check if dob is a non-empty string
+    if (typeof dob === 'string') {
+      // Now, check if dob.formattedDate1 exists and is not empty
+  
+      // Parse the date in the correct format
+      const dateParts = dob.split('/');
+      let dobDate;
+  
+      // Match the formats
+      if (dob.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        // dd/mm/yyyy or mm/dd/yyyy (same regex, will handle both cases based on the input)
+        dobDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); // yyyy-mm-dd
+      } else if (dob.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
+        // yyyy/mm/dd or yyyy/dd/mm
+        // Here we assume it's yyyy/mm/dd format because dd/mm/yyyy would already be captured in the first case
+        dobDate = new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`); // yyyy-mm-dd
+      } else {
+        // If the format doesn't match, it's invalid
         return { isValid: false, error: 'Invalid Date of Birth format. 日期格式无效，必须符合：dd/mm/yyyy, yyyy/mm/dd, yyyy/dd/mm, mm/dd/yyyy。' };
+      }
+  
+      console.log("Official Date:", dobDate);
+
+      // Get current year and check if the person is at least 50 years old
+      const currentYear = new Date().getFullYear();
+      const birthYear = dobDate.getFullYear();
+      const age = currentYear - birthYear;
+  
+      if (age < 50) {
+        return { isValid: false, error: 'Age must be at least 50 years. 年龄必须至少为50岁。' };
+      }
+  
+      return { isValid: true, error: null }; // Valid DOB
     }
-
-    // Parse the date in the correct format
-    const dateParts = dob.split('/');
-    let dobDate;
-
-    if (dob.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-        dobDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); // dd/mm/yyyy
-    } else if (dob.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
-        dobDate = new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`); // yyyy/mm/dd or yyyy/dd/mm
-    } else if (dob.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-        dobDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); // mm/dd/yyyy
+    if (dob.formattedDate1) {
+       // Get current year and check if the person is at least 50 years old
+       const currentYear = new Date().getFullYear();
+       const birthYear = new Date(dob.formattedDate1).getFullYear();
+       const age = currentYear - birthYear;
+       console.log("Age:", age);
+   
+       if (age < 50) {
+         return { isValid: false, error: 'Age must be at least 50 years. 年龄必须至少为50岁。' };
+       }
+   
+       return { isValid: true, error: null }; // Valid DOB
     }
-
-    // Check if the date is valid
-    if (isNaN(dobDate.getTime())) {
-        return { isValid: false, error: 'Invalid Date of Birth. 出生日期无效。' };
-    }
-
-    // Get current year and check if the person is at least 55 years old
-    const currentYear = new Date().getFullYear();
-    const birthYear = dobDate.getFullYear();
-    const age = currentYear - birthYear;
-
-    if (age < 55) {
-        return { isValid: false, error: 'Age must be at least 55 years. 年龄必须至少为55岁。' };
-    }
-
-    return { isValid: true, error: null }; // Valid DOB
+      
+  
+    return { isValid: false, error: 'Date of Birth is required. 出生日期是必填项。' };
   }
+  
 
   validateForm = () => {
     const { currentSection, formData } = this.state;
+    console.log("formData:", formData);
     const errors = {};
 
     if (currentSection === 1) {
@@ -297,7 +307,13 @@ class FormPage extends Component {
       if (!formData.gENDER) {
         errors.gENDER = 'Gender is required. 性别是必填项。';
       }
-      if (formData.dOB) {
+      if (!formData.dOB) 
+      {
+        errors.dOB = "Date of Birth is required. 出生日期是必填项。";
+      }
+      if (formData.dOB) 
+      {
+        console.log("User Input:", formData.dOB);
         const { isValid, error } = this.isValidDOB(formData.dOB);
         if (!isValid) {
             errors.dOB = error;
