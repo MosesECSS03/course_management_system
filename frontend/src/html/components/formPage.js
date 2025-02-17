@@ -250,19 +250,19 @@ class FormPage extends Component {
   
       console.log("Official Date:", dobDate);
 
-      // Get current year and check if the person is at least 55 years old
+      // Get current year and check if the person is at least 50 years old
       const currentYear = new Date().getFullYear();
       const birthYear = dobDate.getFullYear();
       const age = currentYear - birthYear;
   
-      if (age < 55) {
+      if (age < 50) {
         return { isValid: false, error: 'Age must be at least 50 years. 年龄必须至少为50岁。' };
       }
   
       return { isValid: true, error: null }; // Valid DOB
     }
     if (dob.formattedDate1) {
-       // Get current year and check if the person is at least 55 years old
+       // Get current year and check if the person is at least 50 years old
        const currentYear = new Date().getFullYear();
        const birthYear = new Date(dob.formattedDate1).getFullYear();
        const age = currentYear - birthYear;
