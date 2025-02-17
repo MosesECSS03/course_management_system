@@ -200,37 +200,31 @@ class invoiceGenerator {
         y += 15; // Add vertical offset for the next line
     
         doc.text(
-            "              2. Should the application for SFC claims be rejected by SkillsFuture Singapore, full subsidised fees will be payable by cash.",
+            "               2. Should the application for SFC claims be rejected by SkillsFuture Singapore, full subsidised fees will be payable by cash.",
             textX,
             y);
         y += 15; // Add vertical offset for the next line
     
         doc.text(
-            "              3. Cash payment may be made by cash or cheque at our office, or PayNow to our UEN T03SS0051L.",
+            "               3. Cash payment may be made by cash or cheque at our office, or PayNow to our UEN T03SS0051L.",
             textX,
             y
         );
         y += 15; // Add vertical offset for the next line
     
         doc.text(
-            "              4. NSA subsidy is applicable to Singaporean or Singapore PR aged 50 and above.",
+            "               4. NSA subsidy is applicable to Singaporean or Singapore PR aged 50 and above.",
             textX,
             y
         );
         y += 15; // Add vertical offset for the next line
     
         doc.text(
-            "              5. This is a computer generated invoice and requires no signature.",
+            "               5. This is a computer generated invoice and requires no signature.",
             textX,
             y
         );
-        y += 15; // Add vertical offset for the next line
-
-        // Add the date on a new line
-        doc.font(fontPathTimesRegular).fontSize(12).text("This is a computer generated receipt... Do not need any signature...", leftMargin, doc.y, {
-            align: 'left' // Align the date to the left
-        });
-        y += 15; // Add vertical offset for the next line
+        y += 15; // Add vertical offset for the next lin
     };
     
     formatDate(dateStr) {
@@ -375,7 +369,7 @@ class invoiceGenerator {
                 .stroke('black');
         }
     
-        let currentY = tableTop + headerHeight + 2; 
+        let currentY = tableTop + headerHeight; 
         doc.fontSize(9).fillColor('black').font(fontPathRegular);
         array.forEach((item, index) => {
             console.log("Course Reference Code:", this.courseReferenceCode(item.course.courseEngName));
