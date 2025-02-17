@@ -42,8 +42,18 @@ class CoursesSection extends Component {
         width: 150,
       },
       {
-        headerName: "Vacancies",
-        field: "vacanices",
+        headerName: "Current",
+        field: "current",
+        width: 100,
+      },
+      {
+        headerName: "Projected",
+        field: "projected",
+        width: 100,
+      },
+      {
+        headerName: "Maximum",
+        field: "maximum",
         width: 100,
       },
       {
@@ -57,9 +67,9 @@ class CoursesSection extends Component {
             Ended: "#A9A9A9",  // Gray (DarkGray)
             Full: "#4682B4",  // Blue (SteelBlue)
           };
-      
+    
           const backgroundColor = statusStyles[params.value] || "#D3D3D3"; // Default light gray for unknown values
-      
+    
           return (
             <span
               style={{
@@ -68,18 +78,18 @@ class CoursesSection extends Component {
                 textAlign: "center",
                 display: "inline-block",
                 borderRadius: "20px",
-                paddingLeft: "30px",  // Adjust padding for better width/height
+                paddingLeft: "30px",
                 paddingRight: "30px",
-                Width: "fit-content",  // Ensures that the width fits content
-                lineHeight: "30px",  // Centers text vertically
-                whiteSpace: "nowrap", // Prevents text wrapping
+                width: "fit-content",
+                lineHeight: "30px",
+                whiteSpace: "nowrap",
                 backgroundColor: backgroundColor
               }}
             >
               {params.value}
             </span>
           );
-        }  
+        }
       },
       {
         headerName: "Course Duration",
@@ -90,8 +100,22 @@ class CoursesSection extends Component {
         headerName: "Course Timing",
         field: "courseTiming",
         width: 180,
+      },
+      {
+        headerName: "SkillsFuture Credit Eligibility",
+        field: "eligibility",
+        width: 250,
+        cellRenderer: (params) => {
+          const imageSrc = params.value
+            ? "https://upload.wikimedia.org/wikipedia/commons/2/29/Tick-green.png" // ✅ Green Tick
+            : "https://upload.wikimedia.org/wikipedia/commons/5/5f/Red_X.svg"; // ❌ Red Cross
+      
+          return <img src={imageSrc} alt={params.value ? 'Eligible' : 'Not Eligible'} width="20" height="20" />;
+        }
       }
+      
     ];
+  
     
     // Method to get all languages
     getAllLanguages= async(courses)  =>  {
@@ -161,12 +185,15 @@ class CoursesSection extends Component {
         courseId: item.id,
         courseName: splitName.length === 3 ? splitName[1] : (splitName.length === 2 ? splitName[0] : item.name),
         centreLocation: splitName.length === 3 ? locationMap[splitName[2].replace(/[()]/g, '').trim()] || splitName[2].replace(/[()]/g, '').trim() : splitName.length === 2 ? locationMap[splitName[1].replace(/[()]/g, '').trim()] || splitName[1].replace(/[()]/g, '').trim(): '',
-        vacanices: item.stock_quantity,
+        current: item.stock_quantity,
+        projected: displayedDetails.vacancies,
+        maximum: Math.ceil(parseInt(displayedDetails.vacancies) * 1.5),
         noLesson: displayedDetails.noOfLesson,
         language: displayedDetails.language,
         status: displayedDetails.status,
         courseDuration: displayedDetails.startDate+" - "+displayedDetails.endDate,
         courseTiming: displayedDetails.startTime+" - "+displayedDetails.endTime,
+        eligibility: displayedDetails.eligibility
       };
     });
   
@@ -184,7 +211,7 @@ class CoursesSection extends Component {
     }
   
     array = array.flatMap(element => element.split('</p>'));
-    array = array.filter(element => element.trim() !== '');
+    array = array.filter(element => element.trim() !== ''); 
   
     var noOfLesson = array.find(item => item.toLowerCase().includes("lesson")).split("<br />")[1].replace(/\n|<b>|<\/b>/g, "").match(/\d+/);  // Extracts the first sequence of digits
   
@@ -215,7 +242,7 @@ class CoursesSection extends Component {
     let timing = array.flatMap(item => item.replace(/\<strong>|\<\/strong>|\n|<b>|<\/b>/g, "")).find(item => item.toLowerCase().includes("lesson schedule")).split("<br />").pop().trim();
     let startTime = '';
     let endTime = '';
-  
+    
     if (timing) {
       if (timing.includes("&#8211;")) {
         [startTime, endTime] = timing.split("&#8211;").map(t => t.trim());
@@ -278,7 +305,8 @@ class CoursesSection extends Component {
       endDate,
       startTime,
       endTime,
-      status
+      status,
+      eligibility: short_description.includes("SkillsFuture")
     });
   }
     
@@ -356,11 +384,14 @@ class CoursesSection extends Component {
           courseName: item.courseName,
           centreLocation: item.centreLocation,  // Only display the code like "T-253"
           noLesson: item.noLesson,
-          vacanices: item.vacanices,
+          current: item.current,
+          projected: item.projected,
+          maximum: item.maximum,
           status: item.status,
           courseDuration: item.courseDuration,
           courseTiming: item.courseTiming,
-          language: item.language
+          language: item.language,
+          eligibility: item.eligibility
         };
       });
   
@@ -542,13 +573,14 @@ class CoursesSection extends Component {
               padding: '10px',
               backgroundColor: '#F9E29B',
               maxWidth: '1320px',
+              width: '1320px', 
               height: 'fit-content',
               borderRadius: '15px', // Make the border more rounded
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for a floating effect
             }}
             >
               {/* Custom content you want to display */}
-              <p  style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
+              <p style={{textAlign:"left"}}><h2 style={{color:'#000000'}}>More Information</h2></p>
               <p style={{textAlign:"left"}}>
                 <strong>No Of Lesson: </strong>{this.state.rowData[this.state.expandedRowIndex].noLesson+" Lesson(s)"}
               </p>
