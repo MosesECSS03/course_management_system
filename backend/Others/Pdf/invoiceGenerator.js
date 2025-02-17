@@ -224,6 +224,13 @@ class invoiceGenerator {
             textX,
             y
         );
+        y += 15; // Add vertical offset for the next line
+
+        // Add the date on a new line
+        doc.font(fontPathTimesRegular).fontSize(12).text("This is a computer generated receipt... Do not need any signature...", leftMargin, doc.y, {
+            align: 'left' // Align the date to the left
+        });
+        y += 15; // Add vertical offset for the next line
     };
     
     formatDate(dateStr) {
@@ -270,6 +277,7 @@ class invoiceGenerator {
     
         // Create the participants table (uncomment if needed)
         this.createParticipantsTable(doc, array, "NRIC. No. ", "Name of Participant", "Full Course Fee (S$)", "Subsidised Fee Payable (S$)", "Cash", "SFC Claim");
+        
     }
     
 
