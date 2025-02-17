@@ -534,98 +534,127 @@ class DatabaseConnectivity {
     async getNextReceiptNumber(databaseName, collectionName, courseLocation, centreLocation) {
         const db = this.client.db(databaseName);
         const collection = db.collection(collectionName);
-        console.log("Centre:", centreLocation);
     
-        // Get the current two-digit year
+        // Get the current two-digit year (e.g., 2025 -> "25")
         const currentYear = new Date().getFullYear().toString().slice(-2);
     
-        // Retrieve all receipts matching the specified courseLocation
+        // Retrieve all receipts matching the specified courseLocation and location
         const existingReceipts = await collection.find({
-            receiptNo: { $regex: `^${courseLocation}` } // Match all receipts starting with courseLocation
+            receiptNo: { $regex: `^${courseLocation}` },  // Match all receipts starting with courseLocation
+            location: centreLocation                      // Filter by centre location
         }).toArray();
     
-        console.log("Existing receipts:", existingReceipts);
-    
-        // Filter receipts to determine if a reset is needed for ECSS/SFC
+        // Filter receipts to get only those from the current year
         const validReceipts = existingReceipts.filter(receipt => {
-            if (courseLocation === "ECSS/SFC/") {
-                // Match receipts for the current year
-                const regex = new RegExp(`^${courseLocation}\\d+/(${currentYear})$`);
-                return regex.test(receipt.receiptNo);
-            }
-            return true; // For other prefixes, year isn't relevant
+            const regex = new RegExp(`^${courseLocation}\\d+/(${currentYear})$`);
+            return regex.test(receipt.receiptNo);
         });
     
-        // Separate out receipts for "CT Hub"
-        const cthubReceipts = validReceipts.filter(receipt => receipt.location === "CT Hub");
-    
-        // Get the highest receipt number for CT Hub (if any)
-        const cthubReceiptNumbers = cthubReceipts.map(receipt => {
-            if (courseLocation === "ECSS/SFC/") {
-                // Match format: ECSS/SFC/037/2024
-                const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
-                const match = receipt.receiptNo.match(regex);
-                return match ? parseInt(match[1], 10) : null;
-            } else {
-                // Match format: XXX - 0001
-                const regex = new RegExp(`^${courseLocation} - (\\d+)$`);
-                const match = receipt.receiptNo.match(regex);
-                return match ? parseInt(match[1], 10) : null;
-            }
+        // Get the current year's receipt numbers for the specific location (centreLocation)
+        const centreReceiptNumbers = validReceipts.map(receipt => {
+            // Match format: ECSS/SFC/037/2024 or XXX - 0001
+            const regex = new RegExp(`^${courseLocation}(\\d+)(?:/\\d+| - \\d+)$`);
+            const match = receipt.receiptNo.match(regex);
+            return match ? parseInt(match[1], 10) : null;
         }).filter(num => num !== null);
     
-        const maxCthubNumber = cthubReceiptNumbers.length > 0 ? Math.max(...cthubReceiptNumbers) : 0;
+        let nextNumber;
     
-        // Separate out receipts for other locations
-        const otherReceipts = validReceipts.filter(receipt => receipt.location !== "CT Hub");
-    
-        // Get the highest receipt number for other locations
-        const otherReceiptNumbers = otherReceipts.map(receipt => {
-            if (courseLocation === "ECSS/SFC/") {
-                // Match format: ECSS/SFC/037/2024
-                const regex = new RegExp(`^${courseLocation}(\\d+)/\\d+$`);
-                const match = receipt.receiptNo.match(regex);
-                return match ? parseInt(match[1], 10) : null;
-            } else {
-                // Match format: XXX - 0001
-                const regex = new RegExp(`^${courseLocation} - (\\d+)$`);
-                const match = receipt.receiptNo.match(regex);
-                return match ? parseInt(match[1], 10) : null;
-            }
-        }).filter(num => num !== null);
-    
-        const maxOtherNumber = otherReceiptNumbers.length > 0 ? Math.max(...otherReceiptNumbers) : 0;
-    
-        // Now, determine the next receipt number
-        if (currentYear === "25") {
-            // If the current year is 25, and the centre is "CT Hub"
-            if (centreLocation === "CT Hub") {
-                const nextNumber = maxCthubNumber > 0 ? maxCthubNumber + 1 : 109; // Start from 109 if no CT Hub receipts exist
-                return courseLocation === "ECSS/SFC/"
-                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
-                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
-            } else {
-                // For other centres, continue from the highest number for other locations
-                const nextNumber = maxOtherNumber > 0 ? maxOtherNumber + 1 : 1; // Start from 1 if no other receipts exist
-                return courseLocation === "ECSS/SFC/"
-                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
-                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
-            }
+        // First, handle the SkillsFuture Invoice Number
+        if (courseLocation.startsWith("ECSS/SFC/")) {
+            nextNumber = this.getNextReceiptNumberForSkillsFuture(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
         } else {
-            // For other years, reset numbers
+            // Default logic for other locations
+            nextNumber = this.getNextReceiptNumberForPayNowCash(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
+        }
+    
+        // Format the next receipt number with leading zeros
+        const formattedReceiptNumber = `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`;
+    
+        // Results for the current year (CT Hub, Tampines 253 Centre, Pasir Ris West Centre)
+        const result = [
+            `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear} CT Hub`,
+            `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear} Tampines 253 Centre`,
+            `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear} Pasir Ris West Centre`
+        ];
+    
+        // Display the result
+        result.forEach(entry => console.log(entry));
+    
+        // Return the formatted receipt number
+        return formattedReceiptNumber;
+    }
+    
+    getNextReceiptNumberForSkillsFuture(courseLocation, centreReceiptNumbers, centreLocation, currentYear) 
+    {
+        let nextNumber;
+    
+        // Logic for 2025
+        if (currentYear === 25) {
             if (centreLocation === "CT Hub") {
-                const nextNumber = maxCthubNumber > 0 ? maxCthubNumber + 1 : 109; // Start from 109 if no CT Hub receipts exist
-                return courseLocation === "ECSS/SFC/"
-                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
-                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
-            } else {
-                const nextNumber = maxOtherNumber > 0 ? maxOtherNumber + 1 : 1; // Start from 1 if no other receipts exist
-                return courseLocation === "ECSS/SFC/"
-                    ? `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`
-                    : `${courseLocation} - ${String(nextNumber).padStart(4, '0')}`;
+                // For CT Hub in 2025, start from 109
+                nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 109;
+            }             
+            else if (centreLocation === "Tampines 253 Centre") {
+                // For Tampines 253 Centre in 2026 and beyond, start from 1
+                nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+            } 
+            else if (centreLocation === "Pasir Ris West Wellness Centre") {
+                // For Pasir Ris West Wellness Centre in 2026 and beyond, start from 1
+                nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+            }
+        } 
+        // Logic for 2026 and beyond
+        else if (currentYear >= 26) {
+            if (centreLocation === "CT Hub") {
+                // For CT Hub in 2026 and beyond, start from 1
+                nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+            } else if (centreLocation === "Tampines 253 Centre") {
+                // For Tampines 253 Centre in 2026 and beyond, start from 1
+                nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+            } else if (centreLocation === "Pasir Ris West Wellness Centre") {
+                // For Pasir Ris West Wellness Centre in 2026 and beyond, start from 1
+                nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
             }
         }
-    }    
+    
+        // Dynamically calculate the padding length based on the next number's length
+        const paddingLength = nextNumber.toString().length + 2; // Minimum length of 3, and adjust as needed
+        const formattedNextNumber = String(nextNumber).padStart(paddingLength, '0');
+    
+        // Return the formatted receipt number
+        return `${courseLocation}${formattedNextNumber}/${currentYear}`;
+    }
+    
+    
+    getNextReceiptNumberForPayNowCash(courseLocation, centreReceiptNumbers, centreLocation, currentYear) {
+        let nextNumber;
+    
+        // Handle specific logic for each centre location
+        if (centreLocation === "Tampines 253 Centre") {
+            // Custom logic for Tampines 253 Centre
+            nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+        } 
+        else if (centreLocation === "Pasir Ris West Centre") {
+            // Custom logic for Pasir Ris West Centre
+            nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+        } 
+        else if (centreLocation === "CT Hub") {
+            // For CT Hub, it uses the same logic as the others
+            nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+        } 
+    
+        // Determine the length of the next number based on the nextNumber value
+        let numberLength = nextNumber.toString().length;
+    
+        // Format the next number dynamically with leading zeros based on its length
+        let formattedNextNumber = String(nextNumber).padStart(numberLength + 3, '0');  // Start with length 4, increase as needed
+    
+        // Return the formatted receipt number in the format: "courseLocation - 0001"
+        return `${courseLocation} - ${formattedNextNumber}`;
+    }
+    
+    
     
     async newInvoice(databaseName, collectionName, invoiceNumber, month, username, date, time) {
         try {
