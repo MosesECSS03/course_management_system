@@ -92,21 +92,25 @@ class CourseDetailsSection extends Component {
             <label>
               <input
                 type="radio"
-                value="SkillsFuture"
-                checked={this.state.selectedPayment === 'SkillsFuture'}
-                onChange={this.handlePaymentChange}
-              />
-              SkillsFuture
-            </label>
-            <label>
-              <input
-                type="radio"
                 value="PayNow"
                 checked={this.state.selectedPayment === 'PayNow'}
                 onChange={this.handlePaymentChange}
               />
               PayNow
             </label>
+            {/* Conditionally render SkillsFuture based on the course names */}
+            {this.props.courseEnglishName !== 'Community Ukulele – Mandarin' && 
+              this.props.courseChineseName !== '音乐祝福社区四弦琴班 – 中文' && (
+                <label>
+                  <input
+                    type="radio"
+                    value="SkillsFuture"
+                    checked={this.state.selectedPayment === 'SkillsFuture'}
+                    onChange={this.handlePaymentChange}
+                  />
+                  SkillsFuture
+                </label>
+            )}
           </div>
           {!selectedPayment && paymentTouched && (
             <>

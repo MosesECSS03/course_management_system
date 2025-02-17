@@ -41,6 +41,7 @@ router.post('/', async function(req, res, next)
         var participantsParticulars = req.body.participantDetails;
         
         var controller = new RegistrationController();
+        participantsParticulars.registrationDate = this.getCurrentDateTime().date;
         participantsParticulars.official = {
             name: "", // You can set a default or dynamic value
             date: "", // You can set this to the current date using new Date() or any format

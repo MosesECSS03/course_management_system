@@ -181,7 +181,7 @@ class FormPage extends Component {
           payment: payment
       },
       agreement: agreement,
-      status: "Pending"
+      status: "Pending", 
     };
 
     console.log('Participants Details', participantDetails);
@@ -206,6 +206,71 @@ class FormPage extends Component {
       });
   };
 
+  isValidNRIC(nric) {
+    // Check if NRIC is empty
+    if (!nric) {
+        return { isValid: false, error: 'NRIC Number is required. 身份证号码是必填项。' };
+    }
+    // Check if NRIC is exactly 9 characters long
+    if (nric.length !== 9) {
+        return { isValid: false, error: 'NRIC must be exactly 9 characters. NRIC 必须是9个字符。' };
+    }
+    // Check if NRIC follows the correct format (first letter + 7 digits + last letter)
+    if (!/^[STFG]\d{7}[A-Z]$/.test(nric)) {
+        return { isValid: false, error: 'Invalid NRIC format. 必须符合新加坡身份证格式，例如 S1234567D。' };
+    }
+    // If the format is correct, return as valid
+    return { isValid: true, error: null }; // NRIC format is valid, but checksum is not checked
+  }
+
+  isValidDOB(dob) {
+    // Check if DOB is empty
+    if (!dob) {
+        return { isValid: false, error: 'Date of Birth is required. 出生日期是必填项。' };
+    }
+
+    // Regular expressions for different date formats (dd/mm/yyyy, yyyy/mm/dd, yyyy/dd/mm, mm/dd/yyyy)
+    const formats = [
+        /^\d{2}\/\d{2}\/\d{4}$/, // dd/mm/yyyy
+        /^\d{4}\/\d{2}\/\d{2}$/, // yyyy/mm/dd
+        /^\d{4}\/\d{2}\/\d{2}$/, // yyyy/dd/mm
+        /^\d{2}\/\d{2}\/\d{4}$/  // mm/dd/yyyy
+    ];
+
+    // Check if the date matches any of the allowed formats
+    if (!formats.some(format => format.test(dob))) {
+        return { isValid: false, error: 'Invalid Date of Birth format. 日期格式无效，必须符合：dd/mm/yyyy, yyyy/mm/dd, yyyy/dd/mm, mm/dd/yyyy。' };
+    }
+
+    // Parse the date in the correct format
+    const dateParts = dob.split('/');
+    let dobDate;
+
+    if (dob.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        dobDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); // dd/mm/yyyy
+    } else if (dob.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
+        dobDate = new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`); // yyyy/mm/dd or yyyy/dd/mm
+    } else if (dob.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        dobDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`); // mm/dd/yyyy
+    }
+
+    // Check if the date is valid
+    if (isNaN(dobDate.getTime())) {
+        return { isValid: false, error: 'Invalid Date of Birth. 出生日期无效。' };
+    }
+
+    // Get current year and check if the person is at least 55 years old
+    const currentYear = new Date().getFullYear();
+    const birthYear = dobDate.getFullYear();
+    const age = currentYear - birthYear;
+
+    if (age < 55) {
+        return { isValid: false, error: 'Age must be at least 55 years. 年龄必须至少为55岁。' };
+    }
+
+    return { isValid: true, error: null }; // Valid DOB
+  }
+
   validateForm = () => {
     const { currentSection, formData } = this.state;
     const errors = {};
@@ -217,9 +282,12 @@ class FormPage extends Component {
       if (!formData.location) {
         errors.location = 'Location is required. 地点是必填项。';
       }
-      if (!formData.nRIC) {
-        errors.nRIC = 'NRIC Number is required. 身份证号码是必填项。';
-      }
+      if (formData.nRIC) {
+        const { isValid, error } = this.isValidNRIC(formData.nRIC);
+        if (!isValid) {
+            errors.nRIC = error;
+        }
+    }
       if (!formData.rESIDENTIALSTATUS) {
         errors.rESIDENTIALSTATUS = 'Residential Status is required. 居民身份是必填项。';
       }
@@ -229,17 +297,39 @@ class FormPage extends Component {
       if (!formData.gENDER) {
         errors.gENDER = 'Gender is required. 性别是必填项。';
       }
-      if (!formData.dOB) {
-        errors.dOB = 'Date of Birth is required. 出生日期是必填项。';
+      if (formData.dOB) {
+        const { isValid, error } = this.isValidDOB(formData.dOB);
+        if (!isValid) {
+            errors.dOB = error;
+        }
       }
       if (!formData.cNO) {
         errors.cNO = 'Contact No. is required. 联系号码是必填项。';
       }
+      if (!formData.cNO) {
+          errors.cNO = 'Contact No. is required. 联系号码是必填项。';
+      }
+      if (formData.cNO && !/^\d+$/.test(formData.cNO)) {
+          errors.cNO = 'Contact No. must contain only numbers. 联系号码只能包含数字。';
+      }
+      if (formData.cNO && formData.cNO.length !== 8) {
+          errors.cNO = 'Contact No. must be exactly 8 digits. 联系号码必须是8位数字。';
+      }
+      if (formData.cNO && !/^[89]/.test(formData.cNO)) {
+          errors.cNO = 'Contact No. must start with 8 or 9. 联系号码必须以8或9开头。';
+      }    
       if (!formData.eMAIL) {
         errors.eMAIL = 'Email is required. 电子邮件是必填项。';
       }
-      if (!formData.postalCode) {
-        errors.postalCode = 'Postal Code is required. 邮政编码是必填项。';
+      if (!formData.postalCode) 
+      {
+          errors.postalCode = 'Postal Code is required. 邮政编码是必填项。';
+      }
+      if (formData.postalCode && /[^0-9]/.test(formData.postalCode)) {
+          errors.postalCode = 'Postal Code must contain only numbers. 邮政编码只能包含数字。';
+      }
+      if (formData.postalCode && formData.postalCode.length !== 6) {
+          errors.postalCode = 'Postal Code must be exactly 6 digits. 邮政编码必须是6位数字。';
       }
       if (!formData.eDUCATION) {
         errors.eDUCATION = 'Education Level is required. 教育水平是必填项。';
