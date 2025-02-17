@@ -536,7 +536,8 @@ class DatabaseConnectivity {
         const collection = db.collection(collectionName);
     
         // Get the current two-digit year (e.g., 2025 -> "25")
-        const currentYear = new Date().getFullYear().toString().slice(-2);
+        var currentYear = new Date().getFullYear().toString().slice(-2);
+        currentYear = parseInt(currentYear);
     
         // Retrieve all receipts matching the specified courseLocation and location
         const existingReceipts = await collection.find({
@@ -558,30 +559,18 @@ class DatabaseConnectivity {
             return match ? parseInt(match[1], 10) : null;
         }).filter(num => num !== null);
     
-        let nextNumber;
+        let formattedReceiptNumber;
     
         // First, handle the SkillsFuture Invoice Number
         if (courseLocation.startsWith("ECSS/SFC/")) {
-            nextNumber = this.getNextReceiptNumberForSkillsFuture(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
-        } else {
+            formattedReceiptNumber = this.getNextReceiptNumberForSkillsFuture(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
+        } 
+        else 
+        {
             // Default logic for other locations
-            nextNumber = this.getNextReceiptNumberForPayNowCash(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
+            formattedReceiptNumber = this.getNextReceiptNumberForPayNowCash(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
         }
-    
-        // Format the next receipt number with leading zeros
-        const formattedReceiptNumber = `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear}`;
-    
-        // Results for the current year (CT Hub, Tampines 253 Centre, Pasir Ris West Centre)
-        const result = [
-            `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear} CT Hub`,
-            `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear} Tampines 253 Centre`,
-            `${courseLocation}${String(nextNumber).padStart(3, '0')}/${currentYear} Pasir Ris West Centre`
-        ];
-    
-        // Display the result
-        result.forEach(entry => console.log(entry));
-    
-        // Return the formatted receipt number
+
         return formattedReceiptNumber;
     }
     
@@ -592,7 +581,7 @@ class DatabaseConnectivity {
         // Logic for 2025
         if (currentYear === 25) {
             if (centreLocation === "CT Hub") {
-                // For CT Hub in 2025, start from 109
+             // For CT Hub in 2025, start from 109
                 nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 109;
             }             
             else if (centreLocation === "Tampines 253 Centre") {
@@ -618,12 +607,15 @@ class DatabaseConnectivity {
             }
         }
     
-        // Dynamically calculate the padding length based on the next number's length
-        const paddingLength = nextNumber.toString().length + 2; // Minimum length of 3, and adjust as needed
-        const formattedNextNumber = String(nextNumber).padStart(paddingLength, '0');
-    
+        // Pad number to 3 digits if less than 3 digits, else keep original length
+        if (nextNumber.toString().length < 3) {
+            nextNumber = nextNumber.toString().padStart(3, '0'); // Pad to 3 digits if less than 3
+        } else {
+            nextNumber = nextNumber.toString(); // Keep original length if 3 or more digits
+        }
+            
         // Return the formatted receipt number
-        return `${courseLocation}${formattedNextNumber}/${currentYear}`;
+        return `${courseLocation}${nextNumber}/${currentYear.toString()}`;
     }
     
     
