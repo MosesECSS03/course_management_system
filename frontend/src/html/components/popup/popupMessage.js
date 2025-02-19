@@ -254,6 +254,20 @@ class Popup extends Component {
     }));
   };
 
+  handleConfirm = async(id) =>
+  {
+    console.log("Registration Id1:", id);
+    //axios.post('https://moses-ecss-backend.azurewebsites.net/courseregistration', {"purpose": "delete", id})
+      axios.post('http://localhost:3001/courseregistration', {"purpose": "delete", "id":id})
+      .then((response) => {
+        console.log("Deleted Participants:", response);
+        this.props.closePopupMessage();
+      })
+    .catch((error) => {
+      console.error('Error submitting form:', error);
+    });
+  }
+
   // Toggle confirm password visibility
   toggleConfirmPasswordVisibility = () => {
     this.setState((prevState) => ({

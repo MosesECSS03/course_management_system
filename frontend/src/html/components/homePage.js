@@ -401,7 +401,6 @@
         popupMessage: '',
         popupType: '',
       });
-      this.refreshChild();
     };
 
     closePopup2 = () => {
@@ -1007,7 +1006,7 @@
                 All rights reserved.</p>
             </div>
           </div>
-          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} closePopup2={this.closePopup2} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage} handleConfirm = {this.handleConfirm}/>
+          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} closePopup2={this.closePopup2} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage} id = {this.state.deleteId}/>
         </>
       );
     }
