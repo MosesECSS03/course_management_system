@@ -65,6 +65,16 @@ class LoginPage extends Component {
     }
     return '';
   };
+
+  handleConfirm = async(id) =>
+  {
+    //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courseregistration`, { "purpose": "delete", "id": this.state.deleteId});
+    var response = await axios.post(`http://localhost:3001/courseregistration`, { "purpose": "delete", id});
+    console.log("Response:", response);
+    //this.closePopup();
+    //this.setState({ confirmSignal: true});
+  }
+
   
   handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,7 +95,7 @@ class LoginPage extends Component {
 
     try {
       // Replace with your API endpoint and payload
-     const response =  //await axios.post('http://localhost:3001/login', {
+     const response = //await axios.post('http://localhost:3001/login', {
                       await axios.post('https://moses-ecss-backend.azurewebsites.net/login', {
           email,
           password

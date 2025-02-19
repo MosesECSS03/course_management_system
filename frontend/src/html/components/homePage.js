@@ -61,8 +61,7 @@
         refreshKey: 0,
         invoiceVisibility: false,
         dashboard: false,
-        confirmSignal: false,
-        deleteId: "",
+        deleteId: ""
       };
   
       // Set the initial state
@@ -402,6 +401,7 @@
         popupMessage: '',
         popupType: '',
       });
+      this.refreshChild();
     };
 
     closePopup2 = () => {
@@ -633,15 +633,6 @@
     }
   }
 
-  handleConfirm = async() =>
-  {
-    console.log("Confirmation in progress1", this.state.deleteId);
-    //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courseregistration`, { "purpose": "delete", "id": this.state.deleteId});
-    var response = await axios.post(`http://localhost:3001/courseregistration`, { "purpose": "delete", "id": this.state.deleteId});
-    console.log("Response:", response);
-    this.closePopup();
-    //this.setState({ confirmSignal: true});
-  }
 
   createAccountPopupMessage(result, message, popupType)
   {
@@ -773,11 +764,6 @@
       });
     }
 
-    stopSignal = () =>
-    {
-      this.setState({confirmSignal: false});
-    }
-    
     render() 
     {
       console.log("Props History Push", this.props);

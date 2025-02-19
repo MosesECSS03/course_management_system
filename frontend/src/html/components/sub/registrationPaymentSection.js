@@ -984,7 +984,7 @@ class RegistrationPaymentSection extends Component {
         width: 300,
       },
       // Conditionally include the "Delete" column based on the role
-      !["Site in-charge", "Finance"].includes(role) 
+      /*!["Site in-charge", "Finance"].includes(role) 
         ? {
             headerName: "Delete",
             field: "delete",
@@ -1006,13 +1006,13 @@ class RegistrationPaymentSection extends Component {
               );
             }
           }
-        : null,
+        : null,*/
     ].filter(Boolean); // Filter out null values if the "Delete" column is not included
   };
 
   handleDelete = async(id) =>
   {
-    await this.props.generateDeleteConfirmationPopup(id);
+    //await this.props.generateDeleteConfirmationPopup(id);
   }
   
   getPaginatedDetails() {
@@ -1373,9 +1373,7 @@ class RegistrationPaymentSection extends Component {
 
  // componentDidUpdate is called after the component has updated (re-rendered)
   componentDidUpdate(prevProps, prevState) {
-    const { selectedLocation, selectedCourseName, searchQuery, confirmSignal } = this.props;
-    console.log("confirmSignal:",   confirmSignal);
-
+    const { selectedLocation, selectedCourseName, searchQuery} = this.props;
     // Check if the relevant props have changed
     if (
       selectedLocation !== prevProps.selectedLocation ||

@@ -730,7 +730,7 @@ class Popup extends Component {
             <div className="confirmation-message">
               <p>{message}</p>
               <div className="confirmation-buttons">
-                <button onClick={() => this.props.handleConfirm(this.props.id)} className="confirm-btn">Confirm</button>
+                <button onClick={() => this.handleConfirm(this.props.id)} className="confirm-btn">Confirm</button>
                 <button onClick={this.cancel} className="cancel-btn">Cancel</button>
               </div>
             </div>
