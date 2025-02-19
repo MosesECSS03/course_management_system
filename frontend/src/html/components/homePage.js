@@ -60,7 +60,9 @@
         isInactive: false,
         refreshKey: 0,
         invoiceVisibility: false,
-        dashboard: false
+        dashboard: false,
+        confirmSignal: false,
+        deleteId: "",
       };
   
       // Set the initial state
@@ -416,10 +418,19 @@
           isPopupOpen: false  // Close the popup
         });
         this.refreshChild();  // Refresh or call any child method if needed
-      }, 900000);  // 15 mins
+      }, 5000);  // 15 mins
     };
 
 
+    generateDeleteConfirmationPopup = (id) => {
+      console.log("ID deleted:", id);
+      this.setState({
+        isPopupOpen: true,
+        popupMessage: `Are you sure you want to delete this item?`, // You can customize this based on your data
+        popupType: "confirmation", // You can use this to style it differently if needed
+        deleteId: id, // Store the row data to handle the deletion later
+      });
+    };
     
     generateReceiptPopup = () => {
       this.setState({
@@ -607,7 +618,7 @@
 
     // Restart the inactivity timeout
     //this.inactivityTimeout = setTimeout(this.noActivityDetected, 10000); // 1 minute*/
-    this.inactivityTimeout = setTimeout(this.noActivityDetected, 5*60*1000); // 1 minute*/
+    this.inactivityTimeout = setTimeout(this.noActivityDetected, 15*60*1000); // 1 minute*/
   };
 
   goBackHome = async() =>
@@ -622,24 +633,34 @@
     }
   }
 
-    createAccountPopupMessage(result, message, popupType)
-    {
-      console.log(result, message, popupType);
-      this.setState({
-        isPopupOpen: result,
-        popupMessage: message,
-        popupType: "success-message"
-      });
-      setTimeout(() => {
-        this.setState({ isPopupOpen: false});
-      }, 5000);
-    }
+  handleConfirm = async() =>
+  {
+    console.log("Confirmation in progress1", this.state.deleteId);
+    //var response = await axios.post(`https://moses-ecss-backend.azurewebsites.net/courseregistration`, { "purpose": "delete", "id": this.state.deleteId});
+    var response = await axios.post(`http://localhost:3001/courseregistration`, { "purpose": "delete", "id": this.state.deleteId});
+    console.log("Response:", response);
+    this.closePopup();
+    //this.setState({ confirmSignal: true});
+  }
 
-    toggleDropdown = () => {
-      this.setState((prevState) => ({
-        isDropdownOpen: !prevState.isDropdownOpen,
-      }));
-    };
+  createAccountPopupMessage(result, message, popupType)
+  {
+    console.log(result, message, popupType);
+    this.setState({
+      isPopupOpen: result,
+      popupMessage: message,
+      popupType: "success-message"
+    });
+    setTimeout(() => {
+      this.setState({ isPopupOpen: false});
+    }, 5000);
+  }
+
+  toggleDropdown = () => {
+    this.setState((prevState) => ({
+      isDropdownOpen: !prevState.isDropdownOpen,
+    }));
+  };
 
     editAccountPopupMessage(accountId) {
       // Log the account ID for debugging purposes
@@ -752,6 +773,11 @@
       });
     }
 
+    stopSignal = () =>
+    {
+      this.setState({confirmSignal: false});
+    }
+    
     render() 
     {
       console.log("Props History Push", this.props);
@@ -935,6 +961,7 @@
                         generateInvoiceNumber = {this.generateInvoiceNumber}
                         onResetSearch = {this.onResetSearch}
                         closePopupMessage = {this.closePopupMessage}
+                        generateDeleteConfirmationPopup = {this.generateDeleteConfirmationPopup}
                     />
                     </div>
                   </>}                 
@@ -994,7 +1021,7 @@
                 All rights reserved.</p>
             </div>
           </div>
-          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} closePopup2={this.closePopup2} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage}/>
+          <Popup isOpen={isPopupOpen} message={popupMessage} type={popupType} closePopup={this.closePopup} closePopup2={this.closePopup2} goBackLoginPage={this.goBackHome} closePopupMessage={this.closePopupMessage} handleConfirm = {this.handleConfirm}/>
         </>
       );
     }

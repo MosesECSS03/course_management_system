@@ -61,8 +61,8 @@ class RegistrationPaymentSection extends Component {
         var {siteIC, role} = this.props;  
         console.log("Role", role, "SiteIC", siteIC);
         const response = await axios.post(
-          //'http://localhost:3001/courseregistration', 
-          'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
+          'http://localhost:3001/courseregistration', 
+          //'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
           { purpose: 'retrieve', role, siteIC}
         );
 
@@ -181,8 +181,8 @@ class RegistrationPaymentSection extends Component {
         // Check if the value is "Paid" or "Generate SkillsFuture Invoice"
         if (updatedStatus === "Paid" || updatedStatus === "SkillsFuture Done" || updatedStatus === "Cancelled") {
           // Proceed to update WooCommerce stock
-          //const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
-          const stockResponse = await axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', { 
+          const stockResponse = await axios.post('http://localhost:3002/update_stock/', { 
+          //const stockResponse = await axios.post('https://moses-ecss-data.azurewebsites.net/update_stock/', { 
             type: 'update', 
             page: {"courseChiName":chi, "courseEngName":eng, "courseLocation":location}, // Assuming `chi` refers to the course or page
             status: updatedStatus, // Using updatedStatus directly here
@@ -230,8 +230,8 @@ class RegistrationPaymentSection extends Component {
         try {
           //console.log("Fetching receipt number for location:", courseLocation);
           const response = await axios.post(
-            //"http://localhost:3001/receipt", {
-            'https://moses-ecss-backend.azurewebsites.net/receipt',{
+            "http://localhost:3001/receipt", {
+            //'https://moses-ecss-backend.azurewebsites.net/receipt',{
             purpose: "getReceiptNo",
             courseLocation,
             centreLocation
@@ -253,8 +253,8 @@ class RegistrationPaymentSection extends Component {
       generatePDFReceipt = async (id, participant, course, receiptNo, status) => {
         try {
           const pdfResponse = await axios.post(
-           //"http://localhost:3001/courseregistration",
-           'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+           "http://localhost:3001/courseregistration",
+           //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
             {
               purpose: "addReceiptNumber",
               id,
@@ -280,8 +280,8 @@ class RegistrationPaymentSection extends Component {
           if(course.payment === "Cash" || course.payment === "PayNow")
           {
             const pdfResponse = await axios.post(
-              //"http://localhost:3001/courseregistration",
-              'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+              "http://localhost:3001/courseregistration",
+              //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
               {
                 purpose: "receipt",
                 participant,
@@ -312,8 +312,8 @@ class RegistrationPaymentSection extends Component {
           else
           {
             const pdfResponse = await axios.post(
-            //"http://localhost:3001/courseregistration",
-            "https://moses-ecss-backend.azurewebsites.net/courseregistration",
+            "http://localhost:3001/courseregistration",
+            //"https://moses-ecss-backend.azurewebsites.net/courseregistration",
             {
               purpose: "invoice",
               participant,
@@ -445,8 +445,8 @@ class RegistrationPaymentSection extends Component {
     generatePDFInvoice = async (id, participant, course, receiptNo, status) => {
       try {
         const pdfResponse = await axios.post(
-          //"http://localhost:3001/courseregistration",
-          "https://moses-ecss-backend.azurewebsites.net/courseregistration",
+          "http://localhost:3001/courseregistration",
+          //"https://moses-ecss-backend.azurewebsites.net/courseregistration",
           {
             purpose: "addInvoiceNumber",
             id,
@@ -845,11 +845,19 @@ class RegistrationPaymentSection extends Component {
   };
 
   // Custom cell renderer for Payment Method with Buttons
-  paymentMethodRenderer = (params) => {
+  paymentMethodRenderer = (params, courseName) => {
     const currentPaymentMethod = params.value; // Get the current payment method value
 
+    let paymentMethods  ;
     // List of payment methods
-    const paymentMethods = ['Cash', 'PayNow', 'SkillsFuture'];
+    if(courseName !== "Community Ukulele – Mandarin")
+    {
+      paymentMethods = ['Cash', 'PayNow', 'SkillsFuture'];
+    }
+    else
+    {
+      paymentMethods = ['Cash', 'PayNow'];
+    }
 
     // Handle button click to update the payment method in the row
     const handleButtonClick = (method) => {
@@ -872,111 +880,141 @@ class RegistrationPaymentSection extends Component {
     );
   };
   
-  getColumnDefs = () => [
-    {
-      headerName: "S/N",
-      field: "sn",
-      width: 100,
-    },
-    {
-      headerName: "Name",
-      field: "name",
-      width: 300,
-      editable: true,
-    },
-    {
-      headerName: "Contact Number",
-      field: "contactNo",
-      width: 150,
-      editable: true,
-    },
-    {
-      headerName: "Course Name",
-      field: "course",
-      width: 350,
-    },
-    {
-      headerName: "Payment Method",
-      field: "paymentMethod",
-      cellRenderer: (params) => this.paymentMethodRenderer(params),
-      editable: false,
-      width: 500,
-    },
-    {
-      headerName: "Confirmation",
-      field: "confirmed",
-      cellRenderer: (params) => this.slideButtonRenderer(params),
-      editable: false,
-      width: 180,
-      cellStyle: (params) => {
-        const paymentMethodValue = params.data.paymentMethod;
-        return paymentMethodValue !== "SkillsFuture" ? { display: "none" } : {};
+  getColumnDefs = () => {
+    const { role } = this.props; // Get the role from props
+    
+    return [
+      {
+        headerName: "S/N",
+        field: "sn",
+        width: 100,
       },
-    },
-    {
-      headerName: "Payment Status",
-      field: "paymentStatus",
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: (params) => {
-        const paymentMethod = params.data.paymentMethod;
-        const skillsFutureOptions = [
-          "Pending",
-          "Generating SkillsFuture Invoice",
-          "SkillsFuture Done",
-          "Cancelled",
-        ];
-        const otherOptions = ["Pending", "Paid", "Cancelled"];
-        const options =
-          paymentMethod === "SkillsFuture" ? skillsFutureOptions : otherOptions;
-  
-        return { values: options };
+      {
+        headerName: "Name",
+        field: "name",
+        width: 300,
+        editable: true,
       },
-
-      cellRenderer: (params) => {
-        const statusStyles = {
-          Pending: "#FFA500", // Orange for Pending
-          //"Generating SkillsFuture Invoice": "#0000FF", // Blue for Generating SkillsFuture Invoice
-          "Generating SkillsFuture Invoice": "#00CED1", // Blue for Generating SkillsFuture Invoice
-          "SkillsFuture Done": "#008000", // Green for SkillsFuture Done
-          Cancelled: "#FF0000", // Red for Cancelled
-          Paid: "#008000"
-          //Paid: "#00CED1", // Turquoise for Paid
-        };
-        
-  
-        const backgroundColor = statusStyles[params.value] || "#D3D3D3"; // Default light gray for unknown values
-
-        return (
-          <span
-            style={{
-              fontWeight: "bold",
-              color: "white",
-              textAlign: "center",
-              display: "inline-block",
-              borderRadius: "20px",
-              paddingLeft: "30px", // Adjust for long width and height
-              paddingRight: "30px", // Adjust for long width and height
-              minWidth: "150px", // Ensures width fits content
-              lineHeight: "30px", // Centers text vertically
-              whiteSpace: "nowrap", // Prevents text wrapping
-              backgroundColor: backgroundColor
-            }}
-          >
-            {params.value}
-          </span>
-        );
+      {
+        headerName: "Contact Number",
+        field: "contactNo",
+        width: 150,
+        editable: true,
       },
-      editable: true,
-      width: 350, // Adjust column width as needed
-    },
-    {
-      headerName: "Receipt/Invoice Number",
-      field: "recinvNo",
-      width: 300,
-    },
-  ];
+      {
+        headerName: "Course Name",
+        field: "course",
+        width: 350,
+      },
+      {
+        headerName: "Payment Method",
+        field: "paymentMethod",
+        cellRenderer: (params) => {
+          const courseName = params.data.course;
+          return this.paymentMethodRenderer(params, courseName);
+        },
+        editable: false,
+        width: 500,
+      },
+      {
+        headerName: "Confirmation",
+        field: "confirmed",
+        cellRenderer: (params) => this.slideButtonRenderer(params),
+        editable: false,
+        width: 180,
+        cellStyle: (params) => {
+          const paymentMethodValue = params.data.paymentMethod;
+          return paymentMethodValue !== "SkillsFuture" ? { display: "none" } : {};
+        },
+      },
+      {
+        headerName: "Payment Status",
+        field: "paymentStatus",
+        cellEditor: "agSelectCellEditor",
+        cellEditorParams: (params) => {
+          const paymentMethod = params.data.paymentMethod;
+          const skillsFutureOptions = [
+            "Pending",
+            "Generating SkillsFuture Invoice",
+            "SkillsFuture Done",
+            "Cancelled",
+          ];
+          const otherOptions = ["Pending", "Paid", "Cancelled"];
+          const options = paymentMethod === "SkillsFuture" ? skillsFutureOptions : otherOptions;
+    
+          return { values: options };
+        },
+        cellRenderer: (params) => {
+          const statusStyles = {
+            Pending: "#FFA500",
+            "Generating SkillsFuture Invoice": "#00CED1",
+            "SkillsFuture Done": "#008000",
+            Cancelled: "#FF0000",
+            Paid: "#008000",
+          };
+          
+          const backgroundColor = statusStyles[params.value] || "#D3D3D3"; // Default light gray for unknown values
   
+          return (
+            <span
+              style={{
+                fontWeight: "bold",
+                color: "white",
+                textAlign: "center",
+                display: "inline-block",
+                borderRadius: "20px",
+                paddingLeft: "30px",
+                paddingRight: "30px",
+                minWidth: "150px",
+                lineHeight: "30px",
+                whiteSpace: "nowrap",
+                backgroundColor: backgroundColor
+              }}
+            >
+              {params.value}
+            </span>
+          );
+        },
+        editable: true,
+        width: 350,
+      },
+      {
+        headerName: "Receipt/Invoice Number",
+        field: "recinvNo",
+        width: 300,
+      },
+      // Conditionally include the "Delete" column based on the role
+      !["Site in-charge", "Finance"].includes(role) 
+        ? {
+            headerName: "Delete",
+            field: "delete",
+            width: 300,
+            cellRenderer: (params) => {
+              // Check if the role is NOT "Site in-charge" or "Finance"
+              if (["Site in-charge", "Finance"].includes(role)) {
+                return null; // If the role is "Site in-charge" or "Finance", don't show the button
+              }
+              
+              // Return a "Delete" button if the role is allowed
+              return (
+                <button
+                  onClick={() => this.handleDelete(params.data.id)} // Call the delete handler with row data
+                  style={{ backgroundColor: "#87CEEB", color: "#ffffff", borderRadius: "5px", width: "fit-content", fontWeight: "bold", height: "fit-content", margin: "auto"}}
+                >
+                  Delete
+                </button>
+              );
+            }
+          }
+        : null,
+    ].filter(Boolean); // Filter out null values if the "Delete" column is not included
+  };
 
+  handleDelete = async(id) =>
+  {
+    await this.props.generateDeleteConfirmationPopup(id);
+  }
+  
   getPaginatedDetails() {
     const { registerationDetails } = this.state;
     const { currentPage, entriesPerPage } = this.props;
@@ -1108,8 +1146,8 @@ class RegistrationPaymentSection extends Component {
         {
           this.props.showUpdatePopup("Updating in progress... Please wait ...");
           await axios.post(
-            //'http://localhost:3001/courseregistration', 
-            'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+            'http://localhost:3001/courseregistration', 
+            //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
             { 
               purpose: 'updatePaymentMethod', 
               id: id, 
@@ -1122,8 +1160,8 @@ class RegistrationPaymentSection extends Component {
           if(newValue === "Cash" || newValue === "PayNow")
           {
               const response = await axios.post(
-               //'http://localhost:3001/courseregistration', 
-                'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+               'http://localhost:3001/courseregistration', 
+                //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
                 { 
                   purpose: 'updatePaymentStatus', 
                   id: id, 
@@ -1155,8 +1193,8 @@ class RegistrationPaymentSection extends Component {
           this.props.showUpdatePopup("Updating in progress... Please wait ...")
           console.log('Cell clicked', event);
           const response = await axios.post(
-              //'http://localhost:3001/courseregistration', 
-              'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+              'http://localhost:3001/courseregistration', 
+              //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
               { 
                 purpose: 'updateConfirmationStatus', 
                 id: id, 
@@ -1172,8 +1210,8 @@ class RegistrationPaymentSection extends Component {
                 console.log("Auto Generate SkillsFuture Invoice");
                 // Define the parallel tasks function
                 const response = await axios.post(
-                  //'http://localhost:3001/courseregistration', 
-                  'https://moses-ecss-backend.azurewebsites.net/courseregistration',
+                  'http://localhost:3001/courseregistration', 
+                  //'https://moses-ecss-backend.azurewebsites.net/courseregistration',
                   { 
                     purpose: 'updatePaymentStatus', 
                     id: id, 
@@ -1207,8 +1245,8 @@ class RegistrationPaymentSection extends Component {
           this.props.showUpdatePopup("Updating in progress... Please wait ...")
           console.log('Cell clicked', event);
             const response = await axios.post(
-              //'http://localhost:3001/courseregistration', 
-              'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
+              'http://localhost:3001/courseregistration', 
+              //'https://moses-ecss-backend.azurewebsites.net/courseregistration', 
               { 
                 purpose: 'updatePaymentStatus', 
                 id: id, 
@@ -1335,7 +1373,8 @@ class RegistrationPaymentSection extends Component {
 
  // componentDidUpdate is called after the component has updated (re-rendered)
   componentDidUpdate(prevProps, prevState) {
-    const { selectedLocation, selectedCourseName, searchQuery } = this.props;
+    const { selectedLocation, selectedCourseName, searchQuery, confirmSignal } = this.props;
+    console.log("confirmSignal:",   confirmSignal);
 
     // Check if the relevant props have changed
     if (
@@ -1347,7 +1386,6 @@ class RegistrationPaymentSection extends Component {
       this.filterRegistrationDetails();
     }
   }
-
 
   filterRegistrationDetails() {
     const { section, selectedLocation, selectedCourseName, searchQuery } = this.props;

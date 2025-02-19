@@ -16,10 +16,10 @@
   font-size: 1.5rem; /* Adjust font size for smaller screens */
 }
 
-/* Table wrapper with responsive adjustments */
+/* Table wrapper wit responsive adjstments */
 .course-table-wrapper {
   width: 100%; /* Full width for smaller screens */
-  max-width: 1340px;
+  max-width: 1430px;
   overflow: auto;
   margin: 0 auto; /* Center the table */
   height: 50vh;

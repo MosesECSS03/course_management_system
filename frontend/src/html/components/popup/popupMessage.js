@@ -477,7 +477,7 @@ class Popup extends Component {
       alert("An error occurred while submitting the form. Please try again.");
     }
   };
-  
+
   render() {
     const workStatusOptions = [
       { label: 'Retired 退休', value: 'Retired 退休' },
@@ -726,7 +726,16 @@ class Popup extends Component {
             <div className="edit-message">
             <p>{message}</p>
           </div>
-          ):(
+          ):type === "confirmation" ? (
+            <div className="confirmation-message">
+              <p>{message}</p>
+              <div className="confirmation-buttons">
+                <button onClick={() => this.props.handleConfirm(this.props.id)} className="confirm-btn">Confirm</button>
+                <button onClick={this.cancel} className="cancel-btn">Cancel</button>
+              </div>
+            </div>
+          )
+          :(
             // Default layout for other types (like "message")
             <>  
             </>

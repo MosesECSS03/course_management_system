@@ -156,6 +156,35 @@ class RegistrationController {
         }    
     }
 
+    async deleteParticipant(id)
+    {
+        try {
+            // Connect to the database
+            var result = await this.databaseConnectivity.initialize();
+            console.log("Database Connectivity:", result);
+
+            if(result === "Connected to MongoDB Atlas!")
+            {
+                var databaseName = "Courses-Management-System"; 
+                var collectionName = "Registration Forms"
+                var connectedDatabase = await this.databaseConnectivity.deleteFromParticipant(databaseName, collectionName, id);  
+                return connectedDatabase.acknowledged;
+                //console.log("Deleted Participants:", connectedDatabase);
+            }
+        } 
+        catch (error) 
+        {
+            return {
+                success: false,
+                message: "Error updating user",
+                error: error
+            };
+        }
+        finally {
+            await this.databaseConnectivity.close(); // Ensure the connection is closed
+        }    
+    }
+
     async updateOfficialUse(id, name, date, time, status)
     {
         try {

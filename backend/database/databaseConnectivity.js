@@ -786,6 +786,29 @@ class DatabaseConnectivity {
         }
     }
 
+    async deleteFromParticipant(databaseName, collectionName, id)
+     {
+        const db = this.client.db(databaseName);
+        const table = db.collection(collectionName);
+    
+        try {
+            const filter = { 
+                _id: new ObjectId(id) }; // Find document by ID
+            const result = await table.deleteOne(filter);
+    
+            if (result.deletedCount === 1) {
+                console.log("Successfully deleted the document.");
+                return { success: true, message: "Document deleted successfully." };
+            } else {
+                console.log("No document found with that ID.");
+                return { success: false, message: "No document found with that ID." };
+            }
+        } catch (error) {
+            console.log("Error deleting document:", error);
+            return { success: false, error };
+        }
+    }
+
     async deleteAccessRights(databaseName, collectionName, id) {
         const db = this.client.db(databaseName);
         const table = db.collection(collectionName);

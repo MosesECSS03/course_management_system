@@ -41,7 +41,7 @@ router.post('/', async function(req, res, next)
         var participantsParticulars = req.body.participantDetails;
         
         var controller = new RegistrationController();
-        participantsParticulars.registrationDate = this.getCurrentDateTime().date;
+        participantsParticulars.registrationDate = getCurrentDateTime().date;
         participantsParticulars.official = {
             name: "", // You can set a default or dynamic value
             date: "", // You can set this to the current date using new Date() or any format
@@ -59,6 +59,14 @@ router.post('/', async function(req, res, next)
         console.log("Retrieve From Database")
         var controller = new RegistrationController();
         var result = await controller.allParticipants(role, siteIC);
+        //console.log("Retrieve Registration Records:", result);
+        return res.json({"result": result}); 
+    }
+    else if(req.body.purpose === "delete")
+    {
+        var {id} = req.body;
+        var controller = new RegistrationController();
+        var result = await controller.deleteParticipant(id);
         //console.log("Retrieve Registration Records:", result);
         return res.json({"result": result}); 
     }
