@@ -534,6 +534,7 @@ class DatabaseConnectivity {
     async getNextReceiptNumber(databaseName, collectionName, courseLocation, centreLocation) {
         const db = this.client.db(databaseName);
         const collection = db.collection(collectionName);
+        console.log("Locations:", courseLocation, centreLocation);
     
         // Get the current two-digit year (e.g., 2025 -> "25")
         var currentYear = new Date().getFullYear().toString().slice(-2);
@@ -544,31 +545,36 @@ class DatabaseConnectivity {
             receiptNo: { $regex: `^${courseLocation}` },  // Match all receipts starting with courseLocation
             location: centreLocation                      // Filter by centre location
         }).toArray();
+
+        console.log("Existing Receipts:", existingReceipts);
     
-        // Filter receipts to get only those from the current year
-        const validReceipts = existingReceipts.filter(receipt => {
-            const regex = new RegExp(`^${courseLocation}\\d+/(${currentYear})$`);
-            return regex.test(receipt.receiptNo);
-        });
-    
-        // Get the current year's receipt numbers for the specific location (centreLocation)
-        const centreReceiptNumbers = validReceipts.map(receipt => {
-            // Match format: ECSS/SFC/037/2024 or XXX - 0001
-            const regex = new RegExp(`^${courseLocation}(\\d+)(?:/\\d+| - \\d+)$`);
-            const match = receipt.receiptNo.match(regex);
-            return match ? parseInt(match[1], 10) : null;
-        }).filter(num => num !== null);
+
     
         let formattedReceiptNumber;
     
         // First, handle the SkillsFuture Invoice Number
-        if (courseLocation.startsWith("ECSS/SFC/")) {
+        if (courseLocation.startsWith("ECSS/SFC/")) 
+            {
+            // Filter receipts to get only those from the current year
+            const validReceipts = existingReceipts.filter(receipt => {
+                const regex = new RegExp(`^${courseLocation}\\d+/(${currentYear})$`);
+                return regex.test(receipt.receiptNo);
+            });
+        
+            // Get the current year's receipt numbers for the specific location (centreLocation)
+            const centreReceiptNumbers = validReceipts.map(receipt => {
+                // Match format: ECSS/SFC/037/2024 or XXX - 0001
+                const regex = new RegExp(`^${courseLocation}(\\d+)(?:/\\d+| - \\d+)$`);
+                const match = receipt.receiptNo.match(regex);
+                return match ? parseInt(match[1], 10) : null;
+            }).filter(num => num !== null);
             formattedReceiptNumber = this.getNextReceiptNumberForSkillsFuture(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
         } 
         else 
         {
+            console.log("Get Next Number For Receipt (PayNow or Cash)");
             // Default logic for other locations
-            formattedReceiptNumber = this.getNextReceiptNumberForPayNowCash(courseLocation, centreReceiptNumbers, centreLocation, currentYear);
+            formattedReceiptNumber = this.getNextReceiptNumberForPayNowCash(courseLocation, existingReceipts, centreLocation, currentYear);
         }
 
         return formattedReceiptNumber;
@@ -619,21 +625,37 @@ class DatabaseConnectivity {
     }
     
     
-    getNextReceiptNumberForPayNowCash(courseLocation, centreReceiptNumbers, centreLocation, currentYear) {
+    getNextReceiptNumberForPayNowCash(courseLocation, existingReceipts, centreLocation, currentYear) {
         let nextNumber;
     
-        // Handle specific logic for each centre location
+        console.log("Centre Receipt Number:", courseLocation, existingReceipts, centreLocation, currentYear);
+
+         // Filter the existing receipts based on the location
+        const filteredReceipts = existingReceipts.filter(receipt => receipt.location === centreLocation);
+        console.log("Filtered Receipts for Centre Location:", filteredReceipts);
+
+        // Extract the numeric part of the receiptNo (before the "-") and get the numbers
+        const centreReceiptNumbers = filteredReceipts.map(receipt => {
+                const receiptNumberMatch = receipt.receiptNo.split(" - ")[1]; // Split by " - " and get the number part
+                return receiptNumberMatch ? parseInt(receiptNumberMatch, 10) : null;
+            }).filter(num => num !== null);
+
+        console.log("Centre Receipt Numbers11:", centreReceiptNumbers);
+
+        const maxReceiptNumber = existingReceipts.length > 0 ? Math.max(...centreReceiptNumbers) : 0;
+        console.log("Latest Receipt Numbers:", maxReceiptNumber);
+       // Handle specific logic for each centre location
         if (centreLocation === "Tampines 253 Centre") {
             // Custom logic for Tampines 253 Centre
-            nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+            nextNumber =  maxReceiptNumber + 1;
         } 
         else if (centreLocation === "Pasir Ris West Centre") {
             // Custom logic for Pasir Ris West Centre
-            nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+            nextNumber =  maxReceiptNumber + 1;
         } 
         else if (centreLocation === "CT Hub") {
             // For CT Hub, it uses the same logic as the others
-            nextNumber = centreReceiptNumbers.length > 0 ? Math.max(...centreReceiptNumbers) + 1 : 1;
+            nextNumber =  maxReceiptNumber + 1;
         } 
     
         // Determine the length of the next number based on the nextNumber value

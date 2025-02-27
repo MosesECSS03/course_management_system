@@ -139,8 +139,8 @@ class RegistrationController {
             {
                 var databaseName = "Courses-Management-System";
                 var connectedDatabase = await this.databaseConnectivity.updateReceiptNumberData(databaseName, id, receiptNo);  
-                //return connectedDatabase.acknowledged;
-                console.log(connectedDatabase);
+                return connectedDatabase.acknowledged;
+                //console.log(connectedDatabase);
             }
         } 
         catch (error) 
