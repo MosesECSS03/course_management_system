@@ -15,6 +15,8 @@ var receiptRouter = require("./routes/receipt");
 var invoiceRouter = require("./routes/invoice");
 var singpassRouter = require("./routes/singpass");
 
+
+//ok
 var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
