@@ -139,7 +139,7 @@ class FormPage extends Component {
     var residentalStatus = formData.rESIDENTIALSTATUS;
     var race = formData.rACE;
     var gender = formData.gENDER;
-    var dateOfBirth = formData.dOB.formattedDate;
+    var dateOfBirth = typeof formData.dOB === 'string' ? formData.dOB : formData.dOB.formattedDate;
     var contactNumber = formData.cNO;
     var email = formData.eMAIL;
     var postalCode = formData.postalCode;
