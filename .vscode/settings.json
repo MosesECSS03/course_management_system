@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "undefined/subscriptions/d18cfb44-26a0-42aa-9024-3e1e7a1c356f/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/ecss-course-management-system",
-    "appService.deploySubpath": "."
-}
