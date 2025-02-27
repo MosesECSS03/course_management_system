@@ -16,7 +16,6 @@ var invoiceRouter = require("./routes/invoice");
 var singpassRouter = require("./routes/singpass");
 
 var app = express();
-//ok
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
