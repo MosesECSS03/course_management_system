@@ -13,6 +13,7 @@ var accountDetailsRouter = require("./routes/accountDetails");
 var accessRightsRouter = require("./routes/accessRights");
 var receiptRouter = require("./routes/receipt");
 var invoiceRouter = require("./routes/invoice");
+var singpassRouter = require("./routes/singpass");
 
 var app = express();
 
@@ -40,7 +41,7 @@ app.use("/accountDetails", accountDetailsRouter);
 app.use("/accessRights", accessRightsRouter);
 app.use("/receipt", receiptRouter);
 app.use("/invoice", invoiceRouter);
-
+app.use("/singpass", singpassRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
