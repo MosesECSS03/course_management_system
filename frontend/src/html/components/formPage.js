@@ -133,7 +133,7 @@ class FormPage extends Component {
   handleSubmit = () => {
     const { formData } = this.state;
 
-    // Participants Detailsok
+    // Participants Details
     var name = formData.pName;
     var nric = formData.nRIC;
     var residentalStatus = formData.rESIDENTIALSTATUS;
